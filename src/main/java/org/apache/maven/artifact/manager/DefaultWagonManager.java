@@ -388,6 +388,7 @@ public class DefaultWagonManager
         failIfNotOnline();
 
         ArtifactRepository mirror = getMirror( repository.getId() );
+
         if ( mirror != null )
         {
             repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
@@ -396,7 +397,9 @@ public class DefaultWagonManager
         }
 
         String protocol = repository.getProtocol();
+
         Wagon wagon;
+
         try
         {
             wagon = getWagon( protocol );
@@ -415,10 +418,13 @@ public class DefaultWagonManager
 
         // TODO: configure on repository
         int i = 0;
+
         ChecksumObserver md5ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
+
         ChecksumObserver sha1ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
 
         File temp = new File( destination + ".tmp" );
+
         temp.deleteOnExit();
 
         boolean downloaded = false;
@@ -710,10 +716,12 @@ public class DefaultWagonManager
     public ArtifactRepository getMirror( String mirrorOf )
     {
         ArtifactRepository repository = (ArtifactRepository) mirrors.get( mirrorOf );
+
         if ( repository == null )
         {
             repository = (ArtifactRepository) mirrors.get( WILDCARD );
         }
+
         return repository;
     }
 

@@ -311,14 +311,9 @@ public class DefaultArtifactCollectorTest
 
         b.addDependency( "c", "[1.0,2.0]" );
 
-        try
-        {
-            ArtifactResolutionResult res = collect( a );
-            fail( "Should not succeed collecting, got: " + res.getArtifacts() );
-        }
-        catch ( ArtifactResolutionException expected )
-        {
-        }
+        ArtifactResolutionResult res = collect( a );
+
+        assertTrue( res.hasVersionRangeViolations() );
     }
 
     public void testUnboundedRangeWhenVersionUnavailable()
@@ -329,15 +324,9 @@ public class DefaultArtifactCollectorTest
         a.addDependency( "c", "[2.0,]" );
         b.addDependency( "c", "[1.0,]" );
 
-        try
-        {
-            ArtifactResolutionResult res = collect( a );
-            fail( "Should not succeed collecting, got: " + res.getArtifacts() );
-        }
-        catch ( ArtifactResolutionException expected )
-        {
-            assertTrue( true );
-        }
+        ArtifactResolutionResult res = collect( a );
+
+        assertTrue( res.hasVersionRangeViolations() );        
     }
 
     public void testUnboundedRangeBelowLastRelease()
@@ -362,15 +351,9 @@ public class DefaultArtifactCollectorTest
         createArtifactSpec( "c", "2.0" );
         a.addDependency( "c", "[10.0,)" );
 
-        try
-        {
-            ArtifactResolutionResult res = collect( a );
-            fail( "Should not succeed collecting, got: " + res.getArtifacts() );
-        }
-        catch ( ArtifactResolutionException expected )
-        {
-            assertTrue( true );
-        }
+        ArtifactResolutionResult res = collect( a );
+
+        assertTrue( res.hasVersionRangeViolations() );
     }
 
     public void testResolveManagedVersion()
@@ -675,6 +658,11 @@ public class DefaultArtifactCollectorTest
         a.addDependency( "b", "[1.0,)" );
         createArtifactSpec( "b", "1.0-SNAPSHOT" );
 
+        ArtifactResolutionResult res = collect( a );
+
+        assertTrue( res.hasVersionRangeViolations() );
+
+        /*
         try
         {
             ArtifactResolutionResult res = collect( a );
@@ -684,6 +672,7 @@ public class DefaultArtifactCollectorTest
         {
             assertTrue( e.getMessage().indexOf( "[1.0-SNAPSHOT]" ) < e.getMessage().indexOf( "[1.0,)" ) );
         }
+        */
     }
 
     private Artifact getArtifact( String id, Set artifacts )

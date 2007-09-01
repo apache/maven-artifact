@@ -41,7 +41,9 @@ public interface ArtifactResolver
 {
     String ROLE = ArtifactResolver.class.getName();
 
-    void resolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void resolve( Artifact artifact,
+                  List remoteRepositories,
+                  ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts,
@@ -80,7 +82,8 @@ public interface ArtifactResolver
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
                                                   List remoteRepositories,
-                                                  ArtifactMetadataSource source, ArtifactFilter filter )
+                                                  ArtifactMetadataSource source,
+                                                  ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     ArtifactResolutionResult resolveTransitively( Set artifacts,
@@ -93,6 +96,12 @@ public interface ArtifactResolver
                                                   List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    void resolveAlways( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void resolveAlways( Artifact artifact,
+                        List remoteRepositories,
+                        ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
+
+    // New API
+
+    ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 }

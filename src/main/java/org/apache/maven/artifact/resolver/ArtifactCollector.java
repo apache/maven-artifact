@@ -39,11 +39,9 @@ public interface ArtifactCollector
 {
     ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, ArtifactRepository localRepository,
                                       List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter,
-                                      List listeners )
-        throws ArtifactResolutionException;
+                                      List listeners );
 
     ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                       ArtifactRepository localRepository, List remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter, List listeners )
-        throws ArtifactResolutionException;
+                                      ArtifactMetadataSource source, ArtifactFilter filter, List listeners );
 }
