@@ -39,6 +39,8 @@ public class ArtifactResolutionRequest
     private ArtifactMetadataSource metadataSource;
 
     private Map managedVersionMap;
+    
+    private List conflictResolvers;
 
     public Artifact getArtifact()
     {
@@ -193,6 +195,18 @@ public class ArtifactResolutionRequest
     {
         this.managedVersionMap = managedVersionMap;
 
+        return this;
+    }
+    
+    public List getConflictResolvers()
+    {
+        return conflictResolvers;
+    }
+    
+    public ArtifactResolutionRequest setConflictResolvers( List conflictResolvers )
+    {
+        this.conflictResolvers = conflictResolvers;
+        
         return this;
     }
 

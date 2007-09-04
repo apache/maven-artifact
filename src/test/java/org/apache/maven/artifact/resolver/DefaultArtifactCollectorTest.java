@@ -71,7 +71,7 @@ public class DefaultArtifactCollectorTest
 
         this.source = new Source();
         this.artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-        this.artifactCollector = new DefaultArtifactCollector();
+        this.artifactCollector = (ArtifactCollector) lookup( ArtifactCollector.ROLE );
 
         this.projectArtifact = createArtifactSpec( "project", "1.0", null );
     }

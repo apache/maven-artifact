@@ -20,10 +20,14 @@ package org.apache.maven.artifact.resolver.conflict;
  */
 
 /**
+ * The default conflict resolver that delegates to the nearest strategy.
+ * 
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
+ * @see NearestConflictResolver
+ * @deprecated As of 3.0, use a specific implementation instead, e.g. {@link NearestConflictResolver}
  */
 public class DefaultConflictResolver
-    implements ConflictResolver
+    extends NearestConflictResolver
 {
 }

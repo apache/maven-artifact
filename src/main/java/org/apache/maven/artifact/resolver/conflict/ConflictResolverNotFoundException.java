@@ -19,29 +19,32 @@ package org.apache.maven.artifact.resolver.conflict;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.ResolutionNode;
-
 /**
- * Determines which version of an artifact to use when there are conflicting declarations.
+ * Indicates that a specified conflict resolver implementation could not be found.
  * 
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
+ * @since 3.0
  */
-public interface ConflictResolver
+public class ConflictResolverNotFoundException extends Exception
 {
-    static String ROLE = ConflictResolver.class.getName();
+    // constants --------------------------------------------------------------
 
     /**
-     * Determines which of the specified versions of an artifact to use when there are conflicting declarations.
-     * 
-     * @param node1
-     *            the first artifact declaration
-     * @param node2
-     *            the second artifact declaration
-     * @return the artifact declaration to use: <code>node1</code>; <code>node2</code>; or <code>null</code>if
-     *         this conflict cannot be resolved
-     * @since 3.0
+     * The serial version ID.
      */
-    ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 );
+    private static final long serialVersionUID = 3372412184339653914L;
+
+    // constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new <code>ConflictResolverNotFoundException</code> with the specified message.
+     * 
+     * @param message
+     *            the message
+     */
+    public ConflictResolverNotFoundException( String message )
+    {
+        super( message );
+    }
 }
