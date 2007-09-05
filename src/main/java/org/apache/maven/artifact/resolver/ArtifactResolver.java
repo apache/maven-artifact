@@ -33,19 +33,21 @@ import java.util.Set;
  * downloaded. I am just asking LocalRepository for given artifact and I don't
  * care if it is alredy there or how it will get there.
  *
- * @author <a href="michal.maczka@dimatics.com">Michal Maczka </a>
+ * @author Michal Maczka
+ * @author Jason van Zyl
  * @version $Id$
- * @todo possibly fix the signatures, it's unfortunate that in some methods the local repo is listed first and second in others.
  */
 public interface ArtifactResolver
 {
     String ROLE = ArtifactResolver.class.getName();
 
+    /** @deprecated */
     void resolve( Artifact artifact,
                   List remoteRepositories,
                   ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /** @deprecated */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   List remoteRepositories,
@@ -53,6 +55,7 @@ public interface ArtifactResolver
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /** @deprecated */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   List remoteRepositories,
@@ -61,6 +64,7 @@ public interface ArtifactResolver
                                                   List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /** @deprecated */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   ArtifactRepository localRepository,
@@ -69,6 +73,7 @@ public interface ArtifactResolver
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /** @deprecated */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -77,6 +82,7 @@ public interface ArtifactResolver
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /** @deprecated */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -86,6 +92,7 @@ public interface ArtifactResolver
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /** @deprecated */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -96,6 +103,7 @@ public interface ArtifactResolver
                                                   List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /** @deprecated */
     void resolveAlways( Artifact artifact,
                         List remoteRepositories,
                         ArtifactRepository localRepository )
