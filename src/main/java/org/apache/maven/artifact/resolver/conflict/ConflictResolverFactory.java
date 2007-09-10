@@ -19,29 +19,33 @@ package org.apache.maven.artifact.resolver.conflict;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.ResolutionNode;
-
 /**
- * Determines which version of an artifact to use when there are conflicting declarations.
+ * A factory that produces conflict resolvers of various types.
  * 
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
+ * @since 3.0
+ * @see ConflictResolver
  */
-public interface ConflictResolver
+public interface ConflictResolverFactory
 {
-    static String ROLE = ConflictResolver.class.getName();
-
+    // constants --------------------------------------------------------------
+    
     /**
-     * Determines which of the specified versions of an artifact to use when there are conflicting declarations.
-     * 
-     * @param node1
-     *            the first artifact declaration
-     * @param node2
-     *            the second artifact declaration
-     * @return the artifact declaration to use: <code>node1</code>; <code>node2</code>; or <code>null</code>if
-     *         this conflict cannot be resolved
-     * @since 3.0
+     * The plexus role for this component.
      */
-    ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 );
+    String ROLE = ConflictResolverFactory.class.getName();
+    
+    // methods ----------------------------------------------------------------
+    
+    /**
+     * Gets a conflict resolver of the specified type.
+     * 
+     * @param type
+     *            the type of conflict resolver to obtain
+     * @return the conflict resolver
+     * @throws ConflictResolverNotFoundException
+     *             if the specified type was not found
+     */
+    ConflictResolver getConflictResolver( String type ) throws ConflictResolverNotFoundException;
 }

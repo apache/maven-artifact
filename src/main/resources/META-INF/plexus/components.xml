@@ -216,8 +216,43 @@ under the License.
     <component>
       <role>org.apache.maven.artifact.resolver.ArtifactCollector</role>
       <implementation>org.apache.maven.artifact.resolver.DefaultArtifactCollector</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.conflict.ConflictResolver</role>
+        </requirement>
+      </requirements>
     </component>
     
+    <component>
+      <role>org.apache.maven.artifact.resolver.conflict.ConflictResolver</role>
+      <role-hint>default</role-hint>
+      <implementation>org.apache.maven.artifact.resolver.conflict.NearestConflictResolver</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.resolver.conflict.ConflictResolver</role>
+      <role-hint>nearest</role-hint>
+      <implementation>org.apache.maven.artifact.resolver.conflict.NearestConflictResolver</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.resolver.conflict.ConflictResolver</role>
+      <role-hint>farthest</role-hint>
+      <implementation>org.apache.maven.artifact.resolver.conflict.FarthestConflictResolver</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.resolver.conflict.ConflictResolver</role>
+      <role-hint>newest</role-hint>
+      <implementation>org.apache.maven.artifact.resolver.conflict.NewestConflictResolver</implementation>
+    </component>
+
+    <component>
+      <role>org.apache.maven.artifact.resolver.conflict.ConflictResolver</role>
+      <role-hint>oldest</role-hint>
+      <implementation>org.apache.maven.artifact.resolver.conflict.OldestConflictResolver</implementation>
+    </component>
+
     <!-- From maven-artifact-manager -->
     
     <!--
@@ -389,5 +424,15 @@ under the License.
       <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
     </component>    
     
+    <!--
+     |
+     | ConflictResolverFactory
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.resolver.conflict.ConflictResolverFactory</role>
+      <implementation>org.apache.maven.artifact.resolver.conflict.DefaultConflictResolverFactory</implementation>
+    </component>
+     
   </components>
 </component-set>

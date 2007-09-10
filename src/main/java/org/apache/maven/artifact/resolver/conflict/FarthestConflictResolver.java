@@ -22,26 +22,24 @@ package org.apache.maven.artifact.resolver.conflict;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 
 /**
- * Determines which version of an artifact to use when there are conflicting declarations.
+ * Resolves conflicting artifacts by always selecting the <em>farthest</em> declaration. Farthest is defined as the
+ * declaration that has the most transitive steps away from the project being built.
  * 
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
+ * @since 3.0
  */
-public interface ConflictResolver
+public class FarthestConflictResolver
+    implements ConflictResolver
 {
-    static String ROLE = ConflictResolver.class.getName();
-
-    /**
-     * Determines which of the specified versions of an artifact to use when there are conflicting declarations.
-     * 
-     * @param node1
-     *            the first artifact declaration
-     * @param node2
-     *            the second artifact declaration
-     * @return the artifact declaration to use: <code>node1</code>; <code>node2</code>; or <code>null</code>if
-     *         this conflict cannot be resolved
-     * @since 3.0
+    // ConflictResolver methods -----------------------------------------------
+    
+    /*
+     * @see org.apache.maven.artifact.resolver.conflict.ConflictResolver#resolveConflict(org.apache.maven.artifact.resolver.ResolutionNode,
+     *      org.apache.maven.artifact.resolver.ResolutionNode)
      */
-    ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 );
+    public ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 )
+    {
+        return node1.getDepth() >= node2.getDepth() ? node1 : node2;
+    }
 }

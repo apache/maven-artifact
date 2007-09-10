@@ -337,15 +337,6 @@ public class DefaultArtifactResolver
                                                          ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        // TODO: this is simplistic
-        List listeners = new ArrayList();
-        if ( getLogger().isDebugEnabled() )
-        {
-            listeners.add( new DebugResolutionListener( getLogger() ) );
-        }
-
-        listeners.add( new WarningResolutionListener( getLogger() ) );
-
         return resolveTransitively(
             artifacts,
             originatingArtifact,
@@ -354,8 +345,7 @@ public class DefaultArtifactResolver
             remoteRepositories,
             source,
             filter,
-            listeners );
-
+            null );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts,
@@ -404,6 +394,33 @@ public class DefaultArtifactResolver
                                                          List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
+        return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
+                                    remoteRepositories, source, filter, listeners, null );
+    }
+    
+    public ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                         Artifact originatingArtifact,
+                                                         Map managedVersions,
+                                                         ArtifactRepository localRepository,
+                                                         List remoteRepositories,
+                                                         ArtifactMetadataSource source,
+                                                         ArtifactFilter filter,
+                                                         List listeners,
+                                                         List conflictResolvers )
+        throws ArtifactResolutionException, ArtifactNotFoundException
+    {
+        if ( listeners == null )
+        {
+            // TODO: this is simplistic
+            listeners = new ArrayList();
+            if ( getLogger().isDebugEnabled() )
+            {
+                listeners.add( new DebugResolutionListener( getLogger() ) );
+            }
+
+            listeners.add( new WarningResolutionListener( getLogger() ) );
+        }
+
         ArtifactResolutionResult result;
 
         result = artifactCollector.collect(
@@ -414,7 +431,8 @@ public class DefaultArtifactResolver
             remoteRepositories,
             source,
             filter,
-            listeners );
+            listeners,
+            conflictResolvers );
 
         // We have collected all the problems so let's mimic the way the old code worked and just blow up right here.
         // That's right lets just let it rip right here and send a big incomprehensible blob of text at unsuspecting

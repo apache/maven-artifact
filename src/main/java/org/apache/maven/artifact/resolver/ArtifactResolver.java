@@ -103,6 +103,16 @@ public interface ArtifactResolver
                                                   List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
+    /**
+     * @since 3.0
+     * @deprecated
+     */
+    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
+                                                  ArtifactRepository localRepository, List remoteRepositories,
+                                                  ArtifactMetadataSource source, ArtifactFilter filter, List listeners,
+                                                  List conflictResolvers )
+        throws ArtifactResolutionException, ArtifactNotFoundException;
+    
     /** @deprecated */
     void resolveAlways( Artifact artifact,
                         List remoteRepositories,
