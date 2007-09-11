@@ -98,195 +98,197 @@ public class DefaultArtifactResolver
                           boolean force )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        if ( artifact != null )
+        if ( artifact == null )
         {
-            if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
-            {
-                File systemFile = artifact.getFile();
+            return;
+        }
 
-                if ( !systemFile.exists() )
-                {
-                    throw new ArtifactNotFoundException(
-                        "System artifact: " + artifact + " not found in path: " + systemFile,
-                        artifact );
-                }
-                else
-                {
-                    artifact.setResolved( true );
-                }
+        if ( Artifact.SCOPE_SYSTEM.equals( artifact.getScope() ) )
+        {
+            File systemFile = artifact.getFile();
+
+            if ( !systemFile.exists() )
+            {
+                throw new ArtifactNotFoundException(
+                    "System artifact: " + artifact + " not found in path: " + systemFile,
+                    artifact );
             }
-            else if ( !artifact.isResolved() )
+            else
             {
-                // ----------------------------------------------------------------------
-                // Check for the existence of the artifact in the specified local
-                // ArtifactRepository. If it is present then simply return as the
-                // request for resolution has been satisfied.
-                // ----------------------------------------------------------------------
+                artifact.setResolved( true );
+            }
+        }
+        else if ( !artifact.isResolved() )
+        {
+            // ----------------------------------------------------------------------
+            // Check for the existence of the artifact in the specified local
+            // ArtifactRepository. If it is present then simply return as the
+            // request for resolution has been satisfied.
+            // ----------------------------------------------------------------------
 
-                String localPath = localRepository.pathOf( artifact );
+            String localPath = localRepository.pathOf( artifact );
 
-                artifact.setFile(
-                    new File(
-                        localRepository.getBasedir(),
-                        localPath ) );
+            artifact.setFile(
+                new File(
+                    localRepository.getBasedir(),
+                    localPath ) );
 
-                transformationManager.transformForResolve(
-                    artifact,
-                    remoteRepositories,
-                    localRepository );
+            transformationManager.transformForResolve(
+                artifact,
+                remoteRepositories,
+                localRepository );
 
-                boolean localCopy = false;
+            boolean localCopy = false;
 
-                for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            {
+                ArtifactMetadata m = (ArtifactMetadata) i.next();
+
+                if ( m instanceof SnapshotArtifactRepositoryMetadata )
                 {
-                    ArtifactMetadata m = (ArtifactMetadata) i.next();
+                    SnapshotArtifactRepositoryMetadata snapshotMetadata = (SnapshotArtifactRepositoryMetadata) m;
 
-                    if ( m instanceof SnapshotArtifactRepositoryMetadata )
+                    Metadata metadata = snapshotMetadata.getMetadata();
+
+                    if ( metadata != null )
                     {
-                        SnapshotArtifactRepositoryMetadata snapshotMetadata = (SnapshotArtifactRepositoryMetadata) m;
+                        Versioning versioning = metadata.getVersioning();
 
-                        Metadata metadata = snapshotMetadata.getMetadata();
-
-                        if ( metadata != null )
+                        if ( versioning != null )
                         {
-                            Versioning versioning = metadata.getVersioning();
+                            Snapshot snapshot = versioning.getSnapshot();
 
-                            if ( versioning != null )
+                            if ( snapshot != null )
                             {
-                                Snapshot snapshot = versioning.getSnapshot();
-
-                                if ( snapshot != null )
-                                {
-                                    localCopy = snapshot.isLocalCopy();
-                                }
+                                localCopy = snapshot.isLocalCopy();
                             }
                         }
                     }
                 }
+            }
 
-                File destination = artifact.getFile();
+            File destination = artifact.getFile();
 
-                List repositories = remoteRepositories;
+            List repositories = remoteRepositories;
 
-                // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
-                if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
-                    destination.exists() && !localCopy )
+            // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
+            if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
+                destination.exists() && !localCopy )
+            {
+                Date comparisonDate = new Date( destination.lastModified() );
+
+                // cull to list of repositories that would like an update
+                repositories = new ArrayList( remoteRepositories );
+                for ( Iterator i = repositories.iterator(); i.hasNext(); )
                 {
-                    Date comparisonDate = new Date( destination.lastModified() );
+                    ArtifactRepository repository = (ArtifactRepository) i.next();
 
-                    // cull to list of repositories that would like an update
-                    repositories = new ArrayList( remoteRepositories );
-                    for ( Iterator i = repositories.iterator(); i.hasNext(); )
+                    ArtifactRepositoryPolicy policy = repository.getSnapshots();
+
+                    if ( !policy.isEnabled() || !policy.checkOutOfDate( comparisonDate ) )
                     {
-                        ArtifactRepository repository = (ArtifactRepository) i.next();
-
-                        ArtifactRepositoryPolicy policy = repository.getSnapshots();
-
-                        if ( !policy.isEnabled() || !policy.checkOutOfDate( comparisonDate ) )
-                        {
-                            i.remove();
-                        }
-                    }
-
-                    if ( !repositories.isEmpty() )
-                    {
-                        // someone wants to check for updates
-                        force = true;
+                        i.remove();
                     }
                 }
-                boolean resolved = false;
-                if ( !destination.exists() || force )
+
+                if ( !repositories.isEmpty() )
                 {
-                    if ( !wagonManager.isOnline() )
-                    {
-                        throw new ArtifactNotFoundException(
-                            "System is offline.",
-                            artifact );
-                    }
+                    // someone wants to check for updates
+                    force = true;
+                }
+            }
+            boolean resolved = false;
+            if ( !destination.exists() || force )
+            {
+                if ( !wagonManager.isOnline() )
+                {
+                    throw new ArtifactNotFoundException(
+                        "System is offline.",
+                        artifact );
+                }
 
-                    try
+                try
+                {
+                    // TODO: force should be passed to the wagon manager
+                    if ( artifact.getRepository() != null )
                     {
-                        // TODO: force should be passed to the wagon manager
-                        if ( artifact.getRepository() != null )
-                        {
-                            // the transformations discovered the artifact - so use it exclusively
-                            wagonManager.getArtifact(
-                                artifact,
-                                artifact.getRepository() );
-                        }
-                        else
-                        {
-                            wagonManager.getArtifact(
-                                artifact,
-                                repositories );
-                        }
-
-                        if ( !artifact.isResolved() && !destination.exists() )
-                        {
-                            throw new ArtifactResolutionException(
-                                "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
-                                artifact,
-                                remoteRepositories );
-                        }
-                    }
-                    catch ( ResourceDoesNotExistException e )
-                    {
-                        throw new ArtifactNotFoundException(
-                            e.getMessage(),
+                        // the transformations discovered the artifact - so use it exclusively
+                        wagonManager.getArtifact(
                             artifact,
-                            remoteRepositories,
-                            e );
+                            artifact.getRepository() );
                     }
-                    catch ( TransferFailedException e )
+                    else
+                    {
+                        wagonManager.getArtifact(
+                            artifact,
+                            repositories );
+                    }
+
+                    if ( !artifact.isResolved() && !destination.exists() )
                     {
                         throw new ArtifactResolutionException(
-                            e.getMessage(),
+                            "Failed to resolve artifact, possibly due to a repository list that is not appropriately equipped for this artifact's metadata.",
+                            artifact,
+                            remoteRepositories );
+                    }
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    throw new ArtifactNotFoundException(
+                        e.getMessage(),
+                        artifact,
+                        remoteRepositories,
+                        e );
+                }
+                catch ( TransferFailedException e )
+                {
+                    throw new ArtifactResolutionException(
+                        e.getMessage(),
+                        artifact,
+                        remoteRepositories,
+                        e );
+                }
+
+                resolved = true;
+            }
+            else if ( destination.exists() )
+            {
+                // locally resolved...no need to hit the remote repo.
+                artifact.setResolved( true );
+            }
+
+            if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
+            {
+                String version = artifact.getVersion();
+
+                artifact.selectVersion( artifact.getBaseVersion() );
+
+                File copy = new File(
+                    localRepository.getBasedir(),
+                    localRepository.pathOf( artifact ) );
+
+                if ( resolved || !copy.exists() )
+                {
+                    // recopy file if it was reresolved, or doesn't exist.
+                    try
+                    {
+                        FileUtils.copyFile(
+                            destination,
+                            copy );
+                    }
+                    catch ( IOException e )
+                    {
+                        throw new ArtifactResolutionException(
+                            "Unable to copy resolved artifact for local use: " + e.getMessage(),
                             artifact,
                             remoteRepositories,
                             e );
                     }
-
-                    resolved = true;
-                }
-                else if ( destination.exists() )
-                {
-                    // locally resolved...no need to hit the remote repo.
-                    artifact.setResolved( true );
                 }
 
-                if ( artifact.isSnapshot() && !artifact.getBaseVersion().equals( artifact.getVersion() ) )
-                {
-                    String version = artifact.getVersion();
+                artifact.setFile( copy );
 
-                    artifact.selectVersion( artifact.getBaseVersion() );
-
-                    File copy = new File(
-                        localRepository.getBasedir(),
-                        localRepository.pathOf( artifact ) );
-
-                    if ( resolved || !copy.exists() )
-                    {
-                        // recopy file if it was reresolved, or doesn't exist.
-                        try
-                        {
-                            FileUtils.copyFile(
-                                destination,
-                                copy );
-                        }
-                        catch ( IOException e )
-                        {
-                            throw new ArtifactResolutionException(
-                                "Unable to copy resolved artifact for local use: " + e.getMessage(),
-                                artifact,
-                                remoteRepositories,
-                                e );
-                        }
-                    }
-
-                    artifact.setFile( copy );
-
-                    artifact.selectVersion( version );
-                }
+                artifact.selectVersion( version );
             }
         }
     }
