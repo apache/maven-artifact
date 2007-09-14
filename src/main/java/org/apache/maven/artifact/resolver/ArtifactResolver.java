@@ -41,13 +41,13 @@ public interface ArtifactResolver
 {
     String ROLE = ArtifactResolver.class.getName();
 
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     void resolve( Artifact artifact,
                   List remoteRepositories,
                   ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   List remoteRepositories,
@@ -55,7 +55,7 @@ public interface ArtifactResolver
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   List remoteRepositories,
@@ -64,7 +64,7 @@ public interface ArtifactResolver
                                                   List listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   ArtifactRepository localRepository,
@@ -73,7 +73,7 @@ public interface ArtifactResolver
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -82,7 +82,7 @@ public interface ArtifactResolver
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -92,7 +92,7 @@ public interface ArtifactResolver
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -105,7 +105,7 @@ public interface ArtifactResolver
 
     /**
      * @since 3.0
-     * @deprecated
+     * @deprecated use {@link #resolve(ArtifactResolutionRequest)}
      */
     ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
                                                   ArtifactRepository localRepository, List remoteRepositories,
@@ -113,7 +113,7 @@ public interface ArtifactResolver
                                                   List conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException;
     
-    /** @deprecated */
+    /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     void resolveAlways( Artifact artifact,
                         List remoteRepositories,
                         ArtifactRepository localRepository )
@@ -121,5 +121,8 @@ public interface ArtifactResolver
 
     // New API
 
+    /**
+     * @since 3.0
+     */
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 }
