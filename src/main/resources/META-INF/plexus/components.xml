@@ -370,6 +370,28 @@ under the License.
 
     <!--
      |
+     | MetadataResolver
+     |
+     -->
+    <component>
+      <role>org.apache.maven.artifact.resolver.metadata.MetadataResolver</role>
+      <implementation>org.apache.maven.artifact.resolver.metadata.DefaultMetadataResolver</implementation>
+      <role-hint>default</role-hint>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.artifact.resolver.ArtifactResolver</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.factory.ArtifactFactory</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.artifact.metadata.ArtifactMetadataSource</role>
+        </requirement>
+      </requirements>
+    </component>
+
+    <!--
+     |
      | ArtifactInstaller
      |
      -->
