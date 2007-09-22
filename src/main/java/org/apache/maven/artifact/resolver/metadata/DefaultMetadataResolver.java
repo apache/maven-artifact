@@ -26,6 +26,7 @@ implements MetadataResolver
     throws MetadataResolutionException
     {
 		try {
+			getLogger().debug("Received request for: "+req.getQuery() );
 			MetadataResolutionResult res = new MetadataResolutionResult();
 			if( req.type == null ) {
 				throw new MetadataResolutionException("no type in the request");
@@ -69,15 +70,24 @@ getLogger().debug("resolveMetadata request:"
 		+ "\n> remoteRepos: "+req.getRemoteRepositories()
 		+ "\n> localRepo  : "+req.getLocalRepository()
 		);
-			ar.resolve( pomArtifact
-						, req.getRemoteRepositories()
-						, req.getLocalRepository()
-						);
+			
+			try {
+				ar.resolve( pomArtifact
+							, req.getRemoteRepositories()
+							, req.getLocalRepository()
+							);
+			} catch (  ArtifactResolutionException are ) {
+				pomArtifact.setResolved(false);
+			} catch( ArtifactNotFoundException anfe ) {
+				pomArtifact.setResolved(false);
+			}
+
 			if( pomArtifact.isResolved() ) {
 				ResolutionGroup rg = ams.retrieve( pomArtifact, req.getLocalRepository(), req.getRemoteRepositories() );
-				MetadataTreeNode node = new MetadataTreeNode( pomArtifact, parent, true );
+				MetadataTreeNode node = new MetadataTreeNode( pomArtifact, parent, true, query.getScope() );
 				Set<Artifact> dependencies = (Set<Artifact>)rg.getArtifacts();
-				if( dependencies != null && dependencies.size() > 0 ) {
+				if( dependencies != null && dependencies.size() > 0 )
+				{
 					ArrayList<MetadataTreeNode> kids = new ArrayList<MetadataTreeNode>( dependencies.size() );
 					for( Artifact a : dependencies ) {
 						req.query.init( a );
@@ -89,7 +99,7 @@ getLogger().debug("resolveMetadata request:"
 				return node;
 			}
 			else {
-				return new MetadataTreeNode( pomArtifact, parent, false );
+				return new MetadataTreeNode( pomArtifact, parent, false, query.getScope() );
 			}
 		} catch( Exception anyEx ) {
 			anyEx.printStackTrace();

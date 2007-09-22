@@ -3,6 +3,8 @@ package org.apache.maven.artifact.resolver.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
+import sun.security.action.GetLongAction;
+
 /** @author Oleg Gusakov */
 public class ArtifactMetadata
 {
@@ -12,6 +14,8 @@ public class ArtifactMetadata
 	protected String type;
 	protected ArtifactScopeEnum scope;
 	protected String classifier;
+
+	protected boolean resolved = false;
 	//------------------------------------------------------------------
 	public ArtifactMetadata( String groupId, String name, String version )
 	{
@@ -52,6 +56,8 @@ public class ArtifactMetadata
 		setType(af.getType());
 		setScope( af.getScope() );
 		setClassifier( af.getClassifier() );
+		
+		this.resolved = af.isResolved();
 	}
 	//------------------------------------------------------------------
 	@Override
@@ -89,8 +95,10 @@ public class ArtifactMetadata
 	public void setType(String type) {
 		this.type = type;
 	}
-	public ArtifactScopeEnum getScope() {
-		return scope;
+	
+	public ArtifactScopeEnum getScope()
+	{
+		return scope == null ? ArtifactScopeEnum.DEFAULT_SCOPE : scope;
 	}
 	public void setScope(ArtifactScopeEnum scope)
 	{
@@ -99,7 +107,7 @@ public class ArtifactMetadata
 	public void setScope(String scope)
 	{
 		this.scope = scope == null 
-				? ArtifactScopeEnum.compile
+				? ArtifactScopeEnum.DEFAULT_SCOPE
 				: ArtifactScopeEnum.valueOf(scope)
 				;
 	}
@@ -108,6 +116,14 @@ public class ArtifactMetadata
 	}
 	public void setClassifier(String classifier) {
 		this.classifier = classifier;
+	}
+	public boolean isResolved()
+	{
+		return resolved;
+	}
+	public void setResolved(boolean resolved)
+	{
+		this.resolved = resolved;
 	}
 	//------------------------------------------------------------------
 	//------------------------------------------------------------------

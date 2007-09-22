@@ -3,6 +3,7 @@ package org.apache.maven.artifact.resolver.metadata;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.ArtifactScopeEnum;
 
 public class MetadataTreeNode
 {
@@ -17,16 +18,19 @@ public class MetadataTreeNode
 	{
 	}
     //------------------------------------------------------------------------
-	public MetadataTreeNode( ArtifactMetadata md, MetadataTreeNode parent, boolean resolved )
+	public MetadataTreeNode( ArtifactMetadata md, MetadataTreeNode parent, boolean resolved, ArtifactScopeEnum scope )
 	{
+		if( md != null )
+			md.setScope(scope);
+
 		this.md = md;
 		this.parent = parent;
 		this.resolved = resolved;
 	}
     //------------------------------------------------------------------------
-	public MetadataTreeNode( Artifact af, MetadataTreeNode parent, boolean resolved )
+	public MetadataTreeNode( Artifact af, MetadataTreeNode parent, boolean resolved, ArtifactScopeEnum scope )
 	{
-		this( new ArtifactMetadata(af), parent, resolved );
+		this( new ArtifactMetadata(af), parent, resolved, scope );
 	}
     //------------------------------------------------------------------------
 	public void addChildren( List<MetadataTreeNode> kidList )

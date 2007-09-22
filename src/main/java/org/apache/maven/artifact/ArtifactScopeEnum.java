@@ -9,7 +9,8 @@ public enum ArtifactScopeEnum
     , system(5)
     ;
 
-	private int id;
+      public static final ArtifactScopeEnum DEFAULT_SCOPE = compile;
+      private int id;
 
 	// Constructor 
 	ArtifactScopeEnum( int id )
