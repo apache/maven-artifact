@@ -19,7 +19,10 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
+import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.codehaus.plexus.collections.ActiveMap;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,13 +38,53 @@ public class DefaultArtifactRepositoryFactory
 
     private String globalChecksumPolicy;
 
+    // FIXME: This is a non-ThreadLocal cache!!
     private final Map artifactRepositories = new HashMap();
+
+    private ActiveMap repositoryLayouts;
+
+    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
+                                                        String layoutId,
+                                                        boolean uniqueVersion )
+        throws UnknownRepositoryLayoutException
+    {
+        ArtifactRepositoryLayout layout;
+        try
+        {
+            layout = (ArtifactRepositoryLayout) repositoryLayouts.checkedGet( layoutId );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new UnknownRepositoryLayoutException( id, layoutId, e );
+        }
+
+        return createDeploymentArtifactRepository( id, url, layout, uniqueVersion );
+    }
 
     public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
                                                                   ArtifactRepositoryLayout repositoryLayout,
                                                                   boolean uniqueVersion )
     {
         return new DefaultArtifactRepository( id, url, repositoryLayout, uniqueVersion );
+    }
+
+    public ArtifactRepository createArtifactRepository( String id, String url,
+                                                        String layoutId,
+                                                        ArtifactRepositoryPolicy snapshots,
+                                                        ArtifactRepositoryPolicy releases )
+        throws UnknownRepositoryLayoutException
+    {
+        ArtifactRepositoryLayout layout;
+        try
+        {
+            layout = (ArtifactRepositoryLayout) repositoryLayouts.checkedGet( layoutId );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new UnknownRepositoryLayoutException( id, layoutId, e );
+        }
+
+        return createArtifactRepository( id, url, layout, snapshots, releases );
     }
 
     public ArtifactRepository createArtifactRepository( String id, String url,
@@ -93,11 +136,11 @@ public class DefaultArtifactRepositoryFactory
 
     public void setGlobalUpdatePolicy( String updatePolicy )
     {
-        this.globalUpdatePolicy = updatePolicy;
+        globalUpdatePolicy = updatePolicy;
     }
 
     public void setGlobalChecksumPolicy( String checksumPolicy )
     {
-        this.globalChecksumPolicy = checksumPolicy;
+        globalChecksumPolicy = checksumPolicy;
     }
 }

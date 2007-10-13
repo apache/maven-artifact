@@ -28,8 +28,16 @@ package org.apache.maven.artifact;
 public class InvalidRepositoryException
     extends Exception
 {
-    public InvalidRepositoryException( String message, Throwable throwable )
+    private final String repositoryId;
+
+    public InvalidRepositoryException( String message, String repositoryId, Throwable throwable )
     {
         super( message, throwable );
+        this.repositoryId = repositoryId;
+    }
+
+    public String getRepositoryId()
+    {
+        return repositoryId;
     }
 }

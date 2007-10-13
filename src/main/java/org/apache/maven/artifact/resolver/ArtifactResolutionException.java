@@ -20,7 +20,11 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.wagon.TransferFailedException;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -52,13 +56,30 @@ public class ArtifactResolutionException
         super( message, artifact, remoteRepositories );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, Throwable t )
+    public ArtifactResolutionException( String message, Artifact artifact, ArtifactMetadataRetrievalException cause )
     {
-        super( message, artifact, null, t );
+        super( message, artifact, null, cause );
     }
 
-    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, Throwable t )
+    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, ArtifactMetadataRetrievalException cause )
     {
-        super( message, artifact, remoteRepositories, t );
+        super( message, artifact, remoteRepositories, cause );
+    }
+
+    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, TransferFailedException cause )
+    {
+        super( message, artifact, remoteRepositories, cause );
+    }
+
+    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, IOException cause )
+    {
+        super( message, artifact, remoteRepositories, cause );
+    }
+
+    public ArtifactResolutionException( String message,
+                                        Artifact artifact,
+                                        RepositoryMetadataResolutionException cause )
+    {
+        super( message, artifact, null, cause );
     }
 }
