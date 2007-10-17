@@ -19,8 +19,11 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
+import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+
+import java.io.File;
 
 /**
  * @author jdcasey
@@ -28,6 +31,16 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 public interface ArtifactRepositoryFactory
 {
     String ROLE = ArtifactRepositoryFactory.class.getName();
+
+    String DEFAULT_LAYOUT_ID = "default";
+
+    String LOCAL_REPOSITORY_ID = "local";
+
+    ArtifactRepository createLocalRepository( File localRepositoryDirectory )
+        throws InvalidRepositoryException;
+
+    ArtifactRepositoryLayout getLayout( String layoutId )
+        throws UnknownRepositoryLayoutException;
 
     ArtifactRepository createDeploymentArtifactRepository( String id,
                                                            String url,

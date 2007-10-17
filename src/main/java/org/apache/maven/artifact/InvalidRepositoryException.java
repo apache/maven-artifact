@@ -1,5 +1,9 @@
 package org.apache.maven.artifact;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+
+import java.net.MalformedURLException;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -30,9 +34,19 @@ public class InvalidRepositoryException
 {
     private final String repositoryId;
 
-    public InvalidRepositoryException( String message, String repositoryId, Throwable throwable )
+    public InvalidRepositoryException( String message,
+                                       String repositoryId,
+                                       MalformedURLException cause )
     {
-        super( message, throwable );
+        super( message, cause );
+        this.repositoryId = repositoryId;
+    }
+
+    protected InvalidRepositoryException( String message,
+                                       String repositoryId,
+                                       ComponentLookupException cause )
+    {
+        super( message, cause );
         this.repositoryId = repositoryId;
     }
 
