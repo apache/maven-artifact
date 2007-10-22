@@ -22,7 +22,6 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.codehaus.plexus.collections.ActiveMap;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import java.io.File;
@@ -44,22 +43,12 @@ public class DefaultArtifactRepositoryFactory
     // FIXME: This is a non-ThreadLocal cache!!
     private final Map artifactRepositories = new HashMap();
 
-    private ActiveMap repositoryLayouts;
+    private Map repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )
         throws UnknownRepositoryLayoutException
     {
-        ArtifactRepositoryLayout layout;
-        try
-        {
-            layout = (ArtifactRepositoryLayout) repositoryLayouts.checkedGet( layoutId );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new UnknownRepositoryLayoutException( "unknown", layoutId, e );
-        }
-
-        return layout;
+        return (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
     }
 
     public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
@@ -67,15 +56,7 @@ public class DefaultArtifactRepositoryFactory
                                                         boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
-        ArtifactRepositoryLayout layout;
-        try
-        {
-            layout = (ArtifactRepositoryLayout) repositoryLayouts.checkedGet( layoutId );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new UnknownRepositoryLayoutException( id, layoutId, e );
-        }
+        ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
 
         return createDeploymentArtifactRepository( id, url, layout, uniqueVersion );
     }
@@ -93,15 +74,7 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
     {
-        ArtifactRepositoryLayout layout;
-        try
-        {
-            layout = (ArtifactRepositoryLayout) repositoryLayouts.checkedGet( layoutId );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new UnknownRepositoryLayoutException( id, layoutId, e );
-        }
+        ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
 
         return createArtifactRepository( id, url, layout, snapshots, releases );
     }

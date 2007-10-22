@@ -30,15 +30,6 @@ under the License.
       <role-hint>legacy</role-hint>
       <implementation>org.apache.maven.artifact.repository.layout.LegacyRepositoryLayout</implementation>
     </component>
-    
-    <component>
-      <role>org.codehaus.plexus.collections.ActiveMap</role>
-      <role-hint>repositoryLayouts</role-hint>
-      <implementation>org.codehaus.plexus.collections.DefaultActiveMap</implementation>
-      <configuration>
-        <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
-      </configuration>
-    </component>
 
     <!--
      |
@@ -444,8 +435,7 @@ under the License.
       <implementation>org.apache.maven.artifact.repository.DefaultArtifactRepositoryFactory</implementation>
       <requirements>
         <requirement>
-          <role>org.codehaus.plexus.collections.ActiveMap</role>
-          <role-hint>repositoryLayouts</role-hint>
+          <role>org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout</role>
           <field-name>repositoryLayouts</field-name>
         </requirement>
       </requirements>
