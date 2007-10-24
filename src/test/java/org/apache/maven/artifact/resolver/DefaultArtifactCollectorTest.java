@@ -828,7 +828,7 @@ public class DefaultArtifactCollectorTest
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                throw new ArtifactMetadataRetrievalException( e );
+                throw new ArtifactMetadataRetrievalException( "Invalid version creating artifacts", e, artifact );
             }
         }
 
