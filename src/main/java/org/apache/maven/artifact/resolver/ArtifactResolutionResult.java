@@ -23,6 +23,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -99,7 +100,7 @@ public class ArtifactResolutionResult
 
     public Set getArtifactResolutionNodes()
     {
-        return resolutionNodes;
+        return resolutionNodes == null ? Collections.EMPTY_SET : resolutionNodes;
     }
 
     public ArtifactResolutionResult setArtifactResolutionNodes( Set resolutionNodes )
@@ -114,7 +115,7 @@ public class ArtifactResolutionResult
 
     public List getMissingArtifacts()
     {
-        return missingArtifacts;
+        return missingArtifacts == null ? Collections.EMPTY_LIST : missingArtifacts;
     }
 
     public ArtifactResolutionResult addMissingArtifact( Artifact artifact )
@@ -163,7 +164,7 @@ public class ArtifactResolutionResult
 
     public List getVersionRangeViolations()
     {
-        return versionRangeViolations;
+        return versionRangeViolations == null ? Collections.EMPTY_LIST : versionRangeViolations;
     }
 
     // ------------------------------------------------------------------------
@@ -191,7 +192,7 @@ public class ArtifactResolutionResult
 
     public List getMetadataResolutionExceptions()
     {
-        return metadataResolutionExceptions;
+        return metadataResolutionExceptions == null ? Collections.EMPTY_LIST : metadataResolutionExceptions;
     }
 
     // ------------------------------------------------------------------------
@@ -214,7 +215,7 @@ public class ArtifactResolutionResult
 
     public List getErrorArtifactExceptions()
     {
-        return errorArtifactExceptions;
+        return errorArtifactExceptions == null ? Collections.EMPTY_LIST : errorArtifactExceptions;
     }
 
     // ------------------------------------------------------------------------
@@ -242,7 +243,7 @@ public class ArtifactResolutionResult
 
     public List getCircularDependencyExceptions()
     {
-        return circularDependencyExceptions;
+        return circularDependencyExceptions == null ? Collections.EMPTY_LIST : circularDependencyExceptions;
     }
 
     // ------------------------------------------------------------------------
@@ -253,7 +254,7 @@ public class ArtifactResolutionResult
 
     public List getRepositories()
     {
-        return repositories;
+        return repositories == null ? Collections.EMPTY_LIST : repositories;
     }
 
     public ArtifactResolutionResult setRepositories( List repositories )
