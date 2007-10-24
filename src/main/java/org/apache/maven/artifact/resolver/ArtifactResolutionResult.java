@@ -37,7 +37,10 @@ import java.util.Set;
  * - missing artifacts
  * - network/transfer errors
  * - file system errors: permissions
- *
+ * 
+ * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
+ *       complex requiring a long list of checks, need to create a parent/interfact/encapsulation
+ *       for the types of exceptions
  * @author Jason van Zyl
  * @version $Id$
  */
@@ -116,10 +119,7 @@ public class ArtifactResolutionResult
 
     public ArtifactResolutionResult addMissingArtifact( Artifact artifact )
     {
-        if ( missingArtifacts == null )
-        {
-            missingArtifacts = new ArrayList();
-        }
+        initList( missingArtifacts );
 
         missingArtifacts.add( artifact );
 
@@ -142,12 +142,14 @@ public class ArtifactResolutionResult
         return versionRangeViolations != null;
     }
 
+    /**
+     * @TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
+     *       {@link #getVersionRangeViolation(int)} but it's not used like that in
+     *       {@link DefaultArtifactCollector}
+     */
     public ArtifactResolutionResult addVersionRangeViolation( Exception e )
     {
-        if ( versionRangeViolations == null )
-        {
-            versionRangeViolations = new ArrayList();
-        }
+        initList( versionRangeViolations );
 
         versionRangeViolations.add( e );
 
@@ -173,12 +175,9 @@ public class ArtifactResolutionResult
         return metadataResolutionExceptions != null;
     }
 
-    public ArtifactResolutionResult addMetadataResolutionException( Exception e )
+    public ArtifactResolutionResult addMetadataResolutionException( ArtifactResolutionException e )
     {
-        if ( metadataResolutionExceptions == null )
-        {
-            metadataResolutionExceptions = new ArrayList();
-        }
+        initList( metadataResolutionExceptions );
 
         metadataResolutionExceptions.add( e );
 
@@ -204,12 +203,9 @@ public class ArtifactResolutionResult
         return errorArtifactExceptions != null;
     }
 
-    public ArtifactResolutionResult addErrorArtifactException( Exception e )
+    public ArtifactResolutionResult addErrorArtifactException( ArtifactResolutionException e )
     {
-        if ( errorArtifactExceptions == null )
-        {
-            errorArtifactExceptions = new ArrayList();
-        }
+        initList( errorArtifactExceptions );
 
         errorArtifactExceptions.add( e );
 
@@ -230,14 +226,11 @@ public class ArtifactResolutionResult
         return circularDependencyExceptions != null;
     }
 
-    public ArtifactResolutionResult addCircularDependencyException( Exception e )
+    public ArtifactResolutionResult addCircularDependencyException( CyclicDependencyException e )
     {
-        if ( circularDependencyExceptions == null )
-        {
-            circularDependencyExceptions = new ArrayList();
-        }
+        initList( circularDependencyExceptions );
 
-        errorArtifactExceptions.add( e );
+        circularDependencyExceptions.add( e );
 
         return this;
     }
@@ -270,5 +263,11 @@ public class ArtifactResolutionResult
         return this;
     }
 
-
+    private void initList( List l )
+    {
+        if ( l == null )
+        {
+            l = new ArrayList();
+        }
+    }
 }
