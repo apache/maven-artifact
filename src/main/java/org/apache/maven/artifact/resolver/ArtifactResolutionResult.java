@@ -119,7 +119,7 @@ public class ArtifactResolutionResult
 
     public ArtifactResolutionResult addMissingArtifact( Artifact artifact )
     {
-        initList( missingArtifacts );
+        missingArtifacts = initList( missingArtifacts );
 
         missingArtifacts.add( artifact );
 
@@ -149,7 +149,7 @@ public class ArtifactResolutionResult
      */
     public ArtifactResolutionResult addVersionRangeViolation( Exception e )
     {
-        initList( versionRangeViolations );
+        versionRangeViolations = initList( versionRangeViolations );
 
         versionRangeViolations.add( e );
 
@@ -177,7 +177,7 @@ public class ArtifactResolutionResult
 
     public ArtifactResolutionResult addMetadataResolutionException( ArtifactResolutionException e )
     {
-        initList( metadataResolutionExceptions );
+        metadataResolutionExceptions = initList( metadataResolutionExceptions );
 
         metadataResolutionExceptions.add( e );
 
@@ -205,7 +205,7 @@ public class ArtifactResolutionResult
 
     public ArtifactResolutionResult addErrorArtifactException( ArtifactResolutionException e )
     {
-        initList( errorArtifactExceptions );
+        errorArtifactExceptions = initList( errorArtifactExceptions );
 
         errorArtifactExceptions.add( e );
 
@@ -228,7 +228,7 @@ public class ArtifactResolutionResult
 
     public ArtifactResolutionResult addCircularDependencyException( CyclicDependencyException e )
     {
-        initList( circularDependencyExceptions );
+        circularDependencyExceptions = initList( circularDependencyExceptions );
 
         circularDependencyExceptions.add( e );
 
@@ -263,11 +263,12 @@ public class ArtifactResolutionResult
         return this;
     }
 
-    private void initList( List l )
+    private List initList( List l )
     {
         if ( l == null )
         {
-            l = new ArrayList();
+            return new ArrayList();
         }
+        return l;
     }
 }
