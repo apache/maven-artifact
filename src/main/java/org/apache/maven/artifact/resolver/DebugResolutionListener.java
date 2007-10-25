@@ -40,7 +40,7 @@ public class DebugResolutionListener
     private String indent = "";
 
     private static Set ignoredArtifacts = new HashSet();
-    
+
     public DebugResolutionListener( Logger logger )
     {
         this.logger = logger;
@@ -151,6 +151,16 @@ public class DebugResolutionListener
         if ( !replacement.getScope().equals( artifact.getScope() ) )
         {
             String msg = indent + artifact + " (applying scope: " + replacement.getScope() + ")";
+            logger.debug( msg );
+        }
+    }
+
+    public void manageArtifactSystemPath( Artifact artifact, Artifact replacement )
+    {
+        // only show msg if a change is actually taking place
+        if ( !replacement.getScope().equals( artifact.getScope() ) )
+        {
+            String msg = indent + artifact + " (applying system path: " + replacement.getFile() + ")";
             logger.debug( msg );
         }
     }

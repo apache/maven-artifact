@@ -57,7 +57,7 @@ public class DefaultArtifactCollector
      * The conflict resolver to use when none is specified.
      */
     private ConflictResolver defaultConflictResolver;
-         
+
     public ArtifactResolutionResult collect( Set artifacts,
                                              Artifact originatingArtifact,
                                              ArtifactRepository localRepository,
@@ -96,7 +96,7 @@ public class DefaultArtifactCollector
 
             conflictResolvers = Collections.singletonList( defaultConflictResolver );
         }
-                                           
+
         Map resolvedArtifacts = new LinkedHashMap();
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
@@ -173,7 +173,7 @@ public class DefaultArtifactCollector
                                                      Map managedVersions )
     {
         ManagedVersionMap versionMap;
-        if ( managedVersions != null && managedVersions instanceof ManagedVersionMap )
+        if ( ( managedVersions != null ) && ( managedVersions instanceof ManagedVersionMap ) )
         {
             versionMap = (ManagedVersionMap) managedVersions;
         }
@@ -240,7 +240,7 @@ public class DefaultArtifactCollector
                         VersionRange previousRange = previous.getArtifact().getVersionRange();
                         VersionRange currentRange = node.getArtifact().getVersionRange();
 
-                        if ( previousRange != null && currentRange != null )
+                        if ( ( previousRange != null ) && ( currentRange != null ) )
                         {
                             // TODO: shouldn't need to double up on this work, only done for simplicity of handling recommended
                             // version but the restriction is identical
@@ -261,8 +261,8 @@ public class DefaultArtifactCollector
                             for ( int j = 0; j < 2; j++ )
                             {
                                 Artifact resetArtifact = resetNodes[j].getArtifact();
-                                if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null &&
-                                    resetArtifact.getAvailableVersions() != null )
+                                if ( ( resetArtifact.getVersion() == null ) && ( resetArtifact.getVersionRange() != null ) &&
+                                    ( resetArtifact.getAvailableVersions() != null ) )
                                 {
 
                                     resetArtifact.selectVersion( resetArtifact.getVersionRange().matchVersion(
@@ -274,7 +274,7 @@ public class DefaultArtifactCollector
 
                         // Conflict Resolution
                         ResolutionNode resolved = null;
-                        for ( Iterator j = conflictResolvers.iterator(); resolved == null && j.hasNext(); )
+                        for ( Iterator j = conflictResolvers.iterator(); ( resolved == null ) && j.hasNext(); )
                         {
                             ConflictResolver conflictResolver = (ConflictResolver) j.next();
 
@@ -290,14 +290,14 @@ public class DefaultArtifactCollector
                                 + node.getArtifact().getVersion(), previous.getArtifact() ) );
                         }
 
-                        if ( resolved != previous && resolved != node )
+                        if ( ( resolved != previous ) && ( resolved != node ) )
                         {
                             // TODO: add better exception
                             result.addVersionRangeViolation( new ArtifactResolutionException(
                                 "Conflict resolver returned unknown resolution node: ",
                                 resolved.getArtifact() ) );
                         }
-                         
+
 
                         // TODO: should this be part of mediation?
                         // previous one is more dominant
@@ -506,18 +506,25 @@ public class DefaultArtifactCollector
         // provide defaults to children, but should override transitives).
         // We can do this by calling isChildOfRootNode on the current node.
 
-        if ( artifact.getVersion() != null
+        if ( ( artifact.getVersion() != null )
             && ( node.isChildOfRootNode() ? node.getArtifact().getVersion() == null : true ) )
         {
             fireEvent( ResolutionListener.MANAGE_ARTIFACT_VERSION, listeners, node, artifact );
             node.getArtifact().setVersion( artifact.getVersion() );
         }
 
-        if ( artifact.getScope() != null
+        if ( ( artifact.getScope() != null )
             && ( node.isChildOfRootNode() ? node.getArtifact().getScope() == null : true ) )
         {
             fireEvent( ResolutionListener.MANAGE_ARTIFACT_SCOPE, listeners, node, artifact );
             node.getArtifact().setScope( artifact.getScope() );
+        }
+
+        if ( Artifact.SCOPE_SYSTEM.equals( node.getArtifact().getScope() )
+             && ( node.getArtifact().getFile() == null ) && ( artifact.getFile() != null ) )
+        {
+            fireEvent( ResolutionListener.MANAGE_ARTIFACT_SYSTEM_PATH, listeners, node, artifact );
+            node.getArtifact().setFile( artifact.getFile() );
         }
     }
 
@@ -553,7 +560,7 @@ public class DefaultArtifactCollector
         }
 
         /* current POM rules all, if nearest is in current pom, do not update its scope */
-        if ( nearest.getDepth() < 2 && updateScope )
+        if ( ( nearest.getDepth() < 2 ) && updateScope )
         {
             updateScope = false;
 
@@ -640,6 +647,17 @@ public class DefaultArtifactCollector
                     {
                         ResolutionListenerForDepMgmt asImpl = (ResolutionListenerForDepMgmt) listener;
                         asImpl.manageArtifactScope( node.getArtifact(), replacement );
+                    }
+                    else
+                    {
+                        listener.manageArtifact( node.getArtifact(), replacement );
+                    }
+                    break;
+                case ResolutionListener.MANAGE_ARTIFACT_SYSTEM_PATH:
+                    if ( listener instanceof ResolutionListenerForDepMgmt )
+                    {
+                        ResolutionListenerForDepMgmt asImpl = (ResolutionListenerForDepMgmt) listener;
+                        asImpl.manageArtifactSystemPath( node.getArtifact(), replacement );
                     }
                     else
                     {

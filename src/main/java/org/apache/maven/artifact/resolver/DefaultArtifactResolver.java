@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -107,7 +106,11 @@ public class DefaultArtifactResolver
         {
             File systemFile = artifact.getFile();
 
-            if ( !systemFile.exists() )
+            if ( systemFile == null )
+            {
+                throw new ArtifactResolutionException( "systemPath not set for system-scoped artifact: " + artifact.getId(), artifact );
+            }
+            else if ( !systemFile.exists() )
             {
                 throw new ArtifactNotFoundException(
                     "System artifact: " + artifact + " not found in path: " + systemFile,
@@ -377,7 +380,7 @@ public class DefaultArtifactResolver
         return resolveTransitively(
             artifacts,
             originatingArtifact,
-            
+
             Collections.EMPTY_MAP,
             localRepository,
             remoteRepositories,
@@ -399,7 +402,7 @@ public class DefaultArtifactResolver
         return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
                                     remoteRepositories, source, filter, listeners, null );
     }
-    
+
     public ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                          Artifact originatingArtifact,
                                                          Map managedVersions,

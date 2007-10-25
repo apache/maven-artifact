@@ -60,10 +60,12 @@ public interface ResolutionListener
     int SELECT_VERSION_FROM_RANGE = 10;
 
     int RESTRICT_RANGE = 11;
-    
+
     int MANAGE_ARTIFACT_VERSION = 12;
-    
+
     int MANAGE_ARTIFACT_SCOPE = 13;
+
+    int MANAGE_ARTIFACT_SYSTEM_PATH = 14;
 
     void testArtifact( Artifact node );
 
@@ -81,12 +83,12 @@ public interface ResolutionListener
      * @deprecated
      */
     void manageArtifact( Artifact artifact, Artifact replacement );
-    
+
     // TODO Use the following two instead of manageArtifact
     // TODO Remove ResolutionListenerDM interface
 
     //void manageArtifactVersion( Artifact artifact, Artifact replacement );
-    
+
     //void manageArtifactScope( Artifact artifact, Artifact replacement );
 
     void omitForCycle( Artifact artifact );
@@ -94,7 +96,7 @@ public interface ResolutionListener
     /**
      * This event means that the scope has NOT been updated to a farther node scope because current
      * node is in the first level pom
-     * 
+     *
      * @param artifact current node artifact, the one in the first level pom
      * @param ignoredScope scope that was ignored because artifact was in first level pom
      */
