@@ -36,8 +36,8 @@ public class ManagedVersionMap extends HashMap
 
     public String toString()
     {
-        StringBuffer buffer = new StringBuffer("ManagedVersionMap\n");
-        Iterator iter = this.keySet().iterator();
+        StringBuffer buffer = new StringBuffer("ManagedVersionMap (" + size() + " entries)\n");
+        Iterator iter = keySet().iterator();
         while (iter.hasNext())
         {
             String key = (String)iter.next();
