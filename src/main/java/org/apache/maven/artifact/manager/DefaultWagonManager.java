@@ -79,7 +79,7 @@ public class DefaultWagonManager
     // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
     // attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
     private Map proxies = new HashMap();
-                                            
+
     private Map authenticationInfoMap = new HashMap();
 
     private Map serverPermissionsMap = new HashMap();
@@ -97,12 +97,12 @@ public class DefaultWagonManager
 
     private ArtifactRepositoryFactory repositoryFactory;
 
+    private Map wagons;
+
     private boolean interactive = true;
 
-    private Map availableWagons = new HashMap();
-
     private RepositoryPermissions defaultRepositoryPermissions;
-    
+
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
@@ -124,33 +124,17 @@ public class DefaultWagonManager
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
-        PlexusContainer container = getWagonContainer( protocol );
+        Wagon wagon = (Wagon) wagons.get( protocol );
 
-        Wagon wagon;
-        try
-        {
-            wagon = (Wagon) container.lookup( Wagon.ROLE, protocol );
-        }
-        catch ( ComponentLookupException e1 )
+        if ( wagon == null )
         {
             throw new UnsupportedProtocolException(
-                "Cannot find wagon which supports the requested protocol: " + protocol, e1 );
+                                                   "Cannot find wagon which supports the requested protocol: " + protocol );
         }
 
         wagon.setInteractive( interactive );
 
         return wagon;
-    }
-
-    private PlexusContainer getWagonContainer( String protocol )
-    {
-        PlexusContainer container = this.container;
-
-        if ( availableWagons.containsKey( protocol ) )
-        {
-            container = (PlexusContainer) availableWagons.get( protocol );
-        }
-        return container;
     }
 
     public void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
@@ -210,7 +194,7 @@ public class DefaultWagonManager
                 {
                     RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get( repository.getId() );
 
-                    getLogger().debug( 
+                    getLogger().debug(
                         "adding permissions to wagon connection: " + perms.getFileMode() + " " + perms.getDirectoryMode() );
 
                     artifactRepository.setPermissions( perms );
@@ -692,7 +676,6 @@ public class DefaultWagonManager
 
     private void releaseWagon( String protocol, Wagon wagon )
     {
-        PlexusContainer container = getWagonContainer( protocol );
         try
         {
             container.release( wagon );
@@ -700,6 +683,7 @@ public class DefaultWagonManager
         catch ( ComponentLifecycleException e )
         {
             getLogger().error( "Problem releasing wagon - ignoring: " + e.getMessage() );
+            getLogger().debug( "", e );
         }
     }
 
@@ -841,12 +825,11 @@ public class DefaultWagonManager
         }
     }
 
+    /**
+     * @deprecated Wagons are discovered in plugin and extension realms now.
+     */
     public void registerWagons( Collection wagons, PlexusContainer extensionContainer )
     {
-        for ( Iterator i = wagons.iterator(); i.hasNext(); )
-        {
-            availableWagons.put( i.next(), extensionContainer );
-        }
     }
 
     /**
@@ -868,7 +851,7 @@ public class DefaultWagonManager
         if ( serverConfigurationMap.containsKey( repositoryId ) )
         {
             ComponentConfigurator componentConfigurator = null;
-            
+
             try
             {
                 componentConfigurator = new BasicComponentConfigurator();
@@ -900,7 +883,7 @@ public class DefaultWagonManager
 
     public void addConfiguration( String repositoryId, Xpp3Dom configuration )
     {
-        if ( repositoryId == null || configuration == null )
+        if ( ( repositoryId == null ) || ( configuration == null ) )
         {
             throw new IllegalArgumentException( "arguments can't be null" );
         }
