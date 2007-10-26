@@ -45,7 +45,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-34</version>
+      <version>1.0-alpha-35-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
