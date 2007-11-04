@@ -37,96 +37,67 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
     implements RepositoryMetadataManager
 {
-    // component requirement
+    /** @plexus.requirement */
     private WagonManager wagonManager;
 
-    /**
-     * @todo very primitive. Probably we can cache artifacts themselves in a central location, as well as reset the flag over time in a long running process.
-     */
-    private Set cachedMetadata = new HashSet();
-
-    public void resolve( RepositoryMetadata metadata, List remoteRepositories, ArtifactRepository localRepository )
+    public void resolve( RepositoryMetadata metadata,
+                         List remoteRepositories,
+                         ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {
-        boolean alreadyResolved = alreadyResolved( metadata );
-        if ( !alreadyResolved )
+        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
-            for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
+            ArtifactRepository repository = (ArtifactRepository) i.next();
+
+            ArtifactRepositoryPolicy policy =
+                metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+
+            if ( !policy.isEnabled() )
             {
-                ArtifactRepository repository = (ArtifactRepository) i.next();
+                getLogger().debug( "Skipping disabled repository " + repository.getId() );
+            }
+            else if ( repository.isBlacklisted() )
+            {
+                getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
+            }
+            else
+            {
+                File file = new File( localRepository.getBasedir(),
+                    localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
-                ArtifactRepositoryPolicy policy =
-                    metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+                boolean checkForUpdates =
+                    policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
 
-                if ( !policy.isEnabled() )
+                if ( checkForUpdates )
                 {
-                    getLogger().debug( "Skipping disabled repository " + repository.getId() );
+                    getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
+
+                    try
+                    {
+                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), true );
+                    }
+                    catch ( TransferFailedException e )
+                    {
+                        // TODO: [jc; 08-Nov-2005] revisit this for 2.1
+                        // suppressing logging to avoid logging this error twice.
+                    }
                 }
-                else if ( repository.isBlacklisted() )
+
+                // TODO: should this be inside the above check?
+                // touch file so that this is not checked again until interval has passed
+                if ( file.exists() )
                 {
-                    getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
-                }
-                else
-                {
-                    File file = new File( localRepository.getBasedir(),
-                                          localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
-
-
-
-                    boolean checkForUpdates =
-                        policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
-
-                    boolean metadataIsEmpty = true;
-
-                    if ( checkForUpdates )
-                    {
-                        getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
-
-                        try
-                        {
-                            resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), true );
-                            metadataIsEmpty = false;
-                        }
-                        catch ( TransferFailedException e )
-                        {
-                            // TODO: [jc; 08-Nov-2005] revisit this for 2.1
-                            // suppressing logging to avoid logging this error twice.
-                            metadataIsEmpty = true;
-                        }
-                    }
-
-                    // TODO: should this be inside the above check?
-                    // touch file so that this is not checked again until interval has passed
-                    if ( file.exists() )
-                    {
-                        file.setLastModified( System.currentTimeMillis() );
-                    }
-                    else
-                    {
-                        // this ensures that files are not continuously checked when they don't exist remotely
-                        try
-                        {
-                            metadata.storeInLocalRepository( localRepository, repository );
-                        }
-                        catch ( RepositoryMetadataStoreException e )
-                        {
-                            throw new RepositoryMetadataResolutionException(
-                                "Unable to store local copy of metadata: " + e.getMessage(), e );
-                        }
-                    }
+                    file.setLastModified( System.currentTimeMillis() );
                 }
             }
-            cachedMetadata.add( metadata.getKey() );
         }
 
         try
@@ -141,11 +112,12 @@ public class DefaultRepositoryMetadataManager
         catch ( RepositoryMetadataReadException e )
         {
             throw new RepositoryMetadataResolutionException( "Unable to read local copy of metadata: " + e.getMessage(),
-                                                             e );
+                e );
         }
     }
 
-    private void mergeMetadata( RepositoryMetadata metadata, List remoteRepositories,
+    private void mergeMetadata( RepositoryMetadata metadata,
+                                List remoteRepositories,
                                 ArtifactRepository localRepository )
         throws RepositoryMetadataStoreException, RepositoryMetadataReadException
     {
@@ -179,7 +151,9 @@ public class DefaultRepositoryMetadataManager
         updateSnapshotMetadata( metadata, previousMetadata, selected, localRepository );
     }
 
-    private void updateSnapshotMetadata( RepositoryMetadata metadata, Map previousMetadata, ArtifactRepository selected,
+    private void updateSnapshotMetadata( RepositoryMetadata metadata,
+                                         Map previousMetadata,
+                                         ArtifactRepository selected,
                                          ArtifactRepository localRepository )
         throws RepositoryMetadataStoreException
     {
@@ -203,16 +177,6 @@ public class DefaultRepositoryMetadataManager
                     {
                         m.getVersioning().setSnapshot( new Snapshot() );
                     }
-/*
-                    if ( !m.getVersioning().getSnapshot().isLocalCopy() )
-                    {
-                        // TODO: I think this is incorrect (it results in localCopy set in a remote profile). Probably
-                        //   harmless so not removing at this point until full tests in place.
-                        m.getVersioning().getSnapshot().setLocalCopy( true );
-                        metadata.setMetadata( m );
-                        metadata.storeInLocalRepository( localRepository, repository );
-                    }
-*/
                 }
                 else
                 {
@@ -230,14 +194,16 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    private boolean loadMetadata( RepositoryMetadata repoMetadata, ArtifactRepository remoteRepository,
-                                  ArtifactRepository localRepository, Map previousMetadata )
+    private boolean loadMetadata( RepositoryMetadata repoMetadata,
+                                  ArtifactRepository remoteRepository,
+                                  ArtifactRepository localRepository,
+                                  Map previousMetadata )
         throws RepositoryMetadataReadException
     {
         boolean setRepository = false;
 
         File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
+            localRepository.pathOfLocalRepositoryMetadata( repoMetadata, remoteRepository ) );
 
         if ( metadataFile.exists() )
         {
@@ -261,9 +227,7 @@ public class DefaultRepositoryMetadataManager
         return setRepository;
     }
 
-    /**
-     * @todo share with DefaultPluginMappingManager.
-     */
+    /** @todo share with DefaultPluginMappingManager. */
     protected static Metadata readMetadata( File mappingFile )
         throws RepositoryMetadataReadException
     {
@@ -299,7 +263,8 @@ public class DefaultRepositoryMetadataManager
         return result;
     }
 
-    public void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository,
+    public void resolveAlways( RepositoryMetadata metadata,
+                               ArtifactRepository localRepository,
                                ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException
     {
@@ -311,7 +276,7 @@ public class DefaultRepositoryMetadataManager
         }
 
         File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
+            localRepository.pathOfLocalRepositoryMetadata( metadata, remoteRepository ) );
 
         try
         {
@@ -339,8 +304,11 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    private void resolveAlways( ArtifactMetadata metadata, ArtifactRepository repository, File file,
-                                String checksumPolicy, boolean allowBlacklisting )
+    private void resolveAlways( ArtifactMetadata metadata,
+                                ArtifactRepository repository,
+                                File file,
+                                String checksumPolicy,
+                                boolean allowBlacklisting )
         throws RepositoryMetadataResolutionException, TransferFailedException
     {
         if ( !wagonManager.isOnline() )
@@ -375,8 +343,8 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( TransferFailedException e )
         {
-            getLogger().warn( metadata + " could not be retrieved from repository: " + repository.getId() +
-                " due to an error: " + e.getMessage() );
+            getLogger().warn(
+                metadata + " could not be retrieved from repository: " + repository.getId() + " due to an error: " + e.getMessage() );
             getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
             getLogger().debug( "Exception", e );
             repository.setBlacklisted( allowBlacklisting );
@@ -385,12 +353,8 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    private boolean alreadyResolved( ArtifactMetadata metadata )
-    {
-        return cachedMetadata.contains( metadata.getKey() );
-    }
-
-    public void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
+    public void deploy( ArtifactMetadata metadata,
+                        ArtifactRepository localRepository,
                         ArtifactRepository deploymentRepository )
         throws RepositoryMetadataDeploymentException
     {
@@ -404,7 +368,7 @@ public class DefaultRepositoryMetadataManager
         getLogger().info( "Retrieving previous metadata from " + deploymentRepository.getId() );
 
         File file = new File( localRepository.getBasedir(),
-                              localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
+            localRepository.pathOfLocalRepositoryMetadata( metadata, deploymentRepository ) );
 
         try
         {
@@ -442,7 +406,8 @@ public class DefaultRepositoryMetadataManager
         }
     }
 
-    public void install( ArtifactMetadata metadata, ArtifactRepository localRepository )
+    public void install( ArtifactMetadata metadata,
+                         ArtifactRepository localRepository )
         throws RepositoryMetadataInstallationException
     {
         try
