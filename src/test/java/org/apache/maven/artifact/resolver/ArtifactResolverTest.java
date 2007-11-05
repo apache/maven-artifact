@@ -29,6 +29,8 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -232,5 +234,53 @@ public class ArtifactResolverTest
 
         assertLocalArtifactPresent( l );
     }
-}
 
+    public void testTransitiveResolutionOrder()
+        throws Exception
+    {
+        Artifact m = createLocalArtifact( "m", "1.0" );
+
+        Artifact n = createLocalArtifact( "n", "1.0" );
+
+        ArtifactMetadataSource mds = new ArtifactMetadataSource()
+        {
+            public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                             List remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                Set dependencies = new HashSet();
+
+                return new ResolutionGroup( artifact, dependencies, remoteRepositories );
+            }
+
+            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                   List remoteRepositories )
+            {
+                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            }
+        };
+
+        ArtifactResolutionResult result = null;
+
+        Set set = new LinkedHashSet();
+        set.add( n );
+        set.add( m );
+
+        result = artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
+
+        Iterator i = result.getArtifacts().iterator();
+        assertEquals( "n should be first", n, i.next() );
+        assertEquals( "m should be second", m, i.next() );
+
+        // inverse order
+        set = new LinkedHashSet();
+        set.add( m );
+        set.add( n );
+
+        result = artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
+
+        i = result.getArtifacts().iterator();
+        assertEquals( "m should be first", m, i.next() );
+        assertEquals( "n should be second", n, i.next() );
+    }
+}

@@ -24,8 +24,8 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -85,7 +85,7 @@ public class ArtifactResolutionResult
     {
         if ( artifacts == null )
         {
-            artifacts = new HashSet();
+            artifacts = new LinkedHashSet();
 
             for ( Iterator i = resolutionNodes.iterator(); i.hasNext(); )
             {
