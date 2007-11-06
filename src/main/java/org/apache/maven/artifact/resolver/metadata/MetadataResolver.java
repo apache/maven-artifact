@@ -6,5 +6,5 @@ public interface MetadataResolver
     String ROLE = MetadataResolver.class.getName();
 
     MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
-    throws MetadataResolutionException;    
+        throws MetadataResolutionException;
 }

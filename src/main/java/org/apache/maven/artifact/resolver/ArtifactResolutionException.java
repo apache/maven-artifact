@@ -34,44 +34,70 @@ import java.util.List;
 public class ArtifactResolutionException
     extends AbstractArtifactResolutionException
 {
-    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        String classifier, List remoteRepositories, List path, Throwable t )
+    public ArtifactResolutionException( String message,
+                                        String groupId,
+                                        String artifactId,
+                                        String version,
+                                        String type,
+                                        String classifier,
+                                        List remoteRepositories,
+                                        List path,
+                                        Throwable t )
     {
         super( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, t );
     }
 
-    public ArtifactResolutionException( String message, String groupId, String artifactId, String version, String type,
-                                        String classifier, Throwable t )
+    public ArtifactResolutionException( String message,
+                                        String groupId,
+                                        String artifactId,
+                                        String version,
+                                        String type,
+                                        String classifier,
+                                        Throwable t )
     {
-        super( message, groupId, artifactId, version, type, classifier,null, null, t );
+        super( message, groupId, artifactId, version, type, classifier, null, null, t );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact )
+    public ArtifactResolutionException( String message,
+                                        Artifact artifact )
     {
         super( message, artifact );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories )
+    public ArtifactResolutionException( String message,
+                                        Artifact artifact,
+                                        List remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
     }
 
-    public ArtifactResolutionException( String message, Artifact artifact, ArtifactMetadataRetrievalException cause )
+    public ArtifactResolutionException( String message,
+                                        Artifact artifact,
+                                        ArtifactMetadataRetrievalException cause )
     {
         super( message, artifact, null, cause );
     }
 
-    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, ArtifactMetadataRetrievalException cause )
+    protected ArtifactResolutionException( String message,
+                                           Artifact artifact,
+                                           List remoteRepositories,
+                                           ArtifactMetadataRetrievalException cause )
     {
         super( message, artifact, remoteRepositories, cause );
     }
 
-    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, TransferFailedException cause )
+    protected ArtifactResolutionException( String message,
+                                           Artifact artifact,
+                                           List remoteRepositories,
+                                           TransferFailedException cause )
     {
         super( message, artifact, remoteRepositories, cause );
     }
 
-    protected ArtifactResolutionException( String message, Artifact artifact, List remoteRepositories, IOException cause )
+    protected ArtifactResolutionException( String message,
+                                           Artifact artifact,
+                                           List remoteRepositories,
+                                           IOException cause )
     {
         super( message, artifact, remoteRepositories, cause );
     }

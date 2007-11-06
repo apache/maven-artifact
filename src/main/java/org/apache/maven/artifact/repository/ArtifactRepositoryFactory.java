@@ -25,9 +25,7 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 import java.io.File;
 
-/**
- * @author jdcasey
- */
+/** @author jdcasey */
 public interface ArtifactRepositoryFactory
 {
     String ROLE = ArtifactRepositoryFactory.class.getName();

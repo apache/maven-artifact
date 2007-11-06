@@ -33,7 +33,9 @@ public class ResolutionGroup
 
     private final Artifact pomArtifact;
 
-    public ResolutionGroup( Artifact pomArtifact, Set artifacts, List resolutionRepositories )
+    public ResolutionGroup( Artifact pomArtifact,
+                            Set artifacts,
+                            List resolutionRepositories )
     {
         this.pomArtifact = pomArtifact;
         this.artifacts = artifacts;

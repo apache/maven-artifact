@@ -38,12 +38,12 @@ import java.util.Set;
  * - missing artifacts
  * - network/transfer errors
  * - file system errors: permissions
- * 
- * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
- *       complex requiring a long list of checks, need to create a parent/interfact/encapsulation
- *       for the types of exceptions
+ *
  * @author Jason van Zyl
  * @version $Id$
+ * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
+ * complex requiring a long list of checks, need to create a parent/interfact/encapsulation
+ * for the types of exceptions
  */
 public class ArtifactResolutionResult
 {
@@ -145,8 +145,8 @@ public class ArtifactResolutionResult
 
     /**
      * @TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
-     *       {@link #getVersionRangeViolation(int)} but it's not used like that in
-     *       {@link DefaultArtifactCollector}
+     * {@link #getVersionRangeViolation(int)} but it's not used like that in
+     * {@link DefaultArtifactCollector}
      */
     public ArtifactResolutionResult addVersionRangeViolation( Exception e )
     {

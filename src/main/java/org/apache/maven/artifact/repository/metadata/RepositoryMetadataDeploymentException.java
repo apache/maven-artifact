@@ -33,7 +33,8 @@ public class RepositoryMetadataDeploymentException
         super( message );
     }
 
-    public RepositoryMetadataDeploymentException( String message, Exception e )
+    public RepositoryMetadataDeploymentException( String message,
+                                                  Exception e )
     {
         super( message, e );
     }

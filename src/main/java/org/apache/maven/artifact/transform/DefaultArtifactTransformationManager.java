@@ -33,36 +33,42 @@ import java.util.Iterator;
 import java.util.List;
 
 public class DefaultArtifactTransformationManager
-    implements ArtifactTransformationManager, Initializable
+    implements ArtifactTransformationManager,
+    Initializable
 {
     private List artifactTransformations;
 
-	public void initialize() throws InitializationException {
-		// TODO this is a hack until plexus can fix the ordering of the arrays
-	    List transforms = new ArrayList();
-	    Object snapshotTransform = null;
+    public void initialize()
+        throws InitializationException
+    {
+        // TODO this is a hack until plexus can fix the ordering of the arrays
+        List transforms = new ArrayList();
+        Object snapshotTransform = null;
 
-		Object obj[] = artifactTransformations.toArray();
-		for (int x = 0; x < obj.length; x++)
-		{
-			if (obj[x].getClass().getName().indexOf("Snapshot") != -1) {
-			    snapshotTransform = obj[x];
-			}
-			else
-			{
-			    transforms.add( obj[x] );
-			}
-		}
+        Object obj[] = artifactTransformations.toArray();
+        for ( int x = 0; x < obj.length; x++ )
+        {
+            if ( obj[x].getClass().getName().indexOf( "Snapshot" ) != -1 )
+            {
+                snapshotTransform = obj[x];
+            }
+            else
+            {
+                transforms.add( obj[x] );
+            }
+        }
 
-		if ( snapshotTransform != null )
-		{
-		    transforms.add( snapshotTransform );
-		}
+        if ( snapshotTransform != null )
+        {
+            transforms.add( snapshotTransform );
+        }
 
-		artifactTransformations = transforms;
-	}
+        artifactTransformations = transforms;
+    }
 
-    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact,
+                                     List remoteRepositories,
+                                     ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
@@ -72,7 +78,8 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact,
+                                     ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
@@ -82,7 +89,8 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact,
+                                        ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
@@ -92,7 +100,6 @@ public class DefaultArtifactTransformationManager
             transform.transformForDeployment( artifact, remoteRepository, localRepository );
         }
     }
-
 
 
 }

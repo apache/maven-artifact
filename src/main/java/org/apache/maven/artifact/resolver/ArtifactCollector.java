@@ -39,26 +39,39 @@ public interface ArtifactCollector
 {
     /**
      * The plexus role for this component.
-     * 
+     *
      * @since 3.0
      */
     String ROLE = ArtifactCollector.class.getName();
 
     // TODO: deprecate since conflict resolvers should always be specified
-    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, ArtifactRepository localRepository,
-                                      List remoteRepositories, ArtifactMetadataSource source, ArtifactFilter filter,
+    ArtifactResolutionResult collect( Set artifacts,
+                                      Artifact originatingArtifact,
+                                      ArtifactRepository localRepository,
+                                      List remoteRepositories,
+                                      ArtifactMetadataSource source,
+                                      ArtifactFilter filter,
                                       List listeners );
 
     // TODO: deprecate since conflict resolvers should always be specified
-    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                      ArtifactRepository localRepository, List remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter, List listeners );
+    ArtifactResolutionResult collect( Set artifacts,
+                                      Artifact originatingArtifact,
+                                      Map managedVersions,
+                                      ArtifactRepository localRepository,
+                                      List remoteRepositories,
+                                      ArtifactMetadataSource source,
+                                      ArtifactFilter filter,
+                                      List listeners );
 
-    /**
-     * @since 3.0
-     */
-    ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                      ArtifactRepository localRepository, List remoteRepositories,
-                                      ArtifactMetadataSource source, ArtifactFilter filter, List listeners,
-                                      List conflictResolvers ) throws ArtifactResolutionException;
+    /** @since 3.0 */
+    ArtifactResolutionResult collect( Set artifacts,
+                                      Artifact originatingArtifact,
+                                      Map managedVersions,
+                                      ArtifactRepository localRepository,
+                                      List remoteRepositories,
+                                      ArtifactMetadataSource source,
+                                      ArtifactFilter filter,
+                                      List listeners,
+                                      List conflictResolvers )
+        throws ArtifactResolutionException;
 }

@@ -39,7 +39,9 @@ import java.util.List;
 public class ReleaseArtifactTransformation
     extends AbstractVersionTransformation
 {
-    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact,
+                                     List remoteRepositories,
+                                     ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( Artifact.RELEASE_VERSION.equals( artifact.getVersion() ) )
@@ -63,14 +65,16 @@ public class ReleaseArtifactTransformation
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact,
+                                     ArtifactRepository localRepository )
     {
         ArtifactMetadata metadata = createMetadata( artifact );
 
         artifact.addMetadata( metadata );
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact,
+                                        ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
     {
         ArtifactMetadata metadata = createMetadata( artifact );
@@ -92,7 +96,8 @@ public class ReleaseArtifactTransformation
         return new ArtifactRepositoryMetadata( artifact, versioning );
     }
 
-    protected String constructVersion( Versioning versioning, String baseVersion )
+    protected String constructVersion( Versioning versioning,
+                                       String baseVersion )
     {
         return versioning.getRelease();
     }

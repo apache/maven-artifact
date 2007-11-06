@@ -36,7 +36,8 @@ public class ArtifactInstallationException
         super( cause );
     }
 
-    public ArtifactInstallationException( String message, Throwable cause )
+    public ArtifactInstallationException( String message,
+                                          Throwable cause )
     {
         super( message, cause );
     }

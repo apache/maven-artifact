@@ -21,19 +21,23 @@ package org.apache.maven.artifact;
 
 /**
  * Exception thrown when the identity of an artifact can not be established,
- * eg. one of groupId, artifactId, version or type is null.   
+ * eg. one of groupId, artifactId, version or type is null.
  */
 public class InvalidArtifactRTException
     extends RuntimeException
 {
-    
+
     private final String groupId;
     private final String artifactId;
     private final String version;
     private final String type;
     private final String baseMessage;
 
-    public InvalidArtifactRTException( String groupId, String artifactId, String version, String type, String message )
+    public InvalidArtifactRTException( String groupId,
+                                       String artifactId,
+                                       String version,
+                                       String type,
+                                       String message )
     {
         this.groupId = groupId;
         this.artifactId = artifactId;
@@ -42,10 +46,15 @@ public class InvalidArtifactRTException
         this.baseMessage = message;
     }
 
-    public InvalidArtifactRTException( String groupId, String artifactId, String version, String type, String message, Throwable cause )
+    public InvalidArtifactRTException( String groupId,
+                                       String artifactId,
+                                       String version,
+                                       String type,
+                                       String message,
+                                       Throwable cause )
     {
         super( cause );
-        
+
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
@@ -57,7 +66,7 @@ public class InvalidArtifactRTException
     {
         return "For artifact {" + getArtifactKey() + "}: " + getBaseMessage();
     }
-    
+
     public String getBaseMessage()
     {
         return baseMessage;
@@ -82,7 +91,7 @@ public class InvalidArtifactRTException
     {
         return version;
     }
-    
+
     public String getArtifactKey()
     {
         return groupId + ":" + artifactId + ":" + version + ":" + type;

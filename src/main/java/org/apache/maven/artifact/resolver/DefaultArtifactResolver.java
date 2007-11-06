@@ -108,7 +108,8 @@ public class DefaultArtifactResolver
 
             if ( systemFile == null )
             {
-                throw new ArtifactResolutionException( "systemPath not set for system-scoped artifact: " + artifact.getId(), artifact );
+                throw new ArtifactResolutionException(
+                    "systemPath not set for system-scoped artifact: " + artifact.getId(), artifact );
             }
             else if ( !systemFile.exists() )
             {
@@ -400,7 +401,7 @@ public class DefaultArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         return resolveTransitively( artifacts, originatingArtifact, managedVersions, localRepository,
-                                    remoteRepositories, source, filter, listeners, null );
+            remoteRepositories, source, filter, listeners, null );
     }
 
     public ArtifactResolutionResult resolveTransitively( Set artifacts,

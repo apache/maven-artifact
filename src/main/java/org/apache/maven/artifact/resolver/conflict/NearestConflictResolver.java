@@ -24,7 +24,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
 /**
  * Resolves conflicting artifacts by always selecting the <em>nearest</em> declaration. Nearest is defined as the
  * declaration that has the least transitive steps away from the project being built.
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
@@ -34,12 +34,14 @@ public class NearestConflictResolver
     implements ConflictResolver
 {
     // ConflictResolver methods -----------------------------------------------
-    
+
     /*
-     * @see org.apache.maven.artifact.resolver.conflict.ConflictResolver#resolveConflict(org.apache.maven.artifact.resolver.ResolutionNode,
-     *      org.apache.maven.artifact.resolver.ResolutionNode)
-     */
-    public ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 )
+    * @see org.apache.maven.artifact.resolver.conflict.ConflictResolver#resolveConflict(org.apache.maven.artifact.resolver.ResolutionNode,
+    *      org.apache.maven.artifact.resolver.ResolutionNode)
+    */
+
+    public ResolutionNode resolveConflict( ResolutionNode node1,
+                                           ResolutionNode node2 )
     {
         return node1.getDepth() <= node2.getDepth() ? node1 : node2;
     }

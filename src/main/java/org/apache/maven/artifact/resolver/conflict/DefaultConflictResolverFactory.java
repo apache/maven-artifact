@@ -28,26 +28,28 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 
 /**
  * A conflict resolver factory that obtains instances from a plexus container.
- * 
+ *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
  * @since 3.0
  */
-public class DefaultConflictResolverFactory implements ConflictResolverFactory, Contextualizable
+public class DefaultConflictResolverFactory
+    implements ConflictResolverFactory,
+    Contextualizable
 {
     // fields -----------------------------------------------------------------
 
-    /**
-     * The plexus container used to obtain instances from.
-     */
+    /** The plexus container used to obtain instances from. */
     private PlexusContainer container;
-    
+
     // ConflictResolverFactory methods ----------------------------------------
-    
+
     /*
-     * @see org.apache.maven.artifact.resolver.conflict.ConflictResolverFactory#getConflictResolver(java.lang.String)
-     */
-    public ConflictResolver getConflictResolver( String type ) throws ConflictResolverNotFoundException
+    * @see org.apache.maven.artifact.resolver.conflict.ConflictResolverFactory#getConflictResolver(java.lang.String)
+    */
+
+    public ConflictResolver getConflictResolver( String type )
+        throws ConflictResolverNotFoundException
     {
         try
         {
@@ -64,7 +66,9 @@ public class DefaultConflictResolverFactory implements ConflictResolverFactory, 
     /*
      * @see org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable#contextualize(org.codehaus.plexus.context.Context)
      */
-    public void contextualize( Context context ) throws ContextException
+
+    public void contextualize( Context context )
+        throws ContextException
     {
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }

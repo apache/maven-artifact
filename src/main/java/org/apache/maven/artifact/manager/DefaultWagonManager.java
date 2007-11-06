@@ -65,14 +65,15 @@ import java.util.Map;
 
 public class DefaultWagonManager
     extends AbstractLogEnabled
-    implements WagonManager, Contextualizable
+    implements WagonManager,
+    Contextualizable
 {
     private static final String WILDCARD = "*";
 
-    private static final String[] CHECKSUM_IDS = { "md5", "sha1" };
+    private static final String[] CHECKSUM_IDS = {"md5", "sha1"};
 
     /** have to match the CHECKSUM_IDS */
-    private static final String[] CHECKSUM_ALGORITHMS = { "MD5", "SHA-1" };
+    private static final String[] CHECKSUM_ALGORITHMS = {"MD5", "SHA-1"};
 
     private PlexusContainer container;
 
@@ -86,9 +87,7 @@ public class DefaultWagonManager
 
     private Map mirrors = new HashMap();
 
-    /**
-     * Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration
-     */
+    /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
     private Map serverConfigurationMap = new HashMap();
 
     private TransferListener downloadMonitor;
@@ -103,11 +102,9 @@ public class DefaultWagonManager
 
     private RepositoryPermissions defaultRepositoryPermissions;
 
-    /**
-     *  encapsulates access to Server credentials
-     */
+    /** encapsulates access to Server credentials */
     private CredentialsDataSource credentialsDataSource;
-    
+
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
@@ -134,7 +131,7 @@ public class DefaultWagonManager
         if ( wagon == null )
         {
             throw new UnsupportedProtocolException(
-                                                   "Cannot find wagon which supports the requested protocol: " + protocol );
+                "Cannot find wagon which supports the requested protocol: " + protocol );
         }
 
         wagon.setInteractive( interactive );
@@ -142,20 +139,26 @@ public class DefaultWagonManager
         return wagon;
     }
 
-    public void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
+    public void putArtifact( File source,
+                             Artifact artifact,
+                             ArtifactRepository deploymentRepository )
         throws TransferFailedException
     {
         putRemoteFile( deploymentRepository, source, deploymentRepository.pathOf( artifact ), downloadMonitor );
     }
 
-    public void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
+    public void putArtifactMetadata( File source,
+                                     ArtifactMetadata artifactMetadata,
+                                     ArtifactRepository repository )
         throws TransferFailedException
     {
         getLogger().info( "Uploading " + artifactMetadata );
         putRemoteFile( repository, source, repository.pathOfRemoteRepositoryMetadata( artifactMetadata ), null );
     }
 
-    private void putRemoteFile( ArtifactRepository repository, File source, String remotePath,
+    private void putRemoteFile( ArtifactRepository repository,
+                                File source,
+                                String remotePath,
                                 TransferListener downloadMonitor )
         throws TransferFailedException
     {
@@ -198,7 +201,8 @@ public class DefaultWagonManager
 
                 if ( serverPermissionsMap.containsKey( repository.getId() ) )
                 {
-                    RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get( repository.getId() );
+                    RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get(
+                        repository.getId() );
 
                     getLogger().debug(
                         "adding permissions to wagon connection: " + perms.getFileMode() + " " + perms.getDirectoryMode() );
@@ -213,11 +217,13 @@ public class DefaultWagonManager
                 wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
                 wagon.put( source, remotePath );
-            } catch (CredentialsDataSourceException e) {
-            	String err = "Problem with server credentials: "+e.getMessage();
+            }
+            catch ( CredentialsDataSourceException e )
+            {
+                String err = "Problem with server credentials: " + e.getMessage();
                 getLogger().error( err );
-				throw new TransferFailedException(err);
-			}
+                throw new TransferFailedException( err );
+            }
             finally
             {
                 if ( downloadMonitor != null )
@@ -285,7 +291,8 @@ public class DefaultWagonManager
         }
     }
 
-    private ChecksumObserver addChecksumObserver( Wagon wagon, String algorithm )
+    private ChecksumObserver addChecksumObserver( Wagon wagon,
+                                                  String algorithm )
         throws TransferFailedException
     {
         try
@@ -300,7 +307,8 @@ public class DefaultWagonManager
         }
     }
 
-    public void getArtifact( Artifact artifact, List remoteRepositories )
+    public void getArtifact( Artifact artifact,
+                             List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         // TODO [BP]: The exception handling here needs some work
@@ -337,7 +345,8 @@ public class DefaultWagonManager
         }
     }
 
-    public void getArtifact( Artifact artifact, ArtifactRepository repository )
+    public void getArtifact( Artifact artifact,
+                             ArtifactRepository repository )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOf( artifact );
@@ -357,14 +366,16 @@ public class DefaultWagonManager
             getLogger().debug( "Trying repository " + repository.getId() );
 
             getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(),
-                           false );
+                false );
             getLogger().debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
         }
     }
 
-    public void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository repository, File destination,
+    public void getArtifactMetadata( ArtifactMetadata metadata,
+                                     ArtifactRepository repository,
+                                     File destination,
                                      String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException
     {
@@ -373,8 +384,12 @@ public class DefaultWagonManager
         getRemoteFile( repository, destination, remotePath, null, checksumPolicy, true );
     }
 
-    private void getRemoteFile( ArtifactRepository repository, File destination, String remotePath,
-                                TransferListener downloadMonitor, String checksumPolicy, boolean force )
+    private void getRemoteFile( ArtifactRepository repository,
+                                File destination,
+                                String remotePath,
+                                TransferListener downloadMonitor,
+                                String checksumPolicy,
+                                boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         // TODO: better excetpions - transfer failed is not enough?
@@ -386,8 +401,8 @@ public class DefaultWagonManager
         if ( mirror != null )
         {
             repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
-                                                                     repository.getLayout(), repository.getSnapshots(),
-                                                                     repository.getReleases() );
+                repository.getLayout(), repository.getSnapshots(),
+                repository.getReleases() );
         }
 
         String protocol = repository.getProtocol();
@@ -426,7 +441,7 @@ public class DefaultWagonManager
         try
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
-                           getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
+                getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
             boolean firstRun = true;
             boolean retry = true;
@@ -520,7 +535,7 @@ public class DefaultWagonManager
                         {
                             // this was a failed transfer, and we don't want to retry.
                             handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
-                                                   md5TryException );
+                                md5TryException );
                         }
                     }
 
@@ -546,9 +561,11 @@ public class DefaultWagonManager
         catch ( AuthorizationException e )
         {
             throw new TransferFailedException( "Authorization failed: " + e.getMessage(), e );
-        } catch (CredentialsDataSourceException e) {
+        }
+        catch ( CredentialsDataSourceException e )
+        {
             throw new TransferFailedException( "Retrieving credentials failed: " + e.getMessage(), e );
-		}
+        }
         finally
         {
             // Remove every TransferListener
@@ -603,7 +620,9 @@ public class DefaultWagonManager
         }
     }
 
-    private void handleChecksumFailure( String checksumPolicy, String message, Throwable cause )
+    private void handleChecksumFailure( String checksumPolicy,
+                                        String message,
+                                        Throwable cause )
         throws ChecksumFailedException
     {
         if ( ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals( checksumPolicy ) )
@@ -618,8 +637,12 @@ public class DefaultWagonManager
         // otherwise it is ignore
     }
 
-    private void verifyChecksum( ChecksumObserver checksumObserver, File destination, File tempDestination,
-                                 String remotePath, String checksumFileExtension, Wagon wagon )
+    private void verifyChecksum( ChecksumObserver checksumObserver,
+                                 File destination,
+                                 File tempDestination,
+                                 String remotePath,
+                                 String checksumFileExtension,
+                                 Wagon wagon )
         throws ResourceDoesNotExistException, TransferFailedException, AuthorizationException
     {
         try
@@ -686,7 +709,8 @@ public class DefaultWagonManager
         }
     }
 
-    private void releaseWagon( String protocol, Wagon wagon )
+    private void releaseWagon( String protocol,
+                               Wagon wagon )
     {
         try
         {
@@ -705,12 +729,12 @@ public class DefaultWagonManager
     }
 
     public AuthenticationInfo getAuthenticationInfo( String id )
-    throws CredentialsDataSourceException
+        throws CredentialsDataSourceException
     {
-    	return credentialsDataSource == null 
-    			? (AuthenticationInfo) authenticationInfoMap.get( id )
-    			: credentialsDataSource.get(id)
-    			;
+        return credentialsDataSource == null
+            ? (AuthenticationInfo) authenticationInfoMap.get( id )
+            : credentialsDataSource.get( id )
+            ;
     }
 
     public ArtifactRepository getMirror( String mirrorOf )
@@ -737,7 +761,11 @@ public class DefaultWagonManager
      *                      property format: <code>*.foo.com|localhost</code>.
      * @todo [BP] would be nice to configure this via plexus in some way
      */
-    public void addProxy( String protocol, String host, int port, String username, String password,
+    public void addProxy( String protocol,
+                          String host,
+                          int port,
+                          String username,
+                          String password,
                           String nonProxyHosts )
     {
         ProxyInfo proxyInfo = new ProxyInfo();
@@ -757,9 +785,7 @@ public class DefaultWagonManager
         container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
     }
 
-    /**
-     * @todo I'd rather not be setting this explicitly.
-     */
+    /** @todo I'd rather not be setting this explicitly. */
     public void setDownloadMonitor( TransferListener downloadMonitor )
     {
         this.downloadMonitor = downloadMonitor;
@@ -769,11 +795,15 @@ public class DefaultWagonManager
     // library from the 2.0.x code so that we aren't maintaining two lines of code
     // for the artifact management.
     public void addAuthenticationInfo( String repositoryId
-									, String username
-									, String password
-									, String privateKey
-									, String passphrase
-    								)
+        ,
+                                       String username
+        ,
+                                       String password
+        ,
+                                       String privateKey
+        ,
+                                       String passphrase
+    )
     {
         AuthenticationInfo authInfo = new AuthenticationInfo();
         authInfo.setUserName( username );
@@ -787,26 +817,32 @@ public class DefaultWagonManager
     // This is the new way of handling authentication that will allow us to help users setup 
     // authentication requirements.
     public void addAuthenticationCredentials( String repositoryId
-									, String username
-									, String password
-									, String privateKey
-									, String passphrase 
-    								)
-    throws CredentialsDataSourceException
+        ,
+                                              String username
+        ,
+                                              String password
+        ,
+                                              String privateKey
+        ,
+                                              String passphrase
+    )
+        throws CredentialsDataSourceException
     {
         AuthenticationInfo authInfo = new AuthenticationInfo();
         authInfo.setUserName( username );
         authInfo.setPassword( password );
         authInfo.setPrivateKey( privateKey );
         authInfo.setPassphrase( passphrase );
-        
-        if( credentialsDataSource == null )
-        	authenticationInfoMap.put( repositoryId, authInfo );
+
+        if ( credentialsDataSource == null )
+            authenticationInfoMap.put( repositoryId, authInfo );
         else
-        	credentialsDataSource.set( new CredentialsChangeRequest( repositoryId, authInfo, null ) );
+            credentialsDataSource.set( new CredentialsChangeRequest( repositoryId, authInfo, null ) );
     }
 
-    public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
+    public void addPermissionInfo( String repositoryId,
+                                   String filePermissions,
+                                   String directoryPermissions )
     {
         RepositoryPermissions permissions = new RepositoryPermissions();
 
@@ -830,7 +866,9 @@ public class DefaultWagonManager
         }
     }
 
-    public void addMirror( String id, String mirrorOf, String url )
+    public void addMirror( String id,
+                           String mirrorOf,
+                           String url )
     {
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
@@ -866,10 +904,9 @@ public class DefaultWagonManager
         }
     }
 
-    /**
-     * @deprecated Wagons are discovered in plugin and extension realms now.
-     */
-    public void registerWagons( Collection wagons, PlexusContainer extensionContainer )
+    /** @deprecated Wagons are discovered in plugin and extension realms now. */
+    public void registerWagons( Collection wagons,
+                                PlexusContainer extensionContainer )
     {
     }
 
@@ -880,13 +917,15 @@ public class DefaultWagonManager
      * @param repository the repository that has the configuration
      * @throws WagonConfigurationException wraps any error given during configuration of the wagon instance
      */
-    private void configureWagon( Wagon wagon, ArtifactRepository repository )
+    private void configureWagon( Wagon wagon,
+                                 ArtifactRepository repository )
         throws WagonConfigurationException
     {
         configureWagon( wagon, repository.getId() );
     }
 
-    private void configureWagon( Wagon wagon, String repositoryId )
+    private void configureWagon( Wagon wagon,
+                                 String repositoryId )
         throws WagonConfigurationException
     {
         if ( serverConfigurationMap.containsKey( repositoryId ) )
@@ -922,7 +961,8 @@ public class DefaultWagonManager
         }
     }
 
-    public void addConfiguration( String repositoryId, Xpp3Dom configuration )
+    public void addConfiguration( String repositoryId,
+                                  Xpp3Dom configuration )
     {
         if ( ( repositoryId == null ) || ( configuration == null ) )
         {
@@ -939,10 +979,10 @@ public class DefaultWagonManager
         this.defaultRepositoryPermissions = defaultRepositoryPermissions;
     }
 
-	public void registerCredentialsDataSource(CredentialsDataSource cds)
-	{
-		this.credentialsDataSource = cds;
-	}
-    
-    
+    public void registerCredentialsDataSource( CredentialsDataSource cds )
+    {
+        this.credentialsDataSource = cds;
+    }
+
+
 }

@@ -23,7 +23,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
 
 /**
  * Determines which version of an artifact to use when there are conflicting declarations.
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
@@ -34,14 +34,13 @@ public interface ConflictResolver
 
     /**
      * Determines which of the specified versions of an artifact to use when there are conflicting declarations.
-     * 
-     * @param node1
-     *            the first artifact declaration
-     * @param node2
-     *            the second artifact declaration
+     *
+     * @param node1 the first artifact declaration
+     * @param node2 the second artifact declaration
      * @return the artifact declaration to use: <code>node1</code>; <code>node2</code>; or <code>null</code>if
      *         this conflict cannot be resolved
      * @since 3.0
      */
-    ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 );
+    ResolutionNode resolveConflict( ResolutionNode node1,
+                                    ResolutionNode node2 );
 }

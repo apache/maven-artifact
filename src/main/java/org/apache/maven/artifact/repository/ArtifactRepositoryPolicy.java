@@ -55,7 +55,9 @@ public class ArtifactRepositoryPolicy
         this( true, null, null );
     }
 
-    public ArtifactRepositoryPolicy( boolean enabled, String updatePolicy, String checksumPolicy )
+    public ArtifactRepositoryPolicy( boolean enabled,
+                                     String updatePolicy,
+                                     String checksumPolicy )
     {
         this.enabled = enabled;
 

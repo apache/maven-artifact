@@ -60,7 +60,8 @@ public abstract class AbstractRepositoryMetadata
         return "maven-metadata-" + repository.getKey() + ".xml";
     }
 
-    public void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    public void storeInLocalRepository( ArtifactRepository localRepository,
+                                        ArtifactRepository remoteRepository )
         throws RepositoryMetadataStoreException
     {
         try
@@ -77,7 +78,8 @@ public abstract class AbstractRepositoryMetadata
         }
     }
 
-    protected void updateRepositoryMetadata( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    protected void updateRepositoryMetadata( ArtifactRepository localRepository,
+                                             ArtifactRepository remoteRepository )
         throws IOException, XmlPullParserException
     {
         MetadataXpp3Reader mappingReader = new MetadataXpp3Reader();
@@ -85,7 +87,7 @@ public abstract class AbstractRepositoryMetadata
         Metadata metadata = null;
 
         File metadataFile = new File( localRepository.getBasedir(),
-                                      localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
+            localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
         if ( metadataFile.exists() )
         {
@@ -119,7 +121,8 @@ public abstract class AbstractRepositoryMetadata
 
         // beware meta-versions!
         String version = metadata.getVersion();
-        if ( version != null && ( Artifact.LATEST_VERSION.equals( version ) || Artifact.RELEASE_VERSION.equals( version ) ) )
+        if ( version != null && ( Artifact.LATEST_VERSION.equals( version ) || Artifact.RELEASE_VERSION.equals(
+            version ) ) )
         {
             // meta-versions are not valid <version/> values...don't write them.
             metadata.setVersion( null );
@@ -153,7 +156,8 @@ public abstract class AbstractRepositoryMetadata
         return "repository metadata for: \'" + getKey() + "\'";
     }
 
-    protected static Metadata createMetadata( Artifact artifact, Versioning versioning )
+    protected static Metadata createMetadata( Artifact artifact,
+                                              Versioning versioning )
     {
         Metadata metadata = new Metadata();
         metadata.setGroupId( artifact.getGroupId() );

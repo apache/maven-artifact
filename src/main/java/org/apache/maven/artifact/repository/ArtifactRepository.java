@@ -35,7 +35,8 @@ public interface ArtifactRepository
 
     String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata );
 
-    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository );
+    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
+                                          ArtifactRepository repository );
 
     String getUrl();
 

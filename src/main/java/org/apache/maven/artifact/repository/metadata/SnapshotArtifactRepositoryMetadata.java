@@ -40,7 +40,8 @@ public class SnapshotArtifactRepositoryMetadata
         this.artifact = artifact;
     }
 
-    public SnapshotArtifactRepositoryMetadata( Artifact artifact, Snapshot snapshot )
+    public SnapshotArtifactRepositoryMetadata( Artifact artifact,
+                                               Snapshot snapshot )
     {
         super( createMetadata( artifact, createVersioning( snapshot ) ) );
         this.artifact = artifact;

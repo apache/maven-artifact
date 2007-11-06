@@ -26,30 +26,35 @@ import java.util.List;
 
 public interface RepositoryMetadataManager
 {
-    void resolve( RepositoryMetadata repositoryMetadata, List repositories, ArtifactRepository localRepository )
+    void resolve( RepositoryMetadata repositoryMetadata,
+                  List repositories,
+                  ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException;
 
-    void resolveAlways( RepositoryMetadata metadata, ArtifactRepository localRepository,
+    void resolveAlways( RepositoryMetadata metadata,
+                        ArtifactRepository localRepository,
                         ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException;
 
     /**
      * Deploy metadata to the remote repository.
      *
-     * @param metadata the metadata to deploy
-     * @param localRepository the local repository to install to first
+     * @param metadata             the metadata to deploy
+     * @param localRepository      the local repository to install to first
      * @param deploymentRepository the remote repository to deploy to
      */
-    void deploy( ArtifactMetadata metadata, ArtifactRepository localRepository,
+    void deploy( ArtifactMetadata metadata,
+                 ArtifactRepository localRepository,
                  ArtifactRepository deploymentRepository )
         throws RepositoryMetadataDeploymentException;
 
     /**
      * Install the metadata in the local repository.
      *
-     * @param metadata the metadata
+     * @param metadata        the metadata
      * @param localRepository the local repository
      */
-    void install( ArtifactMetadata metadata, ArtifactRepository localRepository )
+    void install( ArtifactMetadata metadata,
+                  ArtifactRepository localRepository )
         throws RepositoryMetadataInstallationException;
 }

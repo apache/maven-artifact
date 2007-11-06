@@ -44,10 +44,11 @@ public class DefaultArtifactDeployer
 
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    /**
-     * @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly.
-     */
-    public void deploy( String basedir, String finalName, Artifact artifact, ArtifactRepository deploymentRepository,
+    /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
+    public void deploy( String basedir,
+                        String finalName,
+                        Artifact artifact,
+                        ArtifactRepository deploymentRepository,
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
@@ -56,7 +57,9 @@ public class DefaultArtifactDeployer
         deploy( source, artifact, deploymentRepository, localRepository );
     }
 
-    public void deploy( File source, Artifact artifact, ArtifactRepository deploymentRepository,
+    public void deploy( File source,
+                        Artifact artifact,
+                        ArtifactRepository deploymentRepository,
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {

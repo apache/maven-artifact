@@ -36,7 +36,8 @@ public class ArtifactDeploymentException
         super( cause );
     }
 
-    public ArtifactDeploymentException( String message, Throwable cause )
+    public ArtifactDeploymentException( String message,
+                                        Throwable cause )
     {
         super( message, cause );
     }

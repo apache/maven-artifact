@@ -53,8 +53,14 @@ public class AbstractArtifactResolutionException
 
     static final String LS = System.getProperty( "line.separator" );
 
-    protected AbstractArtifactResolutionException( String message, String groupId, String artifactId, String version,
-                                                   String type, String classifier, List remoteRepositories, List path )
+    protected AbstractArtifactResolutionException( String message,
+                                                   String groupId,
+                                                   String artifactId,
+                                                   String version,
+                                                   String type,
+                                                   String classifier,
+                                                   List remoteRepositories,
+                                                   List path )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ) );
 
@@ -68,8 +74,15 @@ public class AbstractArtifactResolutionException
         this.path = constructArtifactPath( path, "" );
     }
 
-    protected AbstractArtifactResolutionException( String message, String groupId, String artifactId, String version,
-                                                   String type, String classifier, List remoteRepositories, List path, Throwable t )
+    protected AbstractArtifactResolutionException( String message,
+                                                   String groupId,
+                                                   String artifactId,
+                                                   String version,
+                                                   String type,
+                                                   String classifier,
+                                                   List remoteRepositories,
+                                                   List path,
+                                                   Throwable t )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ), t );
 
@@ -83,22 +96,27 @@ public class AbstractArtifactResolutionException
         this.path = constructArtifactPath( path, "" );
     }
 
-    protected AbstractArtifactResolutionException( String message, Artifact artifact )
+    protected AbstractArtifactResolutionException( String message,
+                                                   Artifact artifact )
     {
         this( message, artifact, null );
     }
 
-    protected AbstractArtifactResolutionException( String message, Artifact artifact, List remoteRepositories )
+    protected AbstractArtifactResolutionException( String message,
+                                                   Artifact artifact,
+                                                   List remoteRepositories )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              artifact.getClassifier(),remoteRepositories, artifact.getDependencyTrail() );
+            artifact.getClassifier(), remoteRepositories, artifact.getDependencyTrail() );
     }
 
-    protected AbstractArtifactResolutionException( String message, Artifact artifact, List remoteRepositories,
+    protected AbstractArtifactResolutionException( String message,
+                                                   Artifact artifact,
+                                                   List remoteRepositories,
                                                    Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              artifact.getClassifier(),remoteRepositories, artifact.getDependencyTrail(), t );
+            artifact.getClassifier(), remoteRepositories, artifact.getDependencyTrail(), t );
     }
 
     public String getGroupId()
@@ -121,17 +139,13 @@ public class AbstractArtifactResolutionException
         return type;
     }
 
-    /**
-     * @return the classifier
-     */
+    /** @return the classifier */
     public String getClassifier()
     {
         return this.classifier;
     }
 
-    /**
-     * @return the path
-     */
+    /** @return the path */
     public String getPath()
     {
         return this.path;
@@ -147,7 +161,8 @@ public class AbstractArtifactResolutionException
         return originalMessage;
     }
 
-    protected static String constructArtifactPath( List path, String indentation )
+    protected static String constructArtifactPath( List path,
+                                                   String indentation )
     {
         StringBuffer sb = new StringBuffer();
 
@@ -172,8 +187,13 @@ public class AbstractArtifactResolutionException
         return sb.toString();
     }
 
-    private static String constructMessageBase( String message, String groupId, String artifactId, String version,
-                                                String type, List remoteRepositories, List path )
+    private static String constructMessageBase( String message,
+                                                String groupId,
+                                                String artifactId,
+                                                String version,
+                                                String type,
+                                                List remoteRepositories,
+                                                List path )
     {
         StringBuffer sb = new StringBuffer();
 
@@ -207,8 +227,15 @@ public class AbstractArtifactResolutionException
         return sb.toString();
     }
 
-    protected static String constructMissingArtifactMessage( String message, String indentation, String groupId, String artifactId, String version,
-                                              String type, String classifier, String downloadUrl, List path )
+    protected static String constructMissingArtifactMessage( String message,
+                                                             String indentation,
+                                                             String groupId,
+                                                             String artifactId,
+                                                             String version,
+                                                             String type,
+                                                             String classifier,
+                                                             String downloadUrl,
+                                                             List path )
     {
         StringBuffer sb = new StringBuffer( message );
 
@@ -243,14 +270,14 @@ public class AbstractArtifactResolutionException
             sb.append( groupId );
             sb.append( " -DartifactId=" );
             sb.append( artifactId );
-            sb.append( " \\\n");
+            sb.append( " \\\n" );
             sb.append( indentation );
             sb.append( "        " );
             sb.append( "-Dversion=" );
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
-            if (classifier !=null && !classifier.equals( "" ))
+            if ( classifier != null && !classifier.equals( "" ) )
             {
                 sb.append( " -Dclassifier=" );
                 sb.append( classifier );
@@ -269,14 +296,14 @@ public class AbstractArtifactResolutionException
             sb.append( groupId );
             sb.append( " -DartifactId=" );
             sb.append( artifactId );
-            sb.append( " \\\n");
+            sb.append( " \\\n" );
             sb.append( indentation );
             sb.append( "        " );
             sb.append( "-Dversion=" );
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
-            if (classifier !=null && !classifier.equals( "" ))
+            if ( classifier != null && !classifier.equals( "" ) )
             {
                 sb.append( " -Dclassifier=" );
                 sb.append( classifier );
@@ -284,7 +311,7 @@ public class AbstractArtifactResolutionException
             sb.append( " -Dpackaging=" );
             sb.append( type );
             sb.append( " -Dfile=/path/to/file" );
-            sb.append( " \\\n");
+            sb.append( " \\\n" );
             sb.append( indentation );
             sb.append( "        " );
             sb.append( " -Durl=[url] -DrepositoryId=[id]" );

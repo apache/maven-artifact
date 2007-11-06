@@ -28,9 +28,7 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author jdcasey
- */
+/** @author jdcasey */
 public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {
@@ -50,9 +48,10 @@ public class DefaultArtifactRepositoryFactory
         return (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
-                                                        String layoutId,
-                                                        boolean uniqueVersion )
+    public ArtifactRepository createDeploymentArtifactRepository( String id,
+                                                                  String url,
+                                                                  String layoutId,
+                                                                  boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
         ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
@@ -60,14 +59,16 @@ public class DefaultArtifactRepositoryFactory
         return createDeploymentArtifactRepository( id, url, layout, uniqueVersion );
     }
 
-    public ArtifactRepository createDeploymentArtifactRepository( String id, String url,
+    public ArtifactRepository createDeploymentArtifactRepository( String id,
+                                                                  String url,
                                                                   ArtifactRepositoryLayout repositoryLayout,
                                                                   boolean uniqueVersion )
     {
         return new DefaultArtifactRepository( id, url, repositoryLayout, uniqueVersion );
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url,
+    public ArtifactRepository createArtifactRepository( String id,
+                                                        String url,
                                                         String layoutId,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
@@ -78,7 +79,8 @@ public class DefaultArtifactRepositoryFactory
         return createArtifactRepository( id, url, layout, snapshots, releases );
     }
 
-    public ArtifactRepository createArtifactRepository( String id, String url,
+    public ArtifactRepository createArtifactRepository( String id,
+                                                        String url,
                                                         ArtifactRepositoryLayout repositoryLayout,
                                                         ArtifactRepositoryPolicy snapshots,
                                                         ArtifactRepositoryPolicy releases )
@@ -117,7 +119,7 @@ public class DefaultArtifactRepositoryFactory
         }
 
         DefaultArtifactRepository repository = new DefaultArtifactRepository( id, url, repositoryLayout, snapshots,
-                                                                              releases );
+            releases );
         repository.setBlacklisted( blacklisted );
 
         artifactRepositories.put( id, repository );
@@ -143,17 +145,17 @@ public class DefaultArtifactRepositoryFactory
         try
         {
             repo = new DefaultArtifactRepository( LOCAL_REPOSITORY_ID,
-                                                  localRepositoryDirectory.toURI()
-                                                                          .toURL()
-                                                                          .toExternalForm(),
-                                                  layout, new ArtifactRepositoryPolicy(),
-                                                  new ArtifactRepositoryPolicy() );
+                localRepositoryDirectory.toURI()
+                    .toURL()
+                    .toExternalForm(),
+                layout, new ArtifactRepositoryPolicy(),
+                new ArtifactRepositoryPolicy() );
         }
         catch ( MalformedURLException e )
         {
             throw new InvalidRepositoryException( "Invalid local repository directory: "
-                                                  + localRepositoryDirectory
-                                                  + ". Cannot render URL.", LOCAL_REPOSITORY_ID, e );
+                + localRepositoryDirectory
+                + ". Cannot render URL.", LOCAL_REPOSITORY_ID, e );
         }
 
         repo.setBasedir( localRepositoryDirectory.getAbsolutePath() );

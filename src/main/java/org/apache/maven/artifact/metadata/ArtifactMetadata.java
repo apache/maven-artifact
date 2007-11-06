@@ -32,14 +32,10 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
  */
 public interface ArtifactMetadata
 {
-    /**
-     * Whether this metadata should be stored alongside the artifact.
-     */
+    /** Whether this metadata should be stored alongside the artifact. */
     boolean storedInArtifactVersionDirectory();
 
-    /**
-     * Whether this metadata should be stored alongside the group.
-     */
+    /** Whether this metadata should be stored alongside the group. */
     boolean storedInGroupDirectory();
 
     String getGroupId();
@@ -76,11 +72,12 @@ public interface ArtifactMetadata
     /**
      * Store the metadata in the local repository.
      *
-     * @param localRepository the local repository
+     * @param localRepository  the local repository
      * @param remoteRepository the remote repository it came from
      * @todo this should only be needed on the repository metadata
      */
-    void storeInLocalRepository( ArtifactRepository localRepository, ArtifactRepository remoteRepository )
+    void storeInLocalRepository( ArtifactRepository localRepository,
+                                 ArtifactRepository remoteRepository )
         throws RepositoryMetadataStoreException;
 
     String extendedToString();

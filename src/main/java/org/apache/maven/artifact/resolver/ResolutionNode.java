@@ -48,7 +48,8 @@ public class ResolutionNode
 
     private List trail;
 
-    public ResolutionNode( Artifact artifact, List remoteRepositories )
+    public ResolutionNode( Artifact artifact,
+                           List remoteRepositories )
     {
         this.artifact = artifact;
         this.remoteRepositories = remoteRepositories;
@@ -57,7 +58,9 @@ public class ResolutionNode
         this.parent = null;
     }
 
-    public ResolutionNode( Artifact artifact, List remoteRepositories, ResolutionNode parent )
+    public ResolutionNode( Artifact artifact,
+                           List remoteRepositories,
+                           ResolutionNode parent )
     {
         this.artifact = artifact;
         this.remoteRepositories = remoteRepositories;
@@ -78,7 +81,9 @@ public class ResolutionNode
         return artifact.getDependencyConflictId();
     }
 
-    public void addDependencies( Set artifacts, List remoteRepositories, ArtifactFilter filter )
+    public void addDependencies( Set artifacts,
+                                 List remoteRepositories,
+                                 ArtifactFilter filter )
         throws CyclicDependencyException, OverConstrainedVersionException
     {
         if ( !artifacts.isEmpty() )

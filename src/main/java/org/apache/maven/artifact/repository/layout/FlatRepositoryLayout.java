@@ -40,7 +40,8 @@ public class FlatRepositoryLayout
         return path.toString();
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
+                                                 ArtifactRepository repository )
     {
         return pathOfRepositoryMetadata( metadata.getLocalFilename( repository ) );
     }
@@ -55,7 +56,7 @@ public class FlatRepositoryLayout
     }
 
     public String pathOfRemoteRepositoryMetadata( ArtifactMetadata metadata )
-    {        
+    {
         return pathOfRepositoryMetadata( metadata.getRemoteFilename() );
     }
 }

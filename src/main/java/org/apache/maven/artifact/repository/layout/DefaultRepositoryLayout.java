@@ -24,9 +24,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-/**
- * @author jdcasey
- */
+/** @author jdcasey */
 public class DefaultRepositoryLayout
     implements ArtifactRepositoryLayout
 {
@@ -60,12 +58,14 @@ public class DefaultRepositoryLayout
         return path.toString();
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
+                                                 ArtifactRepository repository )
     {
         return pathOfRepositoryMetadata( metadata, metadata.getLocalFilename( repository ) );
     }
 
-    private String pathOfRepositoryMetadata( ArtifactMetadata metadata, String filename )
+    private String pathOfRepositoryMetadata( ArtifactMetadata metadata,
+                                             String filename )
     {
         StringBuffer path = new StringBuffer();
 

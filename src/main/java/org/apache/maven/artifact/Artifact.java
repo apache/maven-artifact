@@ -48,7 +48,7 @@ public interface Artifact
     Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
     // TODO: into scope handler
-    
+
     String SCOPE_COMPILE = ArtifactScopeEnum.compile.toString();
 
     String SCOPE_TEST = ArtifactScopeEnum.test.toString();
@@ -91,9 +91,7 @@ public interface Artifact
 
     String getBaseVersion();
 
-    /**
-     * @todo would like to get rid of this - or at least only have one. Base version should be immutable.
-     */
+    /** @todo would like to get rid of this - or at least only have one. Base version should be immutable. */
     void setBaseVersion( String baseVersion );
 
     // ----------------------------------------------------------------------
@@ -110,7 +108,8 @@ public interface Artifact
 
     ArtifactRepository getRepository();
 
-    void updateVersion( String version, ArtifactRepository localRepository );
+    void updateVersion( String version,
+                        ArtifactRepository localRepository );
 
     String getDownloadUrl();
 
@@ -146,9 +145,7 @@ public interface Artifact
 
     void setResolvedVersion( String version );
 
-    /**
-     * @todo remove, a quick hack for the lifecycle executor
-     */
+    /** @todo remove, a quick hack for the lifecycle executor */
     void setArtifactHandler( ArtifactHandler handler );
 
     boolean isRelease();
@@ -160,7 +157,7 @@ public interface Artifact
     void setAvailableVersions( List versions );
 
     boolean isOptional();
-    
+
     void setOptional( boolean optional );
 
     ArtifactVersion getSelectedVersion()

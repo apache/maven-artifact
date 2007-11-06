@@ -87,14 +87,25 @@ public class DefaultArtifact
 
     private boolean optional;
 
-    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
-                            String classifier, ArtifactHandler artifactHandler )
+    public DefaultArtifact( String groupId,
+                            String artifactId,
+                            VersionRange versionRange,
+                            String scope,
+                            String type,
+                            String classifier,
+                            ArtifactHandler artifactHandler )
     {
         this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );
     }
 
-    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String scope, String type,
-                            String classifier, ArtifactHandler artifactHandler, boolean optional )
+    public DefaultArtifact( String groupId,
+                            String artifactId,
+                            VersionRange versionRange,
+                            String scope,
+                            String type,
+                            String classifier,
+                            ArtifactHandler artifactHandler,
+                            boolean optional )
     {
         this.groupId = groupId;
 
@@ -127,25 +138,25 @@ public class DefaultArtifact
         if ( empty( groupId ) )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                                                  "The groupId cannot be empty." );
+                "The groupId cannot be empty." );
         }
 
         if ( artifactId == null )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                                                  "The artifactId cannot be empty." );
+                "The artifactId cannot be empty." );
         }
 
         if ( type == null )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                                                  "The type cannot be empty." );
+                "The type cannot be empty." );
         }
 
         if ( ( version == null ) && ( versionRange == null ) )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                                                  "The version cannot be empty." );
+                "The version cannot be empty." );
         }
     }
 
@@ -436,7 +447,8 @@ public class DefaultArtifact
         return result;
     }
 
-    public void updateVersion( String version, ArtifactRepository localRepository )
+    public void updateVersion( String version,
+                               ArtifactRepository localRepository )
     {
         setResolvedVersion( version );
         setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );

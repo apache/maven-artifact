@@ -38,7 +38,8 @@ public class VersionRange
 
     private final List restrictions;
 
-    private VersionRange( ArtifactVersion recommendedVersion, List restrictions )
+    private VersionRange( ArtifactVersion recommendedVersion,
+                          List restrictions )
     {
         this.recommendedVersion = recommendedVersion;
         this.restrictions = restrictions;
@@ -53,39 +54,40 @@ public class VersionRange
     {
         return restrictions;
     }
-    
+
     public VersionRange cloneOf()
     {
         List copiedRestrictions = null;
-        
+
         if ( restrictions != null )
         {
             copiedRestrictions = new ArrayList();
-            
+
             if ( !restrictions.isEmpty() )
             {
                 copiedRestrictions.addAll( restrictions );
             }
         }
-        
+
         return new VersionRange( recommendedVersion, copiedRestrictions );
     }
 
     /**
      * Create a version range from a string representation
-     * 
+     * <p/>
      * Some spec examples are
      * <ul>
-     *   <li><code>1.0</code> Version 1.0</li>
-     *   <li><code>[1.0,2.0)</code> Versions 1.0 (included) to 2.0 (not included)</li>
-     *   <li><code>[1.0,2.0]</code> Versions 1.0 to 2.0 (both included)</li>
-     *   <li><code>[1.5,)</code> Versions 1.5 and higher</li>
-     *   <li><code>(,1.0],[1.2,)</code> Versions up to 1.0 (included) and 1.2 or higher</li>
+     * <li><code>1.0</code> Version 1.0</li>
+     * <li><code>[1.0,2.0)</code> Versions 1.0 (included) to 2.0 (not included)</li>
+     * <li><code>[1.0,2.0]</code> Versions 1.0 to 2.0 (both included)</li>
+     * <li><code>[1.5,)</code> Versions 1.5 and higher</li>
+     * <li><code>(,1.0],[1.2,)</code> Versions up to 1.0 (included) and 1.2 or higher</li>
      * </ul>
-     * 
+     *
      * @param spec string representation of a version or version range
      * @return a new {@link VersionRange} object that represents the spec
      * @throws InvalidVersionSpecificationException
+     *
      */
     public static VersionRange createFromVersionSpec( String spec )
         throws InvalidVersionSpecificationException
@@ -220,31 +222,32 @@ public class VersionRange
     }
 
     /**
-     * Creates and returns a new <code>VersionRange</code> that is a restriction of this 
+     * Creates and returns a new <code>VersionRange</code> that is a restriction of this
      * version range and the specified version range.
      * <p>
-     * Note: Precedence is given to the recommended version from this version range over the 
+     * Note: Precedence is given to the recommended version from this version range over the
      * recommended version from the specified version range.
      * </p>
+     *
      * @param restriction the <code>VersionRange</code> that will be used to restrict this version
-     * range.
-     * @return the <code>VersionRange</code> that is a restriction of this version range and the 
-     * specified version range.
-     * <p>
-     * The restrictions of the returned version range will be an intersection of the restrictions
-     * of this version range and the specified version range if both version ranges have 
-     * restrictions. Otherwise, the restrictions on the returned range will be empty.
-     * </p>
-     * <p>
-     * The recommended version of the returned version range will be the recommended version of
-     * this version range, provided that ranges falls within the intersected restrictions. If 
-     * the restrictions are empty, this version range's recommended version is used if it is not
-     * <code>null</code>. If it is <code>null</code>, the specified version range's recommended
-     * version is used (provided it is non-<code>null</code>). If no recommended version can be 
-     * obtained, the returned version range's recommended version is set to <code>null</code>.
-     * </p>
-     * @throws NullPointerException if the specified <code>VersionRange</code> is 
-     * <code>null</code>.
+     *                    range.
+     * @return the <code>VersionRange</code> that is a restriction of this version range and the
+     *         specified version range.
+     *         <p>
+     *         The restrictions of the returned version range will be an intersection of the restrictions
+     *         of this version range and the specified version range if both version ranges have
+     *         restrictions. Otherwise, the restrictions on the returned range will be empty.
+     *         </p>
+     *         <p>
+     *         The recommended version of the returned version range will be the recommended version of
+     *         this version range, provided that ranges falls within the intersected restrictions. If
+     *         the restrictions are empty, this version range's recommended version is used if it is not
+     *         <code>null</code>. If it is <code>null</code>, the specified version range's recommended
+     *         version is used (provided it is non-<code>null</code>). If no recommended version can be
+     *         obtained, the returned version range's recommended version is set to <code>null</code>.
+     *         </p>
+     * @throws NullPointerException if the specified <code>VersionRange</code> is
+     *                              <code>null</code>.
      */
     public VersionRange restrict( VersionRange restriction )
     {
@@ -288,7 +291,7 @@ public class VersionRange
             // Use the original recommended version since it exists
             version = recommendedVersion;
         }
-        else if (restriction.recommendedVersion != null)
+        else if ( restriction.recommendedVersion != null )
         {
             // Use the recommended version from the specified VersionRange since there is no
             // original recommended version
@@ -304,7 +307,8 @@ public class VersionRange
         return new VersionRange( version, restrictions );
     }
 
-    private List intersection( List r1, List r2 )
+    private List intersection( List r1,
+                               List r2 )
     {
         List restrictions = new ArrayList( r1.size() + r2.size() );
         Iterator i1 = r1.iterator();

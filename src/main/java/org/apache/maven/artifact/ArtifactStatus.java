@@ -31,34 +31,22 @@ import java.util.Map;
 public final class ArtifactStatus
     implements Comparable
 {
-    /**
-     * No trust - no information about status.
-     */
+    /** No trust - no information about status. */
     public static final ArtifactStatus NONE = new ArtifactStatus( "none", 0 );
 
-    /**
-     * No trust - information was generated with defaults.
-     */
+    /** No trust - information was generated with defaults. */
     public static final ArtifactStatus GENERATED = new ArtifactStatus( "generated", 1 );
 
-    /**
-     * Low trust - was converted from the Maven 1.x repository.
-     */
+    /** Low trust - was converted from the Maven 1.x repository. */
     public static final ArtifactStatus CONVERTED = new ArtifactStatus( "converted", 2 );
 
-    /**
-     * Moderate trust - it was deployed directly from a partner.
-     */
+    /** Moderate trust - it was deployed directly from a partner. */
     public static final ArtifactStatus PARTNER = new ArtifactStatus( "partner", 3 );
 
-    /**
-     * Moderate trust - it was deployed directly by a user.
-     */
+    /** Moderate trust - it was deployed directly by a user. */
     public static final ArtifactStatus DEPLOYED = new ArtifactStatus( "deployed", 4 );
 
-    /**
-     * Trusted, as it has had its data verified by hand.
-     */
+    /** Trusted, as it has had its data verified by hand. */
     public static final ArtifactStatus VERIFIED = new ArtifactStatus( "verified", 5 );
 
     private final int rank;
@@ -67,7 +55,8 @@ public final class ArtifactStatus
 
     private static Map map;
 
-    private ArtifactStatus( String key, int rank )
+    private ArtifactStatus( String key,
+                            int rank )
     {
         this.rank = rank;
         this.key = key;

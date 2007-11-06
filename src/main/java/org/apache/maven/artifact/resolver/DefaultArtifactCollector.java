@@ -53,9 +53,7 @@ import java.util.Set;
 public class DefaultArtifactCollector
     implements ArtifactCollector
 {
-    /**
-     * The conflict resolver to use when none is specified.
-     */
+    /** The conflict resolver to use when none is specified. */
     private ConflictResolver defaultConflictResolver;
 
     public ArtifactResolutionResult collect( Set artifacts,
@@ -80,12 +78,17 @@ public class DefaultArtifactCollector
                                              List listeners )
     {
         return collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source,
-                        filter, listeners, null );
+            filter, listeners, null );
     }
 
-    public ArtifactResolutionResult collect( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                             ArtifactRepository localRepository, List remoteRepositories,
-                                             ArtifactMetadataSource source, ArtifactFilter filter, List listeners,
+    public ArtifactResolutionResult collect( Set artifacts,
+                                             Artifact originatingArtifact,
+                                             Map managedVersions,
+                                             ArtifactRepository localRepository,
+                                             List remoteRepositories,
+                                             ArtifactMetadataSource source,
+                                             ArtifactFilter filter,
+                                             List listeners,
                                              List conflictResolvers )
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
@@ -183,7 +186,8 @@ public class DefaultArtifactCollector
         }
 
         /* remove the originating artifact if it is also in managed versions to avoid being modified during resolution */
-        Artifact managedOriginatingArtifact = (Artifact) versionMap.get( originatingArtifact.getDependencyConflictId() );
+        Artifact managedOriginatingArtifact = (Artifact) versionMap.get(
+            originatingArtifact.getDependencyConflictId() );
 
         if ( managedOriginatingArtifact != null )
         {
@@ -286,8 +290,8 @@ public class DefaultArtifactCollector
                             // TODO: add better exception that can detail the two conflicting artifacts
                             result.addVersionRangeViolation( new ArtifactResolutionException(
                                 "Cannot resolve artifact version conflict between "
-                                + previous.getArtifact().getVersion() + " and "
-                                + node.getArtifact().getVersion(), previous.getArtifact() ) );
+                                    + previous.getArtifact().getVersion() + " and "
+                                    + node.getArtifact().getVersion(), previous.getArtifact() ) );
                         }
 
                         if ( ( resolved != previous ) && ( resolved != node ) )
@@ -297,7 +301,6 @@ public class DefaultArtifactCollector
                                 "Conflict resolver returned unknown resolution node: ",
                                 resolved.getArtifact() ) );
                         }
-
 
                         // TODO: should this be part of mediation?
                         // previous one is more dominant
@@ -475,7 +478,8 @@ public class DefaultArtifactCollector
                                 e );
                         }
 
-                        recurse( result, child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories, source,
+                        recurse( result, child, resolvedArtifacts, managedVersions, localRepository, remoteRepositories,
+                            source,
                             filter, listeners, conflictResolvers );
                     }
                 }
@@ -521,7 +525,7 @@ public class DefaultArtifactCollector
         }
 
         if ( Artifact.SCOPE_SYSTEM.equals( node.getArtifact().getScope() )
-             && ( node.getArtifact().getFile() == null ) && ( artifact.getFile() != null ) )
+            && ( node.getArtifact().getFile() == null ) && ( artifact.getFile() != null ) )
         {
             fireEvent( ResolutionListener.MANAGE_ARTIFACT_SYSTEM_PATH, listeners, node, artifact );
             node.getArtifact().setFile( artifact.getFile() );

@@ -41,32 +41,36 @@ public interface ArtifactTransformation
      * Take in a artifact and return the transformed artifact for locating in the remote repository. If no
      * transformation has occured the original artifact is returned.
      *
-     * @param artifact Artifact to be transformed.
+     * @param artifact           Artifact to be transformed.
      * @param remoteRepositories the repositories to check
-     * @param localRepository the local repository
+     * @param localRepository    the local repository
      */
-    void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    void transformForResolve( Artifact artifact,
+                              List remoteRepositories,
+                              ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * Take in a artifact and return the transformed artifact for locating in the local repository. If no
      * transformation has occured the original artifact is returned.
      *
-     * @param artifact Artifact to be transformed.
+     * @param artifact        Artifact to be transformed.
      * @param localRepository the local repository it will be stored in
      */
-    void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    void transformForInstall( Artifact artifact,
+                              ArtifactRepository localRepository )
         throws ArtifactInstallationException;
 
     /**
      * Take in a artifact and return the transformed artifact for distributing toa remote repository. If no
      * transformation has occured the original artifact is returned.
      *
-     * @param artifact Artifact to be transformed.
+     * @param artifact         Artifact to be transformed.
      * @param remoteRepository the repository to deploy to
-     * @param localRepository the local repository
+     * @param localRepository  the local repository
      */
-    void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+    void transformForDeployment( Artifact artifact,
+                                 ArtifactRepository remoteRepository,
                                  ArtifactRepository localRepository )
         throws ArtifactDeploymentException;
 

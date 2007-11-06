@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * Provides some metadata operations, like querying the remote repository for a list of versions available for an
  * artifact.
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
  * @version $Id$
  */
@@ -36,20 +36,25 @@ public interface ArtifactMetadataSource
 {
     String ROLE = ArtifactMetadataSource.class.getName();
 
-    ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    ResolutionGroup retrieve( Artifact artifact,
+                              ArtifactRepository localRepository,
+                              List remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 
     /**
      * Get a list of available versions for an artifact in the remote repository
-     * 
-     * @param artifact artifact we are interested in. Only <code>groupid</code> and <code>artifactId</code>
-     *                 are needed, for instance the following code will work 
-     *                 <code>artifactFactory.createProjectArtifact( "org.apache.maven", "maven", "" )</code>
-     * @param localRepository local repository
+     *
+     * @param artifact           artifact we are interested in. Only <code>groupid</code> and <code>artifactId</code>
+     *                           are needed, for instance the following code will work
+     *                           <code>artifactFactory.createProjectArtifact( "org.apache.maven", "maven", "" )</code>
+     * @param localRepository    local repository
      * @param remoteRepositories remote repositories, {@link List} $lt; {@link ArtifactRepository} >
      * @return {@link List} $lt; {@link ArtifactVersion} >
-     * @throws ArtifactMetadataRetrievalException in case of error while retrieving repository metadata from the repository.
+     * @throws ArtifactMetadataRetrievalException
+     *          in case of error while retrieving repository metadata from the repository.
      */
-    List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+    List retrieveAvailableVersions( Artifact artifact,
+                                    ArtifactRepository localRepository,
+                                    List remoteRepositories )
         throws ArtifactMetadataRetrievalException;
 }

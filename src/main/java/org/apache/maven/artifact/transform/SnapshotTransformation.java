@@ -52,9 +52,10 @@ public class SnapshotTransformation
 
     private static final String UTC_TIMESTAMP_PATTERN = "yyyyMMdd.HHmmss";
 
-    
 
-    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact,
+                                     List remoteRepositories,
+                                     ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {
         // Only select snapshots that are unresolved (eg 1.0-SNAPSHOT, not 1.0-20050607.123456)
@@ -72,7 +73,8 @@ public class SnapshotTransformation
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact,
+                                     ArtifactRepository localRepository )
     {
         if ( artifact.isSnapshot() )
         {
@@ -84,7 +86,8 @@ public class SnapshotTransformation
         }
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact,
+                                        ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
@@ -127,7 +130,8 @@ public class SnapshotTransformation
         return deploymentTimestamp;
     }
 
-    protected String constructVersion( Versioning versioning, String baseVersion )
+    protected String constructVersion( Versioning versioning,
+                                       String baseVersion )
     {
         String version = null;
         Snapshot snapshot = versioning.getSnapshot();
@@ -146,7 +150,8 @@ public class SnapshotTransformation
         return version;
     }
 
-    private int resolveLatestSnapshotBuildNumber( Artifact artifact, ArtifactRepository localRepository,
+    private int resolveLatestSnapshotBuildNumber( Artifact artifact,
+                                                  ArtifactRepository localRepository,
                                                   ArtifactRepository remoteRepository )
         throws RepositoryMetadataResolutionException
     {

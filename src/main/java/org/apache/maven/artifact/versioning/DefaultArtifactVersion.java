@@ -100,7 +100,8 @@ public class DefaultArtifactVersion
         return result;
     }
 
-    private int compareIntegers( Integer i1, Integer i2 )
+    private int compareIntegers( Integer i1,
+                                 Integer i2 )
     {
         // treat null as 0 in comparison
         if ( i1 == null ? i2 == null : i1.equals( i2 ) )

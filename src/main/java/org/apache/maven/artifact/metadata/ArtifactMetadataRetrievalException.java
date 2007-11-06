@@ -23,7 +23,7 @@ import org.apache.maven.artifact.Artifact;
 
 /**
  * Error while retrieving repository metadata from the repository.
- * 
+ *
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
  * @version $Id$
  */
@@ -33,31 +33,28 @@ public class ArtifactMetadataRetrievalException
 
     private Artifact artifact;
 
-    /**
-     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
-     */
+    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
     public ArtifactMetadataRetrievalException( String message )
     {
         this( message, null, null );
     }
 
-    /**
-     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
-     */
+    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
     public ArtifactMetadataRetrievalException( Throwable cause )
     {
         this( null, cause, null );
     }
 
-    /**
-     * @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)}
-     */
-    public ArtifactMetadataRetrievalException( String message, Throwable cause )
+    /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
+    public ArtifactMetadataRetrievalException( String message,
+                                               Throwable cause )
     {
         this( message, cause, null );
     }
 
-    public ArtifactMetadataRetrievalException( String message, Throwable cause, Artifact artifact )
+    public ArtifactMetadataRetrievalException( String message,
+                                               Throwable cause,
+                                               Artifact artifact )
     {
         super( message, cause );
         this.artifact = artifact;

@@ -47,7 +47,8 @@ public final class ArtifactUtils
         return versionlessKey( artifact.getGroupId(), artifact.getArtifactId() );
     }
 
-    public static String versionlessKey( String groupId, String artifactId )
+    public static String versionlessKey( String groupId,
+                                         String artifactId )
     {
         if ( groupId == null )
         {
@@ -60,12 +61,18 @@ public final class ArtifactUtils
         return groupId + ":" + artifactId;
     }
 
-    public static String artifactId( String groupId, String artifactId, String type, String version )
+    public static String artifactId( String groupId,
+                                     String artifactId,
+                                     String type,
+                                     String version )
     {
         return artifactId( groupId, artifactId, type, null, version );
     }
 
-    public static String artifactId( String groupId, String artifactId, String type, String classifier,
+    public static String artifactId( String groupId,
+                                     String artifactId,
+                                     String type,
+                                     String classifier,
                                      String baseVersion )
     {
         return groupId + ":" + artifactId + ":" + type + ( classifier != null ? ":" + classifier : "" ) + ":" +
@@ -131,8 +138,8 @@ public final class ArtifactUtils
         }
 
         DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range.cloneOf(),
-                                                     artifact.getScope(), artifact.getType(), artifact.getClassifier(),
-                                                     artifact.getArtifactHandler(), artifact.isOptional() );
+            artifact.getScope(), artifact.getType(), artifact.getClassifier(),
+            artifact.getArtifactHandler(), artifact.isOptional() );
         clone.setRelease( artifact.isRelease() );
         clone.setResolvedVersion( artifact.getVersion() );
         clone.setResolved( artifact.isResolved() );
@@ -147,21 +154,21 @@ public final class ArtifactUtils
 
         return clone;
     }
-    
+
     private static List copyList( List original )
     {
         List copy = null;
-        
+
         if ( original != null )
         {
             copy = new ArrayList();
-            
+
             if ( !original.isEmpty() )
             {
                 copy.addAll( original );
             }
         }
-        
+
         return copy;
     }
 

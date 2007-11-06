@@ -21,9 +21,7 @@ package org.apache.maven.artifact.resolver.filter;
 
 import org.apache.maven.artifact.Artifact;
 
-/**
- * Artifact Filter which filters on artifact type
- */
+/** Artifact Filter which filters on artifact type */
 public class TypeArtifactFilter
     implements ArtifactFilter
 {

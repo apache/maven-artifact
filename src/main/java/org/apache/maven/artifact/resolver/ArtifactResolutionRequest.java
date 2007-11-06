@@ -14,7 +14,8 @@ import java.util.Set;
  * A resolution request allows you to either use an existing MavenProject, or a coordinate (gid:aid:version)
  * to process a POMs dependencies.
  *
- * @author Jason van Zyl */
+ * @author Jason van Zyl
+ */
 public class ArtifactResolutionRequest
 {
     private Artifact artifact;
@@ -39,7 +40,7 @@ public class ArtifactResolutionRequest
     private ArtifactMetadataSource metadataSource;
 
     private Map managedVersionMap;
-    
+
     private List conflictResolvers;
 
     public Artifact getArtifact()
@@ -197,16 +198,16 @@ public class ArtifactResolutionRequest
 
         return this;
     }
-    
+
     public List getConflictResolvers()
     {
         return conflictResolvers;
     }
-    
+
     public ArtifactResolutionRequest setConflictResolvers( List conflictResolvers )
     {
         this.conflictResolvers = conflictResolvers;
-        
+
         return this;
     }
 

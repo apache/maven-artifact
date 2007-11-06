@@ -31,7 +31,9 @@ import java.util.List;
 public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {
-    public void transformForResolve( Artifact artifact, List remoteRepositories, ArtifactRepository localRepository )
+    public void transformForResolve( Artifact artifact,
+                                     List remoteRepositories,
+                                     ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
         if ( Artifact.LATEST_VERSION.equals( artifact.getVersion() ) )
@@ -54,18 +56,21 @@ public class LatestArtifactTransformation
         }
     }
 
-    public void transformForInstall( Artifact artifact, ArtifactRepository localRepository )
+    public void transformForInstall( Artifact artifact,
+                                     ArtifactRepository localRepository )
     {
         // metadata is added via addPluginArtifactMetadata
     }
 
-    public void transformForDeployment( Artifact artifact, ArtifactRepository remoteRepository,
+    public void transformForDeployment( Artifact artifact,
+                                        ArtifactRepository remoteRepository,
                                         ArtifactRepository localRepository )
     {
         // metadata is added via addPluginArtifactMetadata
     }
 
-    protected String constructVersion( Versioning versioning, String baseVersion )
+    protected String constructVersion( Versioning versioning,
+                                       String baseVersion )
     {
         return versioning.getLatest();
     }

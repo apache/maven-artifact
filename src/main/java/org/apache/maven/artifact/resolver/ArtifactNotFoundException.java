@@ -33,37 +33,61 @@ public class ArtifactNotFoundException
 {
     private String downloadUrl;
 
-    protected ArtifactNotFoundException( String message, Artifact artifact, List remoteRepositories )
+    protected ArtifactNotFoundException( String message,
+                                         Artifact artifact,
+                                         List remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
     }
 
-    public ArtifactNotFoundException( String message, Artifact artifact )
+    public ArtifactNotFoundException( String message,
+                                      Artifact artifact )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
-              artifact.getClassifier(), null, artifact.getDownloadUrl(), artifact.getDependencyTrail() );
+            artifact.getClassifier(), null, artifact.getDownloadUrl(), artifact.getDependencyTrail() );
     }
 
-    protected ArtifactNotFoundException( String message, Artifact artifact, List remoteRepositories, ResourceDoesNotExistException cause )
+    protected ArtifactNotFoundException( String message,
+                                         Artifact artifact,
+                                         List remoteRepositories,
+                                         ResourceDoesNotExistException cause )
     {
-        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
-              remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail(), cause );
+        this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
+            artifact.getClassifier(),
+            remoteRepositories, artifact.getDownloadUrl(), artifact.getDependencyTrail(), cause );
     }
 
-    public ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type, String classifier,
-                                      List remoteRepositories, String downloadUrl, List path, ResourceDoesNotExistException cause )
+    public ArtifactNotFoundException( String message,
+                                      String groupId,
+                                      String artifactId,
+                                      String version,
+                                      String type,
+                                      String classifier,
+                                      List remoteRepositories,
+                                      String downloadUrl,
+                                      List path,
+                                      ResourceDoesNotExistException cause )
     {
-        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier,downloadUrl, path ), groupId, artifactId,
-               version, type, classifier, remoteRepositories, null, cause );
+        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier,
+            downloadUrl, path ), groupId, artifactId,
+            version, type, classifier, remoteRepositories, null, cause );
 
         this.downloadUrl = downloadUrl;
     }
 
-    private ArtifactNotFoundException( String message, String groupId, String artifactId, String version, String type,
-                                       String classifier, List remoteRepositories, String downloadUrl, List path )
+    private ArtifactNotFoundException( String message,
+                                       String groupId,
+                                       String artifactId,
+                                       String version,
+                                       String type,
+                                       String classifier,
+                                       List remoteRepositories,
+                                       String downloadUrl,
+                                       List path )
     {
-        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier, downloadUrl, path ), groupId, artifactId,
-               version, type, classifier, remoteRepositories, null );
+        super( constructMissingArtifactMessage( message, "", groupId, artifactId, version, type, classifier,
+            downloadUrl, path ), groupId, artifactId,
+            version, type, classifier, remoteRepositories, null );
 
         this.downloadUrl = downloadUrl;
     }

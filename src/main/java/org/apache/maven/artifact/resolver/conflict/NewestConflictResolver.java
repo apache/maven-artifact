@@ -26,7 +26,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 /**
  * Resolves conflicting artifacts by always selecting the <em>newest</em> declaration. Newest is defined as the
  * declaration whose version is greater according to <code>ArtifactVersion.compareTo</code>.
- * 
+ *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
  * @see ArtifactVersion#compareTo(Object)
@@ -36,24 +36,26 @@ public class NewestConflictResolver
     implements ConflictResolver
 {
     // ConflictResolver methods -----------------------------------------------
-    
+
     /*
-     * @see org.apache.maven.artifact.resolver.conflict.ConflictResolver#resolveConflict(org.apache.maven.artifact.resolver.ResolutionNode,
-     *      org.apache.maven.artifact.resolver.ResolutionNode)
-     */
-    public ResolutionNode resolveConflict( ResolutionNode node1, ResolutionNode node2 )
+    * @see org.apache.maven.artifact.resolver.conflict.ConflictResolver#resolveConflict(org.apache.maven.artifact.resolver.ResolutionNode,
+    *      org.apache.maven.artifact.resolver.ResolutionNode)
+    */
+
+    public ResolutionNode resolveConflict( ResolutionNode node1,
+                                           ResolutionNode node2 )
     {
         try
         {
             ArtifactVersion version1 = node1.getArtifact().getSelectedVersion();
             ArtifactVersion version2 = node2.getArtifact().getSelectedVersion();
-            
+
             return version1.compareTo( version2 ) > 0 ? node1 : node2;
         }
-        catch (OverConstrainedVersionException exception)
+        catch ( OverConstrainedVersionException exception )
         {
             // TODO: log message or throw exception?
-            
+
             return null;
         }
     }

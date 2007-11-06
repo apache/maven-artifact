@@ -58,7 +58,8 @@ public class WarningResolutionListener
     {
     }
 
-    public void omitForNearer( Artifact omitted, Artifact kept )
+    public void omitForNearer( Artifact omitted,
+                               Artifact kept )
     {
     }
 
@@ -66,15 +67,18 @@ public class WarningResolutionListener
     {
     }
 
-    public void updateScopeCurrentPom( Artifact artifact, String scope )
+    public void updateScopeCurrentPom( Artifact artifact,
+                                       String scope )
     {
     }
 
-    public void updateScope( Artifact artifact, String scope )
+    public void updateScope( Artifact artifact,
+                             String scope )
     {
     }
 
-    public void manageArtifact( Artifact artifact, Artifact replacement )
+    public void manageArtifact( Artifact artifact,
+                                Artifact replacement )
     {
     }
 
@@ -82,7 +86,9 @@ public class WarningResolutionListener
     {
     }
 
-    public void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange )
+    public void restrictRange( Artifact artifact,
+                               Artifact replacement,
+                               VersionRange newRange )
     {
     }
 }

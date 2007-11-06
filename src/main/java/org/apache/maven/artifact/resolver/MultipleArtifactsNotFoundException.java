@@ -34,25 +34,27 @@ public class MultipleArtifactsNotFoundException
 {
     private final List resolvedArtifacts;
     private final List missingArtifacts;
-    
-    /**
-     * @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)} 
-     */
-    public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List missingArtifacts, List remoteRepositories )
+
+    /** @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)} */
+    public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
+                                               List missingArtifacts,
+                                               List remoteRepositories )
     {
         this( originatingArtifact, new ArrayList(), missingArtifacts, remoteRepositories );
     }
 
     /**
      * Create an instance of the exception with allrequired information.
-     * 
+     *
      * @param originatingArtifact the artifact that was being resolved
-     * @param resolvedArtifacts artifacts that could be resolved
-     * @param missingArtifacts artifacts that could not be resolved
-     * @param remoteRepositories remote repositories where the missing artifacts were not found
+     * @param resolvedArtifacts   artifacts that could be resolved
+     * @param missingArtifacts    artifacts that could not be resolved
+     * @param remoteRepositories  remote repositories where the missing artifacts were not found
      */
-    public MultipleArtifactsNotFoundException( Artifact originatingArtifact, List resolvedArtifacts,
-                                               List missingArtifacts, List remoteRepositories )
+    public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
+                                               List resolvedArtifacts,
+                                               List missingArtifacts,
+                                               List remoteRepositories )
     {
         super( constructMessage( missingArtifacts ), originatingArtifact, remoteRepositories );
         this.resolvedArtifacts = resolvedArtifacts;
@@ -61,26 +63,28 @@ public class MultipleArtifactsNotFoundException
 
     /**
      * artifacts that could be resolved
+     *
      * @return {@link List} of {@link Artifact}
      */
     public List getResolvedArtifacts()
     {
         return resolvedArtifacts;
     }
-    
+
     /**
      * artifacts that could NOT be resolved
+     *
      * @return {@link List} of {@link Artifact}
      */
     public List getMissingArtifacts()
     {
         return missingArtifacts;
     }
-    
+
     private static String constructMessage( List artifacts )
     {
         StringBuffer buffer = new StringBuffer( "Missing:\n" );
-        
+
         buffer.append( "----------\n" );
 
         int counter = 0;
@@ -91,12 +95,13 @@ public class MultipleArtifactsNotFoundException
             String message = ( ++counter ) + ") " + artifact.getId();
 
             buffer.append( constructMissingArtifactMessage( message, "  ", artifact.getGroupId(), artifact
-                .getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(), artifact.getDownloadUrl(), artifact
+                .getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
+                artifact.getDownloadUrl(), artifact
                 .getDependencyTrail() ) );
         }
 
         buffer.append( "----------\n" );
-        
+
         int size = artifacts.size();
 
         buffer.append( size ).append( " required artifact" );
@@ -111,7 +116,7 @@ public class MultipleArtifactsNotFoundException
         }
 
         buffer.append( " missing.\n\nfor artifact: " );
-        
+
         return buffer.toString();
     }
 

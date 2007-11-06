@@ -40,10 +40,11 @@ public class DefaultArtifactInstaller
 
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    /**
-     * @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly.
-     */
-    public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
+    /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
+    public void install( String basedir,
+                         String finalName,
+                         Artifact artifact,
+                         ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
         String extension = artifact.getArtifactHandler().getExtension();
@@ -52,7 +53,9 @@ public class DefaultArtifactInstaller
         install( source, artifact, localRepository );
     }
 
-    public void install( File source, Artifact artifact, ArtifactRepository localRepository )
+    public void install( File source,
+                         Artifact artifact,
+                         ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
         try

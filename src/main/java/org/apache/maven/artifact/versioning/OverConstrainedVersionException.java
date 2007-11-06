@@ -33,12 +33,15 @@ import java.util.List;
 public class OverConstrainedVersionException
     extends ArtifactResolutionException
 {
-    public OverConstrainedVersionException( String msg, Artifact artifact )
+    public OverConstrainedVersionException( String msg,
+                                            Artifact artifact )
     {
         super( msg, artifact );
     }
 
-    public OverConstrainedVersionException( String msg, Artifact artifact, List remoteRepositories )
+    public OverConstrainedVersionException( String msg,
+                                            Artifact artifact,
+                                            List remoteRepositories )
     {
         super( msg, artifact, remoteRepositories );
     }

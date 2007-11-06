@@ -48,11 +48,13 @@ public class DefaultArtifactRepository
     /**
      * Create a local repository or a test repository.
      *
-     * @param id the unique identifier of the repository
-     * @param url the URL of the repository
+     * @param id     the unique identifier of the repository
+     * @param url    the URL of the repository
      * @param layout the layout of the repository
      */
-    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout )
+    public DefaultArtifactRepository( String id,
+                                      String url,
+                                      ArtifactRepositoryLayout layout )
     {
         this( id, url, layout, null, null );
     }
@@ -60,12 +62,15 @@ public class DefaultArtifactRepository
     /**
      * Create a remote deployment repository.
      *
-     * @param id the unique identifier of the repository
-     * @param url the URL of the repository
-     * @param layout the layout of the repository
+     * @param id            the unique identifier of the repository
+     * @param url           the URL of the repository
+     * @param layout        the layout of the repository
      * @param uniqueVersion whether to assign each snapshot a unique version
      */
-    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout, boolean uniqueVersion )
+    public DefaultArtifactRepository( String id,
+                                      String url,
+                                      ArtifactRepositoryLayout layout,
+                                      boolean uniqueVersion )
     {
         super( id, url );
         this.layout = layout;
@@ -75,14 +80,17 @@ public class DefaultArtifactRepository
     /**
      * Create a remote download repository.
      *
-     * @param id the unique identifier of the repository
-     * @param url the URL of the repository
-     * @param layout the layout of the repository
+     * @param id        the unique identifier of the repository
+     * @param url       the URL of the repository
+     * @param layout    the layout of the repository
      * @param snapshots the policies to use for snapshots
-     * @param releases the policies to use for releases
+     * @param releases  the policies to use for releases
      */
-    public DefaultArtifactRepository( String id, String url, ArtifactRepositoryLayout layout,
-                                      ArtifactRepositoryPolicy snapshots, ArtifactRepositoryPolicy releases )
+    public DefaultArtifactRepository( String id,
+                                      String url,
+                                      ArtifactRepositoryLayout layout,
+                                      ArtifactRepositoryPolicy snapshots,
+                                      ArtifactRepositoryPolicy releases )
     {
         super( id, url );
 
@@ -91,7 +99,7 @@ public class DefaultArtifactRepository
         if ( snapshots == null )
         {
             snapshots = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                                                      ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
         }
 
         this.snapshots = snapshots;
@@ -99,7 +107,7 @@ public class DefaultArtifactRepository
         if ( releases == null )
         {
             releases = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                                                     ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
         }
 
         this.releases = releases;
@@ -115,7 +123,8 @@ public class DefaultArtifactRepository
         return layout.pathOfRemoteRepositoryMetadata( artifactMetadata );
     }
 
-    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata, ArtifactRepository repository )
+    public String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
+                                                 ArtifactRepository repository )
     {
         return layout.pathOfLocalRepositoryMetadata( metadata, repository );
     }

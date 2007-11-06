@@ -33,7 +33,8 @@ public class RepositoryMetadataReadException
         super( message );
     }
 
-    public RepositoryMetadataReadException( String message, Exception e )
+    public RepositoryMetadataReadException( String message,
+                                            Exception e )
     {
         super( message, e );
     }

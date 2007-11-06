@@ -27,14 +27,16 @@ import org.apache.maven.wagon.TransferFailedException;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class ChecksumFailedException extends TransferFailedException
+public class ChecksumFailedException
+    extends TransferFailedException
 {
     public ChecksumFailedException( String s )
     {
         super( s );
     }
-    
-    public ChecksumFailedException( String message, Throwable cause )
+
+    public ChecksumFailedException( String message,
+                                    Throwable cause )
     {
         super( message, cause );
     }

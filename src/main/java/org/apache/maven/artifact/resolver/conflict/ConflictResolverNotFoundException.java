@@ -21,27 +21,25 @@ package org.apache.maven.artifact.resolver.conflict;
 
 /**
  * Indicates that a specified conflict resolver implementation could not be found.
- * 
+ *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
  * @since 3.0
  */
-public class ConflictResolverNotFoundException extends Exception
+public class ConflictResolverNotFoundException
+    extends Exception
 {
     // constants --------------------------------------------------------------
 
-    /**
-     * The serial version ID.
-     */
+    /** The serial version ID. */
     private static final long serialVersionUID = 3372412184339653914L;
 
     // constructors -----------------------------------------------------------
 
     /**
      * Creates a new <code>ConflictResolverNotFoundException</code> with the specified message.
-     * 
-     * @param message
-     *            the message
+     *
+     * @param message the message
      */
     public ConflictResolverNotFoundException( String message )
     {

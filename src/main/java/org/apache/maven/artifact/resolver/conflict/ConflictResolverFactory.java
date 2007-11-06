@@ -21,31 +21,29 @@ package org.apache.maven.artifact.resolver.conflict;
 
 /**
  * A factory that produces conflict resolvers of various types.
- * 
+ *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
- * @since 3.0
  * @see ConflictResolver
+ * @since 3.0
  */
 public interface ConflictResolverFactory
 {
     // constants --------------------------------------------------------------
-    
-    /**
-     * The plexus role for this component.
-     */
+
+    /** The plexus role for this component. */
     String ROLE = ConflictResolverFactory.class.getName();
-    
+
     // methods ----------------------------------------------------------------
-    
+
     /**
      * Gets a conflict resolver of the specified type.
-     * 
-     * @param type
-     *            the type of conflict resolver to obtain
+     *
+     * @param type the type of conflict resolver to obtain
      * @return the conflict resolver
      * @throws ConflictResolverNotFoundException
-     *             if the specified type was not found
+     *          if the specified type was not found
      */
-    ConflictResolver getConflictResolver( String type ) throws ConflictResolverNotFoundException;
+    ConflictResolver getConflictResolver( String type )
+        throws ConflictResolverNotFoundException;
 }

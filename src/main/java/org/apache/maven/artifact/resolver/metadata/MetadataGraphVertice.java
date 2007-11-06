@@ -3,22 +3,22 @@ package org.apache.maven.artifact.resolver.metadata;
 /** @author Oleg Gusakov */
 public class MetadataGraphVertice
 {
-	ArtifactMetadata md;
+    ArtifactMetadata md;
 
-	public MetadataGraphVertice(ArtifactMetadata md)
-	{
-		super();
-		this.md = md;
-	}
+    public MetadataGraphVertice( ArtifactMetadata md )
+    {
+        super();
+        this.md = md;
+    }
 
-	public ArtifactMetadata getMd()
-	{
-		return md;
-	}
+    public ArtifactMetadata getMd()
+    {
+        return md;
+    }
 
-	public void setMd(ArtifactMetadata md)
-	{
-		this.md = md;
-	}
+    public void setMd( ArtifactMetadata md )
+    {
+        this.md = md;
+    }
 
 }

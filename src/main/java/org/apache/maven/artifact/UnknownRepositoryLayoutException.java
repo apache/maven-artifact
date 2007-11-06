@@ -9,7 +9,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
  * component in the current container.
  *
  * @author jdcasey
- *
  */
 public class UnknownRepositoryLayoutException
     extends InvalidRepositoryException

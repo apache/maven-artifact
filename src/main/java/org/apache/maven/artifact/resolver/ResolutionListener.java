@@ -44,9 +44,7 @@ public interface ResolutionListener
 
     int UPDATE_SCOPE = 6;
 
-    /**
-     * @deprecated
-     */
+    /** @deprecated  */
     int MANAGE_ARTIFACT = 7;
 
     int OMIT_FOR_CYCLE = 8;
@@ -75,14 +73,15 @@ public interface ResolutionListener
 
     void includeArtifact( Artifact artifact );
 
-    void omitForNearer( Artifact omitted, Artifact kept );
+    void omitForNearer( Artifact omitted,
+                        Artifact kept );
 
-    void updateScope( Artifact artifact, String scope );
+    void updateScope( Artifact artifact,
+                      String scope );
 
-    /**
-     * @deprecated
-     */
-    void manageArtifact( Artifact artifact, Artifact replacement );
+    /** @deprecated  */
+    void manageArtifact( Artifact artifact,
+                         Artifact replacement );
 
     // TODO Use the following two instead of manageArtifact
     // TODO Remove ResolutionListenerDM interface
@@ -97,12 +96,15 @@ public interface ResolutionListener
      * This event means that the scope has NOT been updated to a farther node scope because current
      * node is in the first level pom
      *
-     * @param artifact current node artifact, the one in the first level pom
+     * @param artifact     current node artifact, the one in the first level pom
      * @param ignoredScope scope that was ignored because artifact was in first level pom
      */
-    void updateScopeCurrentPom( Artifact artifact, String ignoredScope );
+    void updateScopeCurrentPom( Artifact artifact,
+                                String ignoredScope );
 
     void selectVersionFromRange( Artifact artifact );
 
-    void restrictRange( Artifact artifact, Artifact replacement, VersionRange newRange );
+    void restrictRange( Artifact artifact,
+                        Artifact replacement,
+                        VersionRange newRange );
 }

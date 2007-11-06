@@ -107,12 +107,17 @@ public interface ArtifactResolver
      * @since 3.0
      * @deprecated use {@link #resolve(ArtifactResolutionRequest)}
      */
-    ArtifactResolutionResult resolveTransitively( Set artifacts, Artifact originatingArtifact, Map managedVersions,
-                                                  ArtifactRepository localRepository, List remoteRepositories,
-                                                  ArtifactMetadataSource source, ArtifactFilter filter, List listeners,
+    ArtifactResolutionResult resolveTransitively( Set artifacts,
+                                                  Artifact originatingArtifact,
+                                                  Map managedVersions,
+                                                  ArtifactRepository localRepository,
+                                                  List remoteRepositories,
+                                                  ArtifactMetadataSource source,
+                                                  ArtifactFilter filter,
+                                                  List listeners,
                                                   List conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException;
-    
+
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     void resolveAlways( Artifact artifact,
                         List remoteRepositories,
@@ -121,8 +126,6 @@ public interface ArtifactResolver
 
     // New API
 
-    /**
-     * @since 3.0
-     */
+    /** @since 3.0 */
     ArtifactResolutionResult resolve( ArtifactResolutionRequest request );
 }

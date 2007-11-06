@@ -43,8 +43,8 @@ public class InvalidRepositoryException
     }
 
     protected InvalidRepositoryException( String message,
-                                       String repositoryId,
-                                       ComponentLookupException cause )
+                                          String repositoryId,
+                                          ComponentLookupException cause )
     {
         super( message, cause );
         this.repositoryId = repositoryId;

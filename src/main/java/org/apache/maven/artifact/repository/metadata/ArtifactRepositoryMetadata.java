@@ -38,7 +38,8 @@ public class ArtifactRepositoryMetadata
         this( artifact, null );
     }
 
-    public ArtifactRepositoryMetadata( Artifact artifact, Versioning versioning )
+    public ArtifactRepositoryMetadata( Artifact artifact,
+                                       Versioning versioning )
     {
         super( createMetadata( artifact, versioning ) );
         this.artifact = artifact;
