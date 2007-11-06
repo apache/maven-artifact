@@ -19,8 +19,14 @@ public class DefaultMetadataResolver
     implements MetadataResolver
 {
     //------------------------------------------------------------------------
+
+    /** @plexus.requirement */
     ArtifactResolver ar;
+
+    /** @plexus.requirement */
     ArtifactFactory af;
+
+    /** @plexus.requirement */
     ArtifactMetadataSource ams;
 
     //------------------------------------------------------------------------
@@ -37,7 +43,7 @@ public class DefaultMetadataResolver
             }
 
             MetadataTreeNode tree = resolveTree( req, null );
-            MetadataGraph graph = null;
+            MetadataGraph graph;
 
             if ( MetadataResolutionRequestTypeEnum.tree.equals( req.type ) )
             {
@@ -58,7 +64,6 @@ public class DefaultMetadataResolver
         }
         catch ( Exception anyEx )
         {
-            anyEx.printStackTrace();
             throw new MetadataResolutionException( anyEx );
         }
     }
@@ -147,7 +152,6 @@ public class DefaultMetadataResolver
         }
         catch ( Exception anyEx )
         {
-            anyEx.printStackTrace();
             throw new MetadataResolutionException( anyEx );
         }
     }
