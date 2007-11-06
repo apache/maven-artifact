@@ -89,7 +89,11 @@ public abstract class AbstractRepositoryMetadata
         File metadataFile = new File( localRepository.getBasedir(),
             localRepository.pathOfLocalRepositoryMetadata( this, remoteRepository ) );
 
-        if ( metadataFile.exists() )
+        if ( metadataFile.length() == 0 )
+        {
+            metadataFile.delete();
+        }
+        else if ( metadataFile.exists() )
         {
             Reader reader = null;
 
