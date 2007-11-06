@@ -32,6 +32,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * @author Jason van Zyl
+ * @plexus.component
+ */
 public class DefaultArtifactTransformationManager
     implements ArtifactTransformationManager,
     Initializable

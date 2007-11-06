@@ -63,6 +63,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/** @plexus.requirement */
 public class DefaultWagonManager
     extends AbstractLogEnabled
     implements WagonManager,
@@ -94,8 +95,10 @@ public class DefaultWagonManager
 
     private boolean online = true;
 
+    /** @plexus.requirement */
     private ArtifactRepositoryFactory repositoryFactory;
 
+    /** @plexus.requirement role="org.apache.maven.wagon.Wagon" */
     private Map wagons;
 
     private boolean interactive = true;

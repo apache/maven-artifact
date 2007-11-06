@@ -32,12 +32,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+/**
+ * @author Jason van Zyl
+ * @plexus.component
+ */
 public class DefaultArtifactInstaller
     extends AbstractLogEnabled
     implements ArtifactInstaller
 {
+    /** @plexus.requirement */
     private ArtifactTransformationManager transformationManager;
 
+    /** @plexus.requirement */
     private RepositoryMetadataManager repositoryMetadataManager;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */

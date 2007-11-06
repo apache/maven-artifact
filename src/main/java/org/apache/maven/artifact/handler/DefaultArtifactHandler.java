@@ -21,7 +21,9 @@ package org.apache.maven.artifact.handler;
 
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author Jason van Zyl
  * @version $Id$
+ * @plexus.component
  */
 public class DefaultArtifactHandler
     implements ArtifactHandler

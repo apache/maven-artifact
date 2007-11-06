@@ -41,6 +41,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Jason van Zyl
+ * @plexus.requirement 
+ */
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled
     implements RepositoryMetadataManager

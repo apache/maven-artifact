@@ -25,10 +25,11 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.versioning.VersionRange;
 
+/** @plexus.component */
 public class DefaultArtifactFactory
     implements ArtifactFactory
 {
-    // TODO: remove, it doesn't know the ones from the plugins
+    /** @plexus.requirement */
     private ArtifactHandlerManager artifactHandlerManager;
 
     public DefaultArtifactFactory()

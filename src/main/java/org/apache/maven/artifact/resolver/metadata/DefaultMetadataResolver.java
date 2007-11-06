@@ -13,7 +13,10 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-/** @author Oleg Gusakov */
+/**
+ * @author Oleg Gusakov
+ * @plexus.component
+ */
 public class DefaultMetadataResolver
     extends AbstractLogEnabled
     implements MetadataResolver

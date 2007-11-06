@@ -45,10 +45,12 @@ import java.util.Set;
  * Default implementation of the artifact collector.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @author Jason van Zyl
  * @version $Id$
  * @todo This needs to collect all errors and not die on the first error. If there are problems retrieving the metadata
  * then we need all the information so that we can tell users about what we attempted to do.
  * @todo there 8 places where we can can range exceptions which is bad, again the result of not using a graph.
+ * @plexus.component
  */
 public class DefaultArtifactCollector
     implements ArtifactCollector

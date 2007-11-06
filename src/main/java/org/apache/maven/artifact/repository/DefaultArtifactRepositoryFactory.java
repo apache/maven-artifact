@@ -28,7 +28,10 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
-/** @author jdcasey */
+/**
+ * @author jdcasey
+ * @plexus.component
+ */
 public class DefaultArtifactRepositoryFactory
     implements ArtifactRepositoryFactory
 {

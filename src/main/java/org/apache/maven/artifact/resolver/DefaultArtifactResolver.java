@@ -47,6 +47,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author Jason van Zyl
+ * @plexus.component
+ */
 public class DefaultArtifactResolver
     extends AbstractLogEnabled
     implements ArtifactResolver
@@ -55,12 +59,16 @@ public class DefaultArtifactResolver
     // Components
     // ----------------------------------------------------------------------
 
+    /** @plexus.requirement */
     private WagonManager wagonManager;
 
+    /** @plexus.requirement */
     private ArtifactTransformationManager transformationManager;
 
+    /** @plexus.requirement */
     protected ArtifactFactory artifactFactory;
 
+    /** @plexus.requirement */
     private ArtifactCollector artifactCollector;
 
     // ----------------------------------------------------------------------

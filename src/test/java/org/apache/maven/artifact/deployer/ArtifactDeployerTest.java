@@ -59,4 +59,23 @@ public class ArtifactDeployerTest
 
         assertRemoteArtifactPresent( artifact );
     }
+
+    public void testArtifactDeploymentForArtifactThatHasAlreadyBeenDeployed()
+        throws Exception
+    {
+        String artifactBasedir = new File( getBasedir(), "src/test/resources/artifact-install" ).getAbsolutePath();
+
+        Artifact artifact = createArtifact( "artifact", "10.1.3" );
+
+        File file = new File( artifactBasedir, "artifact-10.1.3.jar" );
+
+        try
+        {
+            artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
+        }
+        catch( ArtifactDeploymentException e )
+        {
+            fail( "Should have failed due to previous deployment of artifact." );
+        }
+    }
 }

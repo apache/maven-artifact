@@ -20,8 +20,9 @@ package org.apache.maven.artifact.deployer;
  */
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
+ * @plexus.component
  */
 public class ArtifactDeploymentException
     extends Exception
