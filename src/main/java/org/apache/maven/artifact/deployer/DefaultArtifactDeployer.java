@@ -22,27 +22,39 @@ package org.apache.maven.artifact.deployer;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class DefaultArtifactDeployer
     extends AbstractLogEnabled
     implements ArtifactDeployer
 {
+    /** @plexus.component */
     private WagonManager wagonManager;
 
+    /** @plexuxs.component */
     private ArtifactTransformationManager transformationManager;
 
+    /** @plexus.component */
     private RepositoryMetadataManager repositoryMetadataManager;
+
+    /** @plexus.component */
+    private ArtifactMetadataSource metadataSource;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     public void deploy( String basedir,
@@ -69,40 +81,74 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "System is offline. Cannot deploy artifact: " + artifact + "." );
         }
 
+        if ( !artifactHasBeenDeployed( artifact, localRepository, deploymentRepository ) )
+        {
+            try
+            {
+                transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );
+
+                // Copy the original file to the new one if it was transformed
+                File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
+                if ( !artifactFile.equals( source ) )
+                {
+                    FileUtils.copyFile( source, artifactFile );
+                }
+
+                wagonManager.putArtifact( source, artifact, deploymentRepository );
+
+                // must be after the artifact is installed
+                for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+                {
+                    ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                    repositoryMetadataManager.deploy( metadata, localRepository, deploymentRepository );
+                }
+            }
+            catch ( TransferFailedException e )
+            {
+                throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
+            }
+            catch ( IOException e )
+            {
+                throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
+            }
+            catch ( RepositoryMetadataDeploymentException e )
+            {
+                throw new ArtifactDeploymentException( "Error installing artifact's metadata: " + e.getMessage(), e );
+            }
+        }
+    }
+
+    private boolean artifactHasBeenDeployed( Artifact artifact,
+                                             ArtifactRepository localRepository,
+                                             ArtifactRepository remoteRepository  )
+        throws ArtifactDeploymentException
+    {
         try
         {
-            transformationManager.transformForDeployment( artifact, deploymentRepository, localRepository );
+            ArtifactVersion artifactVersion = new DefaultArtifactVersion( artifact.getVersion() );
 
-            // Copy the original file to the new one if it was transformed
-            File artifactFile = new File( localRepository.getBasedir(), localRepository.pathOf( artifact ) );
-            if ( !artifactFile.equals( source ) )
+            List versions = metadataSource.retrieveAvailableVersions( artifact, localRepository,
+                Arrays.asList( new ArtifactRepository[]{remoteRepository} ) );
+
+            for ( Iterator i = versions.iterator(); i.hasNext(); )
             {
-                FileUtils.copyFile( source, artifactFile );
-            }
+                ArtifactVersion deployedArtifactVersion = (ArtifactVersion) i.next();
 
-            wagonManager.putArtifact( source, artifact, deploymentRepository );
+                if ( artifactVersion.compareTo( deployedArtifactVersion ) == 0 )
+                {
+                    getLogger().warn( "The artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + " has already been deployed. Not deploying again." );
 
-            // must be after the artifact is installed
-            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
-            {
-                ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                repositoryMetadataManager.deploy( metadata, localRepository, deploymentRepository );
+                    return true;
+                }
             }
-            // TODO: would like to flush this, but the plugin metadata is added in advance, not as an install/deploy transformation
-            // This would avoid the need to merge and clear out the state during deployment
-//            artifact.getMetadataList().clear();
         }
-        catch ( TransferFailedException e )
+        catch ( ArtifactMetadataRetrievalException e )
         {
-            throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
+            getLogger().warn( "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
+
+            return false;
         }
-        catch ( IOException e )
-        {
-            throw new ArtifactDeploymentException( "Error deploying artifact: " + e.getMessage(), e );
-        }
-        catch ( RepositoryMetadataDeploymentException e )
-        {
-            throw new ArtifactDeploymentException( "Error installing artifact's metadata: " + e.getMessage(), e );
-        }
+
+        return false;
     }
 }
