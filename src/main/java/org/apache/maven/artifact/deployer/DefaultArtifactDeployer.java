@@ -128,6 +128,14 @@ public class DefaultArtifactDeployer
     {
         try
         {
+            // We will just let people deploy snapshots over and over again even if they want
+            // to deploy something different with the same name. 
+
+            if ( artifact.isSnapshot() )
+            {
+                return false;
+            }
+
             // We need to guard against repsositories in distribution management sections that
             // don't have any default policies set so all functions that expect policies
             // present don't fail.
