@@ -765,7 +765,28 @@ public class DefaultWagonManager
         this.downloadMonitor = downloadMonitor;
     }
 
+    // We are leaving this method here so that we can attempt to use the new maven-artifact
+    // library from the 2.0.x code so that we aren't maintaining two lines of code
+    // for the artifact management.
     public void addAuthenticationInfo( String repositoryId
+									, String username
+									, String password
+									, String privateKey
+									, String passphrase
+    								)
+    {
+        AuthenticationInfo authInfo = new AuthenticationInfo();
+        authInfo.setUserName( username );
+        authInfo.setPassword( password );
+        authInfo.setPrivateKey( privateKey );
+        authInfo.setPassphrase( passphrase );
+
+        authenticationInfoMap.put( repositoryId, authInfo );
+    }
+
+    // This is the new way of handling authentication that will allow us to help users setup 
+    // authentication requirements.
+    public void addAuthenticationCredentials( String repositoryId
 									, String username
 									, String password
 									, String privateKey
