@@ -125,26 +125,11 @@ public class DefaultArtifactDeployer
         }
     }
 
-    private static int i;
-
     private boolean artifactHasBeenDeployed( Artifact artifact, ArtifactRepository remoteRepository  )
         throws ArtifactDeploymentException
     {
         try
         {
-            // We have to fake out the tools underneath as they always expect a local repository.
-            // This makes sure that we are checking for remote deployments not things cached locally
-            // as we don't care about things cached locally. In an embedded environment we have to
-            // deal with multiple deployments, and the same deployment by the same project so we
-            // just need to make sure we have a detached local repository each time as not to
-            // get contaminated results.
-
-            File detachedLocalRepository = new File( System.getProperty( "java.io.tmpdir" ), "repo" + i++ );
-
-            ArtifactRepository localRepository = new DefaultArtifactRepository( "id", "file://" + detachedLocalRepository, defaultLayout );
-
-            detachedLocalRepository.deleteOnExit();
-
             // We will just let people deploy snapshots over and over again even if they want
             // to deploy something different with the same name. 
 
@@ -167,8 +152,21 @@ public class DefaultArtifactDeployer
 
             ArtifactVersion artifactVersion = new DefaultArtifactVersion( artifact.getVersion() );
 
+            // We have to fake out the tools underneath as they always expect a local repository.
+            // This makes sure that we are checking for remote deployments not things cached locally
+            // as we don't care about things cached locally. In an embedded environment we have to
+            // deal with multiple deployments, and the same deployment by the same project so we
+            // just need to make sure we have a detached local repository each time as not to
+            // get contaminated results.
+
+            File detachedLocalRepository = File.createTempFile( "maven", "repo" );
+
+            ArtifactRepository localRepository = new DefaultArtifactRepository( "id", "file://" + detachedLocalRepository, defaultLayout );
+
             List versions = metadataSource.retrieveAvailableVersions( artifact, localRepository,
                 Arrays.asList( new ArtifactRepository[]{remoteRepository} ) );
+
+            detachedLocalRepository.delete();
 
             for ( Iterator i = versions.iterator(); i.hasNext(); )
             {
@@ -181,6 +179,12 @@ public class DefaultArtifactDeployer
                     return true;
                 }
             }
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn( "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
+
+            return false;            
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
