@@ -72,19 +72,27 @@ public interface WagonManager
     Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException;
 
-    void getArtifact( Artifact artifact, List remoteRepositories )
+    void getArtifact( Artifact artifact,
+                      List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void getArtifact( Artifact artifact, ArtifactRepository repository )
+    void getArtifact( Artifact artifact,
+                      ArtifactRepository repository )
         throws TransferFailedException, ResourceDoesNotExistException;
 
-    void putArtifact( File source, Artifact artifact, ArtifactRepository deploymentRepository )
+    void putArtifact( File source,
+                      Artifact artifact,
+                      ArtifactRepository deploymentRepository )
         throws TransferFailedException;
 
-    void putArtifactMetadata( File source, ArtifactMetadata artifactMetadata, ArtifactRepository repository )
+    void putArtifactMetadata( File source,
+                              ArtifactMetadata artifactMetadata,
+                              ArtifactRepository repository )
         throws TransferFailedException;
 
-    void getArtifactMetadata( ArtifactMetadata metadata, ArtifactRepository remoteRepository, File destination,
+    void getArtifactMetadata( ArtifactMetadata metadata,
+                              ArtifactRepository remoteRepository,
+                              File destination,
                               String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException;
 
@@ -92,25 +100,42 @@ public interface WagonManager
 
     boolean isOnline();
 
-    void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
+    void addProxy( String protocol,
+                   String host,
+                   int port,
+                   String username,
+                   String password,
+                   String nonProxyHosts );
 
     void registerCredentialsDataSource( CredentialsDataSource cds );
-    
-    void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
-                                String passphrase )
-    throws CredentialsDataSourceException
-    ;
 
-    void addMirror( String id, String mirrorOf, String url );
+    public void addAuthenticationCredentials( String repositoryId,
+                                              String username,
+                                              String password,
+                                              String privateKey,
+                                              String passphrase )
+        throws CredentialsDataSourceException;
+
+    void addAuthenticationInfo( String repositoryId,
+                                String username,
+                                String password,
+                                String privateKey,
+                                String passphrase );
+
+    void addMirror( String id,
+                    String mirrorOf,
+                    String url );
 
     void setDownloadMonitor( TransferListener downloadMonitor );
 
-    void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions );
+    void addPermissionInfo( String repositoryId,
+                            String filePermissions,
+                            String directoryPermissions );
 
     ProxyInfo getProxy( String protocol );
 
     AuthenticationInfo getAuthenticationInfo( String id )
-    throws CredentialsDataSourceException;
+        throws CredentialsDataSourceException;
 
     /**
      * Set the configuration for a repository
@@ -118,13 +143,15 @@ public interface WagonManager
      * @param repositoryId  id of the repository to set the configuration to
      * @param configuration dom tree of the xml with the configuration for the {@link Wagon}
      */
-    void addConfiguration( String repositoryId, Xpp3Dom configuration );
+    void addConfiguration( String repositoryId,
+                           Xpp3Dom configuration );
 
     void setInteractive( boolean interactive );
 
-    void registerWagons( Collection wagons, PlexusContainer extensionContainer );
+    void registerWagons( Collection wagons,
+                         PlexusContainer extensionContainer );
 
     void findAndRegisterWagons( PlexusContainer container );
 
-    void setDefaultRepositoryPermissions( RepositoryPermissions permissions );    
+    void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
 }
