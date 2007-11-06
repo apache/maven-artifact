@@ -27,6 +27,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
@@ -46,17 +47,20 @@ public class DefaultArtifactDeployer
     extends AbstractLogEnabled
     implements ArtifactDeployer
 {
-    /** @plexus.component */
+    /** @plexus.requirement */
     private WagonManager wagonManager;
 
-    /** @plexuxs.component */
+    /** @plexuxs.requirement */
     private ArtifactTransformationManager transformationManager;
 
-    /** @plexus.component */
+    /** @plexus.requirement */
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    /** @plexus.component */
+    /** @plexus.requirement */
     private ArtifactMetadataSource metadataSource;
+
+    /** @plexus.requirement */
+    private ArtifactRepositoryLayout defaultLayout;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     public void deploy( String basedir,
@@ -83,7 +87,7 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "System is offline. Cannot deploy artifact: " + artifact + "." );
         }
 
-        if ( !artifactHasBeenDeployed( artifact, localRepository, deploymentRepository ) )
+        if ( !artifactHasBeenDeployed( artifact, deploymentRepository ) )
         {
             try
             {
@@ -121,13 +125,17 @@ public class DefaultArtifactDeployer
         }
     }
 
-    private boolean artifactHasBeenDeployed( Artifact artifact,
-                                             ArtifactRepository localRepository,
-                                             ArtifactRepository remoteRepository  )
+    private boolean artifactHasBeenDeployed( Artifact artifact, ArtifactRepository remoteRepository  )
         throws ArtifactDeploymentException
     {
         try
         {
+            // We have to fake out the tools underneath as they always expect a local repository.
+            // This makes sure that we are checking for remote deployments not things cached locally
+            // as we don't care about things cached locally.
+            
+            ArtifactRepository localRepository = new DefaultArtifactRepository( "", "", defaultLayout );
+
             // We will just let people deploy snapshots over and over again even if they want
             // to deploy something different with the same name. 
 
