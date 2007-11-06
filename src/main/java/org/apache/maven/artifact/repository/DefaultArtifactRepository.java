@@ -139,6 +139,11 @@ public class DefaultArtifactRepository
         return snapshots;
     }
 
+    public void setReleases( ArtifactRepositoryPolicy releases )
+    {
+        this.releases = releases;
+    }
+
     public ArtifactRepositoryPolicy getReleases()
     {
         return releases;

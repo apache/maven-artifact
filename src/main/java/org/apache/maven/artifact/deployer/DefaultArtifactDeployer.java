@@ -25,6 +25,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
@@ -100,6 +102,7 @@ public class DefaultArtifactDeployer
                 for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
                 {
                     ArtifactMetadata metadata = (ArtifactMetadata) i.next();
+                    
                     repositoryMetadataManager.deploy( metadata, localRepository, deploymentRepository );
                 }
             }
@@ -125,6 +128,19 @@ public class DefaultArtifactDeployer
     {
         try
         {
+            // We need to guard against repsositories in distribution management sections that
+            // don't have any default policies set so all functions that expect policies
+            // present don't fail.
+
+            if ( remoteRepository.getReleases() == null )
+            {
+                ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy();
+
+                releasesPolicy.setEnabled( true );
+
+                ((DefaultArtifactRepository )remoteRepository).setReleases( releasesPolicy );
+            }
+
             ArtifactVersion artifactVersion = new DefaultArtifactVersion( artifact.getVersion() );
 
             List versions = metadataSource.retrieveAvailableVersions( artifact, localRepository,
