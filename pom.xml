@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,9 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>maven-parent</artifactId>
     <groupId>org.apache.maven</groupId>
@@ -31,11 +28,11 @@ under the License.
   <artifactId>maven-artifact</artifactId>
   <version>3.0-SNAPSHOT</version>
   <name>Maven Artifact</name>
-  <scm>                                                                                                                                                                                
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/artifact/trunk</connection>                                                                                            
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/trunk</developerConnection>                                                                         
-    <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/trunk</url>                                                                                                                
-  </scm>       
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/artifact/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/trunk</url>
+  </scm>
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -51,7 +48,7 @@ under the License.
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-beta-2</version>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-file</artifactId>
@@ -63,7 +60,7 @@ under the License.
       <artifactId>easymock</artifactId>
       <version>1.2_Java1.3</version>
       <scope>test</scope>
-    </dependency>      
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -75,25 +72,25 @@ under the License.
           <version>1.0.0</version>
           <model>src/main/mdo/metadata.mdo</model>
         </configuration>
-        <executions>                                                                                                                                          
-          <execution>                                                                                                                                         
-            <id>site-docs</id>                                                                                                                                
-            <phase>pre-site</phase>                                                                                                                           
-            <goals>                                                                                                                                           
-              <goal>xdoc</goal>                                                                                                                               
-              <goal>xsd</goal>                                                                                                                                
-            </goals>                                                                                                                                          
-          </execution>                                                                                                                                        
-          <execution>                                                                                                                                         
-            <id>standard</id>                                                                                                                                 
-            <goals>                                                                                                                                           
-              <goal>java</goal>                                                                                                                               
-              <goal>xpp3-reader</goal>                                                                                                                        
-              <goal>xpp3-writer</goal>                                                                                                                        
-            </goals>                                                                                                                                          
-          </execution>                                                                                                                                        
-        </executions>                      
-      </plugin>    
+        <executions>
+          <execution>
+            <id>site-docs</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>xdoc</goal>
+              <goal>xsd</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>standard</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
@@ -102,6 +99,13 @@ under the License.
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <target>1.5</target>
+          <source>1.5</source>
+        </configuration>
+      </plugin>      
     </plugins>
   </build>
 </project>

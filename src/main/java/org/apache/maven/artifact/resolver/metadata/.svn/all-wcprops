@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/repos/!svn/ver/2475/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata
+END
+ArtifactMetadata.java
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/repos/!svn/ver/2480/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/ArtifactMetadata.java
+END
+MetadataResolutionRequest.java
+K 25
+svn:wc:ra_dav:version-url
+V 147
+/repos/!svn/ver/2479/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataResolutionRequest.java
+END
+MetadataResolutionException.java
+K 25
+svn:wc:ra_dav:version-url
+V 149
+/repos/!svn/ver/2475/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataResolutionException.java
+END
+MetadataResolver.java
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/repos/!svn/ver/2475/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataResolver.java
+END
+DefaultMetadataResolver.java
+K 25
+svn:wc:ra_dav:version-url
+V 145
+/repos/!svn/ver/2480/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/DefaultMetadataResolver.java
+END
+MetadataResolutionResult.java
+K 25
+svn:wc:ra_dav:version-url
+V 146
+/repos/!svn/ver/2475/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataResolutionResult.java
+END
+MetadataGraphVertice.java
+K 25
+svn:wc:ra_dav:version-url
+V 142
+/repos/!svn/ver/2479/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataGraphVertice.java
+END
+MetadataGraphEdge.java
+K 25
+svn:wc:ra_dav:version-url
+V 139
+/repos/!svn/ver/2475/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataGraphEdge.java
+END
+MetadataGraph.java
+K 25
+svn:wc:ra_dav:version-url
+V 135
+/repos/!svn/ver/2479/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataGraph.java
+END
+MetadataTreeNode.java
+K 25
+svn:wc:ra_dav:version-url
+V 138
+/repos/!svn/ver/2480/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataTreeNode.java
+END
+MetadataResolutionRequestTypeEnum.java
+K 25
+svn:wc:ra_dav:version-url
+V 155
+/repos/!svn/ver/2479/code/sandbox/trunk/maven-artifact-GFR/src/main/java/org/apache/maven/artifact/resolver/metadata/MetadataResolutionRequestTypeEnum.java
+END

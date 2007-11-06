@@ -103,6 +103,11 @@ public class DefaultWagonManager
 
     private RepositoryPermissions defaultRepositoryPermissions;
 
+    /**
+     *  encapsulates access to Server credentials
+     */
+    private CredentialsDataSource credentialsDataSource;
+    
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
@@ -176,6 +181,7 @@ public class DefaultWagonManager
         }
 
         Map checksums = new HashMap( 2 );
+
         Map sums = new HashMap( 2 );
 
         // TODO: configure these on the repository
@@ -207,7 +213,11 @@ public class DefaultWagonManager
                 wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
                 wagon.put( source, remotePath );
-            }
+            } catch (CredentialsDataSourceException e) {
+            	String err = "Problem with server credentials: "+e.getMessage();
+                getLogger().error( err );
+				throw new TransferFailedException(err);
+			}
             finally
             {
                 if ( downloadMonitor != null )
@@ -536,7 +546,9 @@ public class DefaultWagonManager
         catch ( AuthorizationException e )
         {
             throw new TransferFailedException( "Authorization failed: " + e.getMessage(), e );
-        }
+        } catch (CredentialsDataSourceException e) {
+            throw new TransferFailedException( "Retrieving credentials failed: " + e.getMessage(), e );
+		}
         finally
         {
             // Remove every TransferListener
@@ -693,8 +705,12 @@ public class DefaultWagonManager
     }
 
     public AuthenticationInfo getAuthenticationInfo( String id )
+    throws CredentialsDataSourceException
     {
-        return (AuthenticationInfo) authenticationInfoMap.get( id );
+    	return credentialsDataSource == null 
+    			? (AuthenticationInfo) authenticationInfoMap.get( id )
+    			: credentialsDataSource.get(id)
+    			;
     }
 
     public ArtifactRepository getMirror( String mirrorOf )
@@ -749,20 +765,24 @@ public class DefaultWagonManager
         this.downloadMonitor = downloadMonitor;
     }
 
-    public void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
-                                       String passphrase )
+    public void addAuthenticationInfo( String repositoryId
+									, String username
+									, String password
+									, String privateKey
+									, String passphrase 
+    								)
+    throws CredentialsDataSourceException
     {
         AuthenticationInfo authInfo = new AuthenticationInfo();
-
         authInfo.setUserName( username );
-
         authInfo.setPassword( password );
-
         authInfo.setPrivateKey( privateKey );
-
         authInfo.setPassphrase( passphrase );
-
-        authenticationInfoMap.put( repositoryId, authInfo );
+        
+        if( credentialsDataSource == null )
+        	authenticationInfoMap.put( repositoryId, authInfo );
+        else
+        	credentialsDataSource.set( new CredentialsChangeRequest( repositoryId, authInfo, null ) );
     }
 
     public void addPermissionInfo( String repositoryId, String filePermissions, String directoryPermissions )
@@ -897,4 +917,11 @@ public class DefaultWagonManager
     {
         this.defaultRepositoryPermissions = defaultRepositoryPermissions;
     }
+
+	public void registerCredentialsDataSource(CredentialsDataSource cds)
+	{
+		this.credentialsDataSource = cds;
+	}
+    
+    
 }

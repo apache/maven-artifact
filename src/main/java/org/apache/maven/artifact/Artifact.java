@@ -48,15 +48,16 @@ public interface Artifact
     Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
     // TODO: into scope handler
-    String SCOPE_COMPILE = "compile";
+    
+    String SCOPE_COMPILE = ArtifactScopeEnum.compile.toString();
 
-    String SCOPE_TEST = "test";
+    String SCOPE_TEST = ArtifactScopeEnum.test.toString();
 
-    String SCOPE_RUNTIME = "runtime";
+    String SCOPE_RUNTIME = ArtifactScopeEnum.runtime.toString();
 
-    String SCOPE_PROVIDED = "provided";
+    String SCOPE_PROVIDED = ArtifactScopeEnum.provided.toString();
 
-    String SCOPE_SYSTEM = "system";
+    String SCOPE_SYSTEM = ArtifactScopeEnum.system.toString();
 
     String RELEASE_VERSION = "RELEASE";
 

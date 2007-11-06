@@ -94,8 +94,12 @@ public interface WagonManager
 
     void addProxy( String protocol, String host, int port, String username, String password, String nonProxyHosts );
 
+    void registerCredentialsDataSource( CredentialsDataSource cds );
+    
     void addAuthenticationInfo( String repositoryId, String username, String password, String privateKey,
-                                String passphrase );
+                                String passphrase )
+    throws CredentialsDataSourceException
+    ;
 
     void addMirror( String id, String mirrorOf, String url );
 
@@ -105,7 +109,8 @@ public interface WagonManager
 
     ProxyInfo getProxy( String protocol );
 
-    AuthenticationInfo getAuthenticationInfo( String id );
+    AuthenticationInfo getAuthenticationInfo( String id )
+    throws CredentialsDataSourceException;
 
     /**
      * Set the configuration for a repository
