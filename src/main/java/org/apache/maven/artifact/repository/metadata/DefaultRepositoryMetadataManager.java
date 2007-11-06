@@ -381,10 +381,8 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( TransferFailedException e )
         {
-            // TODO: [jc; 08-Nov-2005] revisit this for 2.1
-            // suppressing logging to avoid logging this error twice.
-            // We don't want to interrupt program flow here. Just allow empty metadata instead.
-            // rethrowing this would change behavior.
+            throw new RepositoryMetadataDeploymentException(
+                "Unable to get previous metadata to update: " + e.getMessage(), e );
         }
 
         try
