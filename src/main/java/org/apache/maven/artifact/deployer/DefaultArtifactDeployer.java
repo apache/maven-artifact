@@ -106,7 +106,7 @@ public class DefaultArtifactDeployer
                 for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
                 {
                     ArtifactMetadata metadata = (ArtifactMetadata) i.next();
-                    
+
                     repositoryMetadataManager.deploy( metadata, localRepository, deploymentRepository );
                 }
             }
@@ -125,7 +125,8 @@ public class DefaultArtifactDeployer
         }
     }
 
-    private boolean artifactHasBeenDeployed( Artifact artifact, ArtifactRepository remoteRepository  )
+    private boolean artifactHasBeenDeployed( Artifact artifact,
+                                             ArtifactRepository remoteRepository )
         throws ArtifactDeploymentException
     {
         try
@@ -147,7 +148,7 @@ public class DefaultArtifactDeployer
                 ArtifactRepositoryPolicy releasesPolicy = new ArtifactRepositoryPolicy();
 
                 releasesPolicy.setEnabled( true );
-                ((DefaultArtifactRepository )remoteRepository).setReleases( releasesPolicy );
+                ( (DefaultArtifactRepository) remoteRepository ).setReleases( releasesPolicy );
             }
 
             ArtifactVersion artifactVersion = new DefaultArtifactVersion( artifact.getVersion() );
@@ -161,7 +162,8 @@ public class DefaultArtifactDeployer
 
             File detachedLocalRepository = File.createTempFile( "maven", "repo" );
 
-            ArtifactRepository localRepository = new DefaultArtifactRepository( "id", "file://" + detachedLocalRepository, defaultLayout );
+            ArtifactRepository localRepository = new DefaultArtifactRepository( "id",
+                "file://" + detachedLocalRepository, defaultLayout );
 
             List versions = metadataSource.retrieveAvailableVersions( artifact, localRepository,
                 Arrays.asList( new ArtifactRepository[]{remoteRepository} ) );
@@ -174,7 +176,8 @@ public class DefaultArtifactDeployer
 
                 if ( artifactVersion.compareTo( deployedArtifactVersion ) == 0 )
                 {
-                    getLogger().warn( "The artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + " has already been deployed. Not deploying again." );
+                    getLogger().warn(
+                        "The artifact " + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + " has already been deployed. Not deploying again." );
 
                     return true;
                 }
@@ -182,13 +185,15 @@ public class DefaultArtifactDeployer
         }
         catch ( IOException e )
         {
-            getLogger().warn( "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
+            getLogger().warn(
+                "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
 
-            return false;            
+            return false;
         }
         catch ( ArtifactMetadataRetrievalException e )
         {
-            getLogger().warn( "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
+            getLogger().warn(
+                "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
 
             return false;
         }

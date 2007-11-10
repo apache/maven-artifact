@@ -838,9 +838,13 @@ public class DefaultWagonManager
         authInfo.setPassphrase( passphrase );
 
         if ( credentialsDataSource == null )
+        {
             authenticationInfoMap.put( repositoryId, authInfo );
+        }
         else
+        {
             credentialsDataSource.set( new CredentialsChangeRequest( repositoryId, authInfo, null ) );
+        }
     }
 
     public void addPermissionInfo( String repositoryId,

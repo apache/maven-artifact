@@ -65,7 +65,9 @@ public class ArtifactMetadata
     public ArtifactMetadata( Artifact af )
     {
         if ( af != null )
+        {
             init( af );
+        }
     }
 
     //------------------------------------------------------------------

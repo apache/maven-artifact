@@ -43,7 +43,7 @@ import java.util.Map;
 
 /**
  * @author Jason van Zyl
- * @plexus.requirement 
+ * @plexus.requirement
  */
 public class DefaultRepositoryMetadataManager
     extends AbstractLogEnabled

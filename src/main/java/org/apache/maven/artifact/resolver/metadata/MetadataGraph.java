@@ -18,7 +18,9 @@ public class MetadataGraph
         throws MetadataResolutionException
     {
         if ( tree == null )
+        {
             throw new MetadataResolutionException( "tree is null" );
+        }
 
         int count = countNodes( tree );
         vertices = new HashMap<String, MetadataGraphVertice>( count );
@@ -34,7 +36,9 @@ public class MetadataGraph
         throws MetadataResolutionException
     {
         if ( node == null )
+        {
             return;
+        }
 
         String nodeHash = node.graphHash();
         MetadataGraphVertice vertice = vertices.get( nodeHash );
@@ -67,10 +71,14 @@ public class MetadataGraph
 
         MetadataTreeNode[] kids = node.getChildren();
         if ( kids == null || kids.length < 1 )
+        {
             return;
+        }
 
         for ( MetadataTreeNode n : kids )
+        {
             processNodes( vertice, n, depth + 1 );
+        }
     }
 
     //------------------------------------------------------------------------
@@ -88,14 +96,20 @@ public class MetadataGraph
     private static int countNodes( MetadataTreeNode tree )
     {
         if ( tree == null )
+        {
             return 0;
+        }
 
         int count = 1;
         MetadataTreeNode[] kids = tree.getChildren();
         if ( kids == null || kids.length < 1 )
+        {
             return count;
+        }
         for ( MetadataTreeNode n : kids )
+        {
             count += countNodes( n );
+        }
 
         return count;
     }

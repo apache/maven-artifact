@@ -26,7 +26,9 @@ public class MetadataTreeNode
                              ArtifactScopeEnum scope )
     {
         if ( md != null )
+        {
             md.setScope( scope );
+        }
 
         this.md = md;
         this.parent = parent;
@@ -46,12 +48,16 @@ public class MetadataTreeNode
     public void addChildren( List<MetadataTreeNode> kidList )
     {
         if ( kidList == null || kidList.size() < 1 )
+        {
             return;
+        }
 
         children = new MetadataTreeNode[kidList.size()];
         int i = 0;
         for ( MetadataTreeNode n : kidList )
+        {
             children[i++] = n;
+        }
     }
 
     //------------------------------------------------------------------
@@ -66,9 +72,11 @@ public class MetadataTreeNode
         throws MetadataResolutionException
     {
         if ( md == null )
+        {
             throw new MetadataResolutionException( "treenode without metadata, parent: "
                 + ( parent == null ? "null" : parent.toString() )
             );
+        }
 
         return md.groupId + ":" + md.artifactId;
     }

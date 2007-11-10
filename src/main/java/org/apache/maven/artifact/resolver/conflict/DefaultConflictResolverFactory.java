@@ -32,10 +32,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
  * @plexus.component
- * @since 3.0
- *
  * @todo you don't need the container in here with the active maps (jvz).
- *
+ * @since 3.0
  */
 public class DefaultConflictResolverFactory
     implements ConflictResolverFactory,
@@ -45,6 +43,7 @@ public class DefaultConflictResolverFactory
 
     /**
      * The plexus container used to obtain instances from.
+     *
      * @plexus.requirement
      */
     private PlexusContainer container;
