@@ -63,7 +63,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-/** @plexus.requirement */
+/** @plexus.component */
 public class DefaultWagonManager
     extends AbstractLogEnabled
     implements WagonManager,
@@ -95,15 +95,17 @@ public class DefaultWagonManager
 
     private boolean online = true;
 
+    private boolean interactive = true;
+
+    private RepositoryPermissions defaultRepositoryPermissions;
+    
+    // Components
+
     /** @plexus.requirement */
     private ArtifactRepositoryFactory repositoryFactory;
 
     /** @plexus.requirement role="org.apache.maven.wagon.Wagon" */
     private Map wagons;
-
-    private boolean interactive = true;
-
-    private RepositoryPermissions defaultRepositoryPermissions;
 
     /** encapsulates access to Server credentials */
     private CredentialsDataSource credentialsDataSource;
@@ -314,11 +316,11 @@ public class DefaultWagonManager
                              List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-        // TODO [BP]: The exception handling here needs some work
         boolean successful = false;
-        for ( Iterator iter = remoteRepositories.iterator(); iter.hasNext() && !successful; )
+
+        for ( Iterator i = remoteRepositories.iterator(); i.hasNext() && !successful; )
         {
-            ArtifactRepository repository = (ArtifactRepository) iter.next();
+            ArtifactRepository repository = (ArtifactRepository) i.next();
 
             try
             {
@@ -368,8 +370,8 @@ public class DefaultWagonManager
         {
             getLogger().debug( "Trying repository " + repository.getId() );
 
-            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(),
-                false );
+            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
+
             getLogger().debug( "  Artifact resolved" );
 
             artifact.setResolved( true );
@@ -463,6 +465,7 @@ public class DefaultWagonManager
                     try
                     {
                         downloaded = wagon.getIfNewer( remotePath, temp, destination.lastModified() );
+
                         if ( !downloaded )
                         {
                             // prevent additional checks of this artifact until it expires again
@@ -473,6 +476,7 @@ public class DefaultWagonManager
                     {
                         // older wagons throw this. Just get() instead
                         wagon.get( remotePath, temp );
+
                         downloaded = true;
                     }
                 }

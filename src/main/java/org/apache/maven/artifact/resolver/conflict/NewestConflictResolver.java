@@ -31,6 +31,7 @@ import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
  * @version $Id$
  * @see ArtifactVersion#compareTo(Object)
  * @since 3.0
+ * @plexus.component role-hint="newest"
  */
 public class NewestConflictResolver
     implements ConflictResolver

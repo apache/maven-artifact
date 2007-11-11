@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.deployer;
+package org.apache.maven.artifact.resolver.metadata;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,26 +19,47 @@ package org.apache.maven.artifact.deployer;
  * under the License.
  */
 
+import org.apache.maven.artifact.Artifact;
+
 /**
+ * Error while retrieving repository metadata from the repository.
+ *
  * @author Jason van Zyl
  * @version $Id$
  */
-public class ArtifactDeploymentException
+public class MetadataRetrievalException
     extends Exception
 {
-    public ArtifactDeploymentException( String message )
+
+    private ArtifactMetadata artifact;
+
+    public MetadataRetrievalException( String message )
     {
-        super( message );
+        this( message, null, null );
     }
 
-    public ArtifactDeploymentException( Throwable cause )
+    public MetadataRetrievalException( Throwable cause )
     {
-        super( cause );
+        this( null, cause, null );
     }
 
-    public ArtifactDeploymentException( String message,
-                                        Throwable cause )
+    public MetadataRetrievalException( String message,
+                                       Throwable cause )
+    {
+        this( message, cause, null );
+    }
+
+    public MetadataRetrievalException( String message,
+                                       Throwable cause,
+                                       ArtifactMetadata artifact )
     {
         super( message, cause );
+
+        this.artifact = artifact;
+    }
+
+    public ArtifactMetadata getArtifactMetadata()
+    {
+        return artifact;
     }
 }

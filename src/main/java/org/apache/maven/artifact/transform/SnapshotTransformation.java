@@ -40,8 +40,8 @@ import java.util.TimeZone;
 /**
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author <a href="mailto:mmaczka@interia.pl">Michal Maczka</a>
- * @version $Id: SnapshotTransformation.java,v 1.1 2005/03/03 15:37:25
- *          jvanzyl Exp $
+ * @version $Id$
+ * @plexus.component role="org.apache.maven.artifact.transform.ArtifactTransformation" role-hint="snapshot"
  */
 public class SnapshotTransformation
     extends AbstractVersionTransformation

@@ -16,7 +16,6 @@ import java.util.Set;
 public class DefaultArtifactRepositoryFactoryTest
     extends PlexusTestCase
 {
-
     private ArtifactRepositoryFactory repoFactory;
 
     private Set toDelete = new HashSet();
@@ -73,5 +72,4 @@ public class DefaultArtifactRepositoryFactoryTest
 
         assertTrue( layout instanceof DefaultRepositoryLayout );
     }
-
 }

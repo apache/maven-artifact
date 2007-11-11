@@ -43,6 +43,7 @@ public class DefaultArtifactRepositoryFactory
     // FIXME: This is a non-ThreadLocal cache!!
     private final Map artifactRepositories = new HashMap();
 
+    /** @plexus.requirement role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" */                                  
     private Map repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )

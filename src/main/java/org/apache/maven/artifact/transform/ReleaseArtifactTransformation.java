@@ -35,6 +35,7 @@ import java.util.List;
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
+ * @plexus.component role="org.apache.maven.artifact.transform.ArtifactTransformation" role-hint="release"
  */
 public class ReleaseArtifactTransformation
     extends AbstractVersionTransformation

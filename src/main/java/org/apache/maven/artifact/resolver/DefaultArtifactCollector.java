@@ -55,7 +55,10 @@ import java.util.Set;
 public class DefaultArtifactCollector
     implements ArtifactCollector
 {
-    /** The conflict resolver to use when none is specified. */
+    /**
+     * The conflict resolver to use when none is specified.
+     * @plexus.requirement role-hint="nearest" 
+     */
     private ConflictResolver defaultConflictResolver;
 
     public ArtifactResolutionResult collect( Set artifacts,
@@ -146,7 +149,7 @@ public class DefaultArtifactCollector
                         if ( node.filterTrail( filter ) )
                         {
                             // If it was optional and not a direct dependency,
-                            // we don't add it or its children, just allow the update of the version and scope
+                            // we don't add it or its children, just allow the update of the version and artifactScope
                             if ( node.isChildOfRootNode() || !artifact.isOptional() )
                             {
                                 artifact.setDependencyTrail( node.getDependencyTrail() );
@@ -324,7 +327,7 @@ public class DefaultArtifactCollector
 
                         if ( checkScopeUpdate( farthest, nearest, listeners ) )
                         {
-                            // if we need to update scope of nearest to use farthest scope, use the nearest version, but farthest scope
+                            // if we need to update artifactScope of nearest to use farthest artifactScope, use the nearest version, but farthest artifactScope
                             nearest.disable();
                             farthest.getArtifact().setVersion( nearest.getArtifact().getVersion() );
                             fireEvent( ResolutionListener.OMIT_FOR_NEARER, listeners, nearest, farthest.getArtifact() );
@@ -535,7 +538,7 @@ public class DefaultArtifactCollector
     }
 
     /**
-     * Check if the scope needs to be updated.
+     * Check if the artifactScope needs to be updated.
      * <a href="http://docs.codehaus.org/x/IGU#DependencyMediationandConflictResolution-Scoperesolution">More info</a>.
      *
      * @param farthest  farthest resolution node
@@ -565,7 +568,7 @@ public class DefaultArtifactCollector
             updateScope = true;
         }
 
-        /* current POM rules all, if nearest is in current pom, do not update its scope */
+        /* current POM rules all, if nearest is in current pom, do not update its artifactScope */
         if ( ( nearest.getDepth() < 2 ) && updateScope )
         {
             updateScope = false;
@@ -577,8 +580,8 @@ public class DefaultArtifactCollector
         {
             fireEvent( ResolutionListener.UPDATE_SCOPE, listeners, nearest, farthestArtifact );
 
-            // previously we cloned the artifact, but it is more effecient to just update the scope
-            // if problems are later discovered that the original object needs its original scope value, cloning may
+            // previously we cloned the artifact, but it is more effecient to just update the artifactScope
+            // if problems are later discovered that the original object needs its original artifactScope value, cloning may
             // again be appropriate
             nearestArtifact.setScope( farthestArtifact.getScope() );
         }

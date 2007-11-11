@@ -10,6 +10,7 @@ public class MetadataTreeNode
     ArtifactMetadata md; // this node
 
     MetadataTreeNode parent; // papa of cause
+
     MetadataTreeNode[] children; // of cause
 
     boolean resolved = false; // if current node was resolved
@@ -27,7 +28,7 @@ public class MetadataTreeNode
     {
         if ( md != null )
         {
-            md.setScope( scope );
+            md.setArtifactScope( scope );
         }
 
         this.md = md;

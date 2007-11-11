@@ -3,8 +3,6 @@ package org.apache.maven.artifact.resolver.metadata;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
-import sun.security.action.GetLongAction;
-
 /** @author Oleg Gusakov */
 public class ArtifactMetadata
 {
@@ -12,7 +10,7 @@ public class ArtifactMetadata
     protected String artifactId;
     protected String version;
     protected String type;
-    protected ArtifactScopeEnum scope;
+    protected ArtifactScopeEnum artifactScope;
     protected String classifier;
     protected String uri;
 
@@ -40,9 +38,9 @@ public class ArtifactMetadata
                              String name,
                              String version,
                              String type,
-                             ArtifactScopeEnum scope )
+                             ArtifactScopeEnum artifactScope )
     {
-        this( groupId, name, version, type, scope, null );
+        this( groupId, name, version, type, artifactScope, null );
     }
 
     //------------------------------------------------------------------
@@ -50,28 +48,30 @@ public class ArtifactMetadata
                              String name,
                              String version,
                              String type,
-                             ArtifactScopeEnum scope,
+                             ArtifactScopeEnum artifactScope,
                              String classifier )
     {
         this.groupId = groupId;
         this.artifactId = name;
         this.version = version;
         this.type = type;
-        this.scope = scope;
+        this.artifactScope = artifactScope;
         this.classifier = classifier;
     }
 
     //------------------------------------------------------------------
     public ArtifactMetadata( Artifact af )
     {
+        /*
         if ( af != null )
         {
             init( af );
         }
+        */
     }
 
     //------------------------------------------------------------------
-    public void init( Artifact af )
+    public void init( ArtifactMetadata af )
     {
         setGroupId( af.getGroupId() );
         setArtifactId( af.getArtifactId() );
@@ -79,7 +79,7 @@ public class ArtifactMetadata
         setType( af.getType() );
         setScope( af.getScope() );
         setClassifier( af.getClassifier() );
-        setUri( af.getDownloadUrl() );
+        //setUri( af.getDownloadUrl() );
 
         this.resolved = af.isResolved();
     }
@@ -138,19 +138,19 @@ public class ArtifactMetadata
         this.type = type;
     }
 
-    public ArtifactScopeEnum getScope()
+    public ArtifactScopeEnum getArtifactScope()
     {
-        return scope == null ? ArtifactScopeEnum.DEFAULT_SCOPE : scope;
+        return artifactScope == null ? ArtifactScopeEnum.DEFAULT_SCOPE : artifactScope;
     }
 
-    public void setScope( ArtifactScopeEnum scope )
+    public void setArtifactScope( ArtifactScopeEnum artifactScope )
     {
-        this.scope = scope;
+        this.artifactScope = artifactScope;
     }
 
     public void setScope( String scope )
     {
-        this.scope = scope == null
+        this.artifactScope = scope == null
             ? ArtifactScopeEnum.DEFAULT_SCOPE
             : ArtifactScopeEnum.valueOf( scope )
             ;
@@ -184,6 +184,21 @@ public class ArtifactMetadata
     public void setUri( String uri )
     {
         this.uri = uri;
+    }
+
+    public String getScope()
+    {
+        if ( artifactScope == null )
+        {
+            return ArtifactScopeEnum.DEFAULT_SCOPE.getScope();
+        }
+
+        return artifactScope.getScope();
+    }
+
+    public String getDependencyConflictId()
+    {
+        return groupId + ":" + artifactId;
     }
 
     //------------------------------------------------------------------

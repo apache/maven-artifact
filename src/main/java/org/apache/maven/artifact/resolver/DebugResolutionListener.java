@@ -87,15 +87,15 @@ public class DebugResolutionListener
                                        String ignoredScope )
     {
         logger.debug(
-            indent + artifact + " (not setting scope to: " + ignoredScope + "; local scope " + artifact.getScope() +
+            indent + artifact + " (not setting artifactScope to: " + ignoredScope + "; local artifactScope " + artifact.getScope() +
                 " wins)" );
 
         // TODO: better way than static? this might hide messages in a reactor
         if ( !ignoredArtifacts.contains( artifact ) )
         {
-            logger.warn( "\n\tArtifact " + artifact + " retains local scope '" + artifact.getScope() +
-                "' overriding broader scope '" + ignoredScope + "'\n" +
-                "\tgiven by a dependency. If this is not intended, modify or remove the local scope.\n" );
+            logger.warn( "\n\tArtifact " + artifact + " retains local artifactScope '" + artifact.getScope() +
+                "' overriding broader artifactScope '" + ignoredScope + "'\n" +
+                "\tgiven by a dependency. If this is not intended, modify or remove the local artifactScope.\n" );
             ignoredArtifacts.add( artifact );
         }
     }
@@ -103,7 +103,7 @@ public class DebugResolutionListener
     public void updateScope( Artifact artifact,
                              String scope )
     {
-        logger.debug( indent + artifact + " (setting scope to: " + scope + ")" );
+        logger.debug( indent + artifact + " (setting artifactScope to: " + scope + ")" );
     }
 
     public void selectVersionFromRange( Artifact artifact )
@@ -122,8 +122,8 @@ public class DebugResolutionListener
 
     /**
      * The logic used here used to be a copy of the logic used in the DefaultArtifactCollector, and this method was
-     * called right before the actual version/scope changes were done. However, a different set of conditionals (and
-     * more information) is needed to be able to determine when and if the version and/or scope changes. See the two
+     * called right before the actual version/artifactScope changes were done. However, a different set of conditionals (and
+     * more information) is needed to be able to determine when and if the version and/or artifactScope changes. See the two
      * added methods, manageArtifactVersion and manageArtifactScope.
      */
     public void manageArtifact( Artifact artifact,
@@ -137,7 +137,7 @@ public class DebugResolutionListener
         }
         if ( replacement.getScope() != null )
         {
-            msg += "applying scope: " + replacement.getScope();
+            msg += "applying artifactScope: " + replacement.getScope();
         }
         msg += ")";
         logger.debug( msg );
@@ -160,7 +160,7 @@ public class DebugResolutionListener
         // only show msg if a change is actually taking place
         if ( !replacement.getScope().equals( artifact.getScope() ) )
         {
-            String msg = indent + artifact + " (applying scope: " + replacement.getScope() + ")";
+            String msg = indent + artifact + " (applying artifactScope: " + replacement.getScope() + ")";
             logger.debug( msg );
         }
     }

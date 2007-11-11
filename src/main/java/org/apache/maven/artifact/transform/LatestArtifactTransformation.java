@@ -28,6 +28,7 @@ import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 import java.util.List;
 
+/** @plexus.component role="org.apache.maven.artifact.transform.ArtifactTransformation" role-hint="latest" */
 public class LatestArtifactTransformation
     extends AbstractVersionTransformation
 {

@@ -32,7 +32,7 @@ public class DefaultArtifactTest
 
     private DefaultArtifact snapshotArtifact;
 
-    private String groupId = "groupid", artifactId = "artifactId", version = "1.0", scope = "scope", type = "type",
+    private String groupId = "groupid", artifactId = "artifactId", version = "1.0", scope = "artifactScope", type = "type",
         classifier = "classifier";
 
     private String snapshotSpecVersion = "1.0-SNAPSHOT";

@@ -25,50 +25,23 @@ import org.apache.maven.artifact.installer.ArtifactInstallationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jason van Zyl
  * @plexus.component
  */
 public class DefaultArtifactTransformationManager
-    implements ArtifactTransformationManager,
-    Initializable
+    implements ArtifactTransformationManager
 {
+    /** @plexus.requirement
+     *    role="org.apache.maven.artifact.transform.ArtifactTransformation"
+     *    role-hints="release,latest,snapshot"
+     */
     private List artifactTransformations;
-
-    public void initialize()
-        throws InitializationException
-    {
-        // TODO this is a hack until plexus can fix the ordering of the arrays
-        List transforms = new ArrayList();
-        Object snapshotTransform = null;
-
-        Object obj[] = artifactTransformations.toArray();
-        for ( int x = 0; x < obj.length; x++ )
-        {
-            if ( obj[x].getClass().getName().indexOf( "Snapshot" ) != -1 )
-            {
-                snapshotTransform = obj[x];
-            }
-            else
-            {
-                transforms.add( obj[x] );
-            }
-        }
-
-        if ( snapshotTransform != null )
-        {
-            transforms.add( snapshotTransform );
-        }
-
-        artifactTransformations = transforms;
-    }
 
     public void transformForResolve( Artifact artifact,
                                      List remoteRepositories,
@@ -78,6 +51,7 @@ public class DefaultArtifactTransformationManager
         for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
         {
             ArtifactTransformation transform = (ArtifactTransformation) i.next();
+
             transform.transformForResolve( artifact, remoteRepositories, localRepository );
         }
     }
@@ -105,5 +79,8 @@ public class DefaultArtifactTransformationManager
         }
     }
 
-
+    public List getArtifactTransformations()
+    {
+        return artifactTransformations;
+    }
 }

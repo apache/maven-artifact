@@ -47,7 +47,7 @@ public interface Artifact
 
     Pattern VERSION_FILE_PATTERN = Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
 
-    // TODO: into scope handler
+    // TODO: into artifactScope handler
 
     String SCOPE_COMPILE = ArtifactScopeEnum.compile.toString();
 
@@ -70,11 +70,11 @@ public interface Artifact
     void setVersion( String version );
 
     /**
-     * Get the scope of the artifact. If the artifact is a standalone rather than a dependency, it's scope will be
-     * <code>null</code>. The scope may not be the same as it was declared on the original dependency, as this is the
-     * result of combining it with the main project scope.
+     * Get the artifactScope of the artifact. If the artifact is a standalone rather than a dependency, it's artifactScope will be
+     * <code>null</code>. The artifactScope may not be the same as it was declared on the original dependency, as this is the
+     * result of combining it with the main project artifactScope.
      *
-     * @return the scope
+     * @return the artifactScope
      */
     String getScope();
 

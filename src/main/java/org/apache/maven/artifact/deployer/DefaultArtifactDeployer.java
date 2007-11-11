@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+/** @plexus.component */
 public class DefaultArtifactDeployer
     extends AbstractLogEnabled
     implements ArtifactDeployer
@@ -50,7 +51,7 @@ public class DefaultArtifactDeployer
     /** @plexus.requirement */
     private WagonManager wagonManager;
 
-    /** @plexuxs.requirement */
+    /** @plexus.requirement */
     private ArtifactTransformationManager transformationManager;
 
     /** @plexus.requirement */
@@ -59,7 +60,7 @@ public class DefaultArtifactDeployer
     /** @plexus.requirement */
     private ArtifactMetadataSource metadataSource;
 
-    /** @plexus.requirement */
+    /** @plexus.requirement role-hint="default" */
     private ArtifactRepositoryLayout defaultLayout;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */

@@ -27,14 +27,13 @@ import java.util.Set;
 
 /**
  * @author Jason van Zyl
- * @version $Id: DefaultArtifactHandlerManager.java,v 1.1.1.1 2004/08/09
- *          18:37:32 jvanzyl Exp $
+ * @version $Id$
  * @plexus.component
  */
 public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
-    /** @plexus.requirement role="org.apache.maven.artifact.ArtifactHandler" */
+    /** @plexus.requirement role="org.apache.maven.artifact.handler.ArtifactHandler" */
     private Map artifactHandlers;
 
     public ArtifactHandler getArtifactHandler( String type )

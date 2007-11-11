@@ -24,7 +24,10 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-/** @author jdcasey */
+/**
+ * @author jdcasey
+ * @plexus.component role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" role-hint="default"
+ */
 public class DefaultRepositoryLayout
     implements ArtifactRepositoryLayout
 {

@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
@@ -24,13 +22,13 @@ public class DefaultMetadataResolver
     //------------------------------------------------------------------------
 
     /** @plexus.requirement */
-    ArtifactResolver ar;
+    ArtifactResolver artifactResolver;
 
     /** @plexus.requirement */
-    ArtifactFactory af;
+    ArtifactFactory artifactFactory;
 
     /** @plexus.requirement */
-    ArtifactMetadataSource ams;
+    MetadataSource metadataSource;
 
     //------------------------------------------------------------------------
     public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest req )
@@ -39,13 +37,16 @@ public class DefaultMetadataResolver
         try
         {
             getLogger().debug( "Received request for: " + req.getQuery() );
+
             MetadataResolutionResult res = new MetadataResolutionResult();
+
             if ( req.type == null )
             {
                 throw new MetadataResolutionException( "no type in the request" );
             }
 
             MetadataTreeNode tree = resolveTree( req, null );
+
             MetadataGraph graph;
 
             if ( MetadataResolutionRequestTypeEnum.tree.equals( req.type ) )
@@ -55,7 +56,9 @@ public class DefaultMetadataResolver
             if ( MetadataResolutionRequestTypeEnum.graph.equals( req.type ) )
             {
                 graph = new MetadataGraph( tree );
+
                 res.setTree( tree );
+
                 res.setGraph( graph );
             }
 
@@ -79,29 +82,35 @@ public class DefaultMetadataResolver
         try
         {
             ArtifactMetadata query = req.getQuery();
-            Artifact pomArtifact = af.createArtifact(
+
+            Artifact pomArtifact = artifactFactory.createArtifact(
                 query.getGroupId()
                 , query.getArtifactId()
                 , query.getVersion()
                 , null
                 , "pom"
             );
+
             getLogger().debug( "resolveMetadata request:"
                 + "\n> artifact   : " + pomArtifact.toString()
                 + "\n> remoteRepos: " + req.getRemoteRepositories()
                 + "\n> localRepo  : " + req.getLocalRepository()
             );
+
             String error = null;
+
             try
             {
                 ArtifactResolutionRequest arr = new ArtifactResolutionRequest();
+
                 arr.setArtifact( pomArtifact );
+
                 arr.setLocalRepository( req.getLocalRepository() );
+
                 arr.setRemoteRepostories( req.getRemoteRepositories() );
-                ar.resolve( pomArtifact
-                    , req.getRemoteRepositories()
-                    , req.getLocalRepository()
-                );
+
+                artifactResolver.resolve( pomArtifact, req.getRemoteRepositories() , req.getLocalRepository() );
+
                 if ( !pomArtifact.isResolved() )
                 {
                     getLogger().info( "*************> Did not resolve " + pomArtifact.toString()
@@ -114,6 +123,7 @@ public class DefaultMetadataResolver
             catch ( ArtifactResolutionException are )
             {
                 pomArtifact.setResolved( false );
+
                 error = are.getMessage();
             }
             catch ( ArtifactNotFoundException anfe )
@@ -130,18 +140,25 @@ public class DefaultMetadataResolver
                     + "\nerror: " + error
                 );
             }
+
             if ( pomArtifact.isResolved() )
             {
-                ResolutionGroup rg = ams.retrieve( pomArtifact, req.getLocalRepository(), req.getRemoteRepositories() );
-                MetadataTreeNode node = new MetadataTreeNode( pomArtifact, parent, true, query.getScope() );
-                Set<Artifact> dependencies = (Set<Artifact>) rg.getArtifacts();
+                MetadataResolution metadataResolution = metadataSource.retrieve( query, req.getLocalRepository(), req.getRemoteRepositories() );
+
+                MetadataTreeNode node = new MetadataTreeNode( pomArtifact, parent, true, query.getArtifactScope() );
+
+                Set<ArtifactMetadata> dependencies = metadataResolution.getDependencies();
+
                 if ( dependencies != null && dependencies.size() > 0 )
                 {
                     ArrayList<MetadataTreeNode> kids = new ArrayList<MetadataTreeNode>( dependencies.size() );
-                    for ( Artifact a : dependencies )
+
+                    for ( ArtifactMetadata a : dependencies )
                     {
                         req.query.init( a );
+
                         req.query.setType( "pom" );
+
                         kids.add( resolveTree( req, node ) );
                     }
                     node.addChildren( kids );
@@ -150,7 +167,7 @@ public class DefaultMetadataResolver
             }
             else
             {
-                return new MetadataTreeNode( pomArtifact, parent, false, query.getScope() );
+                return new MetadataTreeNode( pomArtifact, parent, false, query.getArtifactScope() );
             }
         }
         catch ( Exception anyEx )

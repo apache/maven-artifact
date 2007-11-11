@@ -41,7 +41,6 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -255,7 +254,7 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
         assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
-        assertEquals( "Check scope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
+        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
     }
 
     public void testResolveLocalWithNewerVersionButLesserScopeResolvedFirst()
@@ -268,7 +267,7 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
         assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
-        assertEquals( "Check scope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
+        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
     }
 
     public void testResolveNearestWithRanges()
@@ -400,8 +399,8 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-//        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
-        assertEquals( "Check scope", Artifact.SCOPE_TEST, artifact.getScope() );
+//        assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getArtifactScope() );
+        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, artifact.getScope() );
     }
 
     public void testResolveRuntimeScopeOverTestScope()
@@ -418,8 +417,8 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-//        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
-        assertEquals( "Check scope", Artifact.SCOPE_TEST, artifact.getScope() );
+//        assertEquals( "Check artifactScope", Artifact.SCOPE_RUNTIME, artifact.getArtifactScope() );
+        assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, artifact.getScope() );
     }
 
     public void testResolveCompileScopeOverRuntimeScope()
@@ -437,7 +436,7 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, root.artifact, modifiedC} ),
                       res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
-        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
+        assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getScope() );
     }
 
     public void testResolveCompileScopeOverProvidedScope()
@@ -454,8 +453,8 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-//        assertEquals( "Check scope", Artifact.SCOPE_COMPILE, artifact.getScope() );
-        assertEquals( "Check scope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
+//        assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getArtifactScope() );
+        assertEquals( "Check artifactScope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
     }
 
     public void testResolveRuntimeScopeOverProvidedScope()
@@ -472,8 +471,8 @@ public class DefaultArtifactCollectorTest
         assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         // local wins now, and irrelevant if not local as test/provided aren't transitive
-//        assertEquals( "Check scope", Artifact.SCOPE_RUNTIME, artifact.getScope() );
-        assertEquals( "Check scope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
+//        assertEquals( "Check artifactScope", Artifact.SCOPE_RUNTIME, artifact.getArtifactScope() );
+        assertEquals( "Check artifactScope", Artifact.SCOPE_PROVIDED, artifact.getScope() );
     }
 
     public void testProvidedScopeNotTransitive()
@@ -609,14 +608,14 @@ public class DefaultArtifactCollectorTest
         ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ), filter );
         Artifact artifact = getArtifact( "d", res.getArtifacts() );
         assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
-        assertEquals( "Check scope", expectedScope, artifact.getScope() );
+        assertEquals( "Check artifactScope", expectedScope, artifact.getScope() );
         assertEquals( "Check version", expectedVersion, artifact.getVersion() );
 
         ArtifactSpec d = createArtifactSpec( "d", "1.0" );
         res = collect( createSet( new Object[]{a.artifact, b.artifact, d.artifact} ), filter );
         artifact = getArtifact( "d", res.getArtifacts() );
         assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
-        assertEquals( "Check scope", d.artifact.getScope(), artifact.getScope() );
+        assertEquals( "Check artifactScope", d.artifact.getScope(), artifact.getScope() );
         assertEquals( "Check version", "1.0", artifact.getVersion() );
     }
 

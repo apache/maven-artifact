@@ -23,7 +23,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 
 /**
- * Filter to only retain objects in the given scope or better.
+ * Filter to only retain objects in the given artifactScope or better.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$

@@ -39,13 +39,16 @@ import java.util.List;
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  * @todo try and refactor to remove abstract methods - not particular happy about current design
+ * @plexus.component
  */
 public abstract class AbstractVersionTransformation
     extends AbstractLogEnabled
     implements ArtifactTransformation
 {
+    /** @plexus.requirement */
     protected RepositoryMetadataManager repositoryMetadataManager;
 
+    /** @plexus.requirement */
     protected WagonManager wagonManager;
 
     protected String resolveVersion( Artifact artifact,

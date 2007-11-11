@@ -27,6 +27,7 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
 import java.util.List;
+import java.util.Map;
 
 /** Manages multiple ArtifactTransformation instances and applies them in succession. */
 public interface ArtifactTransformationManager
@@ -70,4 +71,6 @@ public interface ArtifactTransformationManager
                                  ArtifactRepository localRepository )
         throws ArtifactDeploymentException;
 
+
+    List getArtifactTransformations();
 }

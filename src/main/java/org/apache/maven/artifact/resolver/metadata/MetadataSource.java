@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.conflict;
+package org.apache.maven.artifact.resolver.metadata;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,16 +19,23 @@ package org.apache.maven.artifact.resolver.conflict;
  * under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import java.util.List;
+
 /**
- * The default conflict resolver that delegates to the nearest strategy.
+ * Provides some metadata operations, like querying the remote repository for a list of versions available for an
+ * artifact.
  *
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
+ * @author Jason van Zyl
  * @version $Id$
- * @see NearestConflictResolver
- * @deprecated As of 3.0, use a specific implementation instead, e.g. {@link NearestConflictResolver}
- * @plexus.component
  */
-public class DefaultConflictResolver
-    extends NearestConflictResolver
+public interface MetadataSource
 {
+    String ROLE = MetadataSource.class.getName();
+
+    MetadataResolution retrieve( ArtifactMetadata artifact,
+                                 ArtifactRepository localRepository,
+                                 List remoteRepositories )
+        throws MetadataRetrievalException;
 }

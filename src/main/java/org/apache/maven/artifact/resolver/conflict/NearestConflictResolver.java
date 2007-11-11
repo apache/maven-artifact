@@ -29,6 +29,7 @@ import org.apache.maven.artifact.resolver.ResolutionNode;
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
  * @version $Id$
  * @since 3.0
+ * @plexus.component role-hint="nearest"
  */
 public class NearestConflictResolver
     implements ConflictResolver

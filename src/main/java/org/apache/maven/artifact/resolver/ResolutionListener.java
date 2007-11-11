@@ -50,7 +50,7 @@ public interface ResolutionListener
     int OMIT_FOR_CYCLE = 8;
 
     /**
-     * this event means that the scope has NOT been updated to a farther node scope because current
+     * this event means that the artifactScope has NOT been updated to a farther node artifactScope because current
      * node is in the first level pom
      */
     int UPDATE_SCOPE_CURRENT_POM = 9;
@@ -93,11 +93,11 @@ public interface ResolutionListener
     void omitForCycle( Artifact artifact );
 
     /**
-     * This event means that the scope has NOT been updated to a farther node scope because current
+     * This event means that the artifactScope has NOT been updated to a farther node artifactScope because current
      * node is in the first level pom
      *
      * @param artifact     current node artifact, the one in the first level pom
-     * @param ignoredScope scope that was ignored because artifact was in first level pom
+     * @param ignoredScope artifactScope that was ignored because artifact was in first level pom
      */
     void updateScopeCurrentPom( Artifact artifact,
                                 String ignoredScope );

@@ -58,7 +58,7 @@ public class MetadataGraph
                 edges.put( edgeId, edgeList );
             }
 
-            MetadataGraphEdge e = new MetadataGraphEdge( node.md.version, node.md.scope, depth );
+            MetadataGraphEdge e = new MetadataGraphEdge( node.md.version, node.md.artifactScope, depth );
             if ( !edgeList.contains( e ) )
             {
                 edgeList.add( e );

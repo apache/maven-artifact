@@ -178,7 +178,7 @@ public class DefaultArtifactFactory
                                      String inheritedScope,
                                      boolean optional )
     {
-        // TODO: can refactor - inherited scope calculation belongs in the collector, use scope handler
+        // TODO: can refactor - inherited artifactScope calculation belongs in the collector, use artifactScope handler
 
         String desiredScope = Artifact.SCOPE_RUNTIME;
         if ( inheritedScope == null )
@@ -191,7 +191,7 @@ public class DefaultArtifactFactory
         }
         else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
         {
-            // added to retain compile scope. Remove if you want compile inherited as runtime
+            // added to retain compile artifactScope. Remove if you want compile inherited as runtime
             desiredScope = Artifact.SCOPE_COMPILE;
         }
 
