@@ -51,6 +51,7 @@ public class ArtifactResolverTest
 
     private Artifact projectArtifact;
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -61,6 +62,7 @@ public class ArtifactResolverTest
         projectArtifact = createLocalArtifact( "project", "3.0" );
     }
 
+    @Override
     protected String component()
     {
         return "resolver";
@@ -87,6 +89,7 @@ public class ArtifactResolverTest
         assertLocalArtifactPresent( b );
     }
 
+    @Override
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
         throws Exception
     {
