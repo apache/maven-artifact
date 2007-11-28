@@ -50,6 +50,13 @@ public class InvalidRepositoryException
         this.repositoryId = repositoryId;
     }
 
+    protected InvalidRepositoryException( String message,
+                                          String repositoryId )
+    {
+        super( message );
+        this.repositoryId = repositoryId;
+    }
+
     public String getRepositoryId()
     {
         return repositoryId;

@@ -43,7 +43,7 @@ public class DefaultArtifactRepositoryFactory
     // FIXME: This is a non-ThreadLocal cache!!
     private final Map artifactRepositories = new HashMap();
 
-    /** @plexus.requirement role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" */                                  
+    /** @plexus.requirement role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" */
     private Map repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )
@@ -60,7 +60,20 @@ public class DefaultArtifactRepositoryFactory
     {
         ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
 
+        checkLayout( id, layoutId, layout );
+
         return createDeploymentArtifactRepository( id, url, layout, uniqueVersion );
+    }
+
+    private void checkLayout( String repositoryId,
+                              String layoutId,
+                              ArtifactRepositoryLayout layout )
+        throws UnknownRepositoryLayoutException
+    {
+        if ( layout == null )
+        {
+            throw new UnknownRepositoryLayoutException( repositoryId, layoutId );
+        }
     }
 
     public ArtifactRepository createDeploymentArtifactRepository( String id,
@@ -79,6 +92,8 @@ public class DefaultArtifactRepositoryFactory
         throws UnknownRepositoryLayoutException
     {
         ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
+
+        checkLayout( id, layoutId, layout );
 
         return createArtifactRepository( id, url, layout, snapshots, releases );
     }
