@@ -8,18 +8,27 @@ import org.apache.maven.artifact.ArtifactScopeEnum;
 public class MetadataTreeNode
 {
     ArtifactMetadata md; // this node
-
     MetadataTreeNode parent; // papa of cause
+
+    /** default # of children. Used for tree creation optimization only */
+    int nChildren = 8;
 
     MetadataTreeNode[] children; // of cause
 
-    boolean resolved = false; // if current node was resolved
+    public int getNChildren()
+	{
+		return nChildren;
+	}
 
-    //------------------------------------------------------------------------
+	public void setNChildren(int children)
+	{
+		nChildren = children;
+	}
+
+	//------------------------------------------------------------------------
     public MetadataTreeNode()
     {
     }
-
     //------------------------------------------------------------------------
     public MetadataTreeNode( ArtifactMetadata md,
                              MetadataTreeNode parent,
@@ -29,13 +38,12 @@ public class MetadataTreeNode
         if ( md != null )
         {
             md.setArtifactScope( scope );
+            md.setResolved(resolved);
         }
 
         this.md = md;
         this.parent = parent;
-        this.resolved = resolved;
     }
-
     //------------------------------------------------------------------------
     public MetadataTreeNode( Artifact af,
                              MetadataTreeNode parent,
@@ -44,21 +52,18 @@ public class MetadataTreeNode
     {
         this( new ArtifactMetadata( af ), parent, resolved, scope );
     }
-
     //------------------------------------------------------------------------
-    public void addChildren( List<MetadataTreeNode> kidList )
+    public void addChild( int index, MetadataTreeNode kid )
     {
-        if ( kidList == null || kidList.size() < 1 )
+        if ( kid == null )
         {
             return;
         }
 
-        children = new MetadataTreeNode[kidList.size()];
-        int i = 0;
-        for ( MetadataTreeNode n : kidList )
-        {
-            children[i++] = n;
-        }
+        if( children == null )
+        	children = new MetadataTreeNode[nChildren];
+        
+        children[index % nChildren] = kid;
     }
 
     //------------------------------------------------------------------
@@ -67,7 +72,6 @@ public class MetadataTreeNode
     {
         return md == null ? "no metadata" : md.toString();
     }
-
     //------------------------------------------------------------------
     public String graphHash()
         throws MetadataResolutionException
@@ -107,16 +111,6 @@ public class MetadataTreeNode
     public void setParent( MetadataTreeNode parent )
     {
         this.parent = parent;
-    }
-
-    public boolean isResolved()
-    {
-        return resolved;
-    }
-
-    public void setResolved( boolean resolved )
-    {
-        this.resolved = resolved;
     }
 
     public MetadataTreeNode[] getChildren()

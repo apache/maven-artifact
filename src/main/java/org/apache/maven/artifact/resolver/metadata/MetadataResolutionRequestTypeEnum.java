@@ -2,7 +2,7 @@ package org.apache.maven.artifact.resolver.metadata;
 
 public enum MetadataResolutionRequestTypeEnum
 {
-    tree( 1 ), graph( 2 ), noConflictGraph( 3 ), subGraph( 4 );
+    tree( 1 ), graph( 2 ), classpathCompile( 3 ), classpathTest( 4 ), classpathRuntime( 5 );
 
     private int id;
 

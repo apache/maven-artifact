@@ -2,24 +2,54 @@ package org.apache.maven.artifact.resolver.metadata;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
-/** @author Oleg Gusakov */
+
+/**
+ * metadata graph edge - combination of version, scope and depth define 
+ * an edge in the graph
+ * 
+ * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
+ *
+ */
+
 public class MetadataGraphEdge
 {
-    String version;
+    String            version;
     ArtifactScopeEnum scope;
-    int depth = -1;
+    int               depth = -1;
+    int               pomOrder = -1;
+    boolean           resolved = true;
+    String            artifactUri;
+    
+    /**
+     * capturing where this link came from
+     * and where it is linked to.
+     * 
+     *   In the first implementation only source used for explanatory function
+     */
+    ArtifactMetadata  source;
+    ArtifactMetadata  target;
 
-    public MetadataGraphEdge( String version,
-                              ArtifactScopeEnum scope,
-                              int depth )
+    //----------------------------------------------------------------------------
+    public MetadataGraphEdge( String version
+    						, boolean resolved
+                            , ArtifactScopeEnum scope
+                            , String artifactUri
+                            , int depth
+                            , int pomOrder
+                            )
     {
         super();
         this.version = version;
         this.scope = scope;
+        this.artifactUri = artifactUri;
         this.depth = depth;
+        this.resolved = resolved;
+        this.pomOrder = pomOrder;
     }
-
     //----------------------------------------------------------------------------
+    /**
+     * helper for equals
+     */
     private static boolean objectsEqual( Object o1,
                                          Object o2 )
     {
@@ -37,6 +67,9 @@ public class MetadataGraphEdge
     }
 
     //----------------------------------------------------------------------------
+    /**
+     * used to eliminate exact duplicates in the edge list
+     */
     @Override
     public boolean equals( Object o )
     {
@@ -45,8 +78,10 @@ public class MetadataGraphEdge
             MetadataGraphEdge e = (MetadataGraphEdge) o;
             return
                 objectsEqual( version, e.version )
-                    && objectsEqual( scope, e.scope )
-                    && depth == e.depth
+                && ArtifactScopeEnum.checkScope(scope).getScope().equals( 
+                		ArtifactScopeEnum.checkScope(e.scope).getScope()
+                														)
+                && depth == e.depth
                 ;
         }
         return false;
@@ -82,6 +117,57 @@ public class MetadataGraphEdge
     {
         this.depth = depth;
     }
+
+	public boolean isResolved()
+	{
+		return resolved;
+	}
+
+	public void setResolved(boolean resolved)
+	{
+		this.resolved = resolved;
+	}
+
+	public int getPomOrder()
+	{
+		return pomOrder;
+	}
+
+	public void setPomOrder(int pomOrder)
+	{
+		this.pomOrder = pomOrder;
+	}
+
+	public String getArtifactUri()
+	{
+		return artifactUri;
+	}
+	public void setArtifactUri(String artifactUri)
+	{
+		this.artifactUri = artifactUri;
+	}
+	
+	public ArtifactMetadata getSource()
+	{
+		return source;
+	}
+	public void setSource(ArtifactMetadata source)
+	{
+		this.source = source;
+	}
+	public ArtifactMetadata getTarget()
+	{
+		return target;
+	}
+	public void setTarget(ArtifactMetadata target)
+	{
+		this.target = target;
+	}
+	@Override
+	public String toString()
+	{
+		return "[version="+version+", scope="+(scope == null ? "null" : scope.getScope())+", depth="+depth+"]";
+	}
     //----------------------------------------------------------------------------
     //----------------------------------------------------------------------------
 }

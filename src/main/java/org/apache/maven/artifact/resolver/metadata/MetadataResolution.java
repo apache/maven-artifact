@@ -1,27 +1,54 @@
 package org.apache.maven.artifact.resolver.metadata;
 
-import org.apache.maven.artifact.Artifact;
+import java.util.Collection;
+
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
-import java.util.Set;
-
-/** @author Jason van Zyl */
+/**
+ * 
+ * @author Jason van Zyl
+ *  
+ */
 public class MetadataResolution
 {
-    private Set<ArtifactMetadata> dependencies;
+    /** resolved MD  */
+    private ArtifactMetadata artifactMetadata;
 
-    private Set<ArtifactRepository> metadataRepositories;
-
-    public MetadataResolution( Set<ArtifactMetadata> dependencies,
-                               Set<ArtifactRepository> metadataRepositories )
+    /** repositories, added by this POM  */
+    private Collection<ArtifactRepository> metadataRepositories;
+    //-------------------------------------------------------------------
+    public MetadataResolution( ArtifactMetadata artifactMetadata )
     {
-        this.dependencies = dependencies;
-
+        this.artifactMetadata = artifactMetadata;
+    }
+    //-------------------------------------------------------------------
+    public MetadataResolution( ArtifactMetadata artifactMetadata,
+    		Collection<ArtifactRepository> metadataRepositories )
+    {
+    	this( artifactMetadata );
         this.metadataRepositories = metadataRepositories;
     }
+    //-------------------------------------------------------------------
+	public Collection<ArtifactRepository> getMetadataRepositories()
+	{
+		return metadataRepositories;
+	}
 
-    public Set<ArtifactMetadata> getDependencies()
-    {
-        return dependencies;
-    }
+	public void setMetadataRepositories(
+			Collection<ArtifactRepository> metadataRepositories)
+	{
+		this.metadataRepositories = metadataRepositories;
+	}
+    //-------------------------------------------------------------------
+	public ArtifactMetadata getArtifactMetadata()
+	{
+		return artifactMetadata;
+	}
+
+	public void setArtifactMetadata(ArtifactMetadata artifactMetadata)
+	{
+		this.artifactMetadata = artifactMetadata;
+	}
+    //-------------------------------------------------------------------
+    //-------------------------------------------------------------------
 }

@@ -5,17 +5,61 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** @author Oleg Gusakov */
+import org.apache.maven.artifact.ArtifactScopeEnum;
+
+/**
+ * maven dependency metadata graph
+ * 
+ * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
+ *
+ */
 
 public class MetadataGraph
 {
-    MetadataGraphVertice entry;
-    Map<String, MetadataGraphVertice> vertices;
+	public static char DEFAULT_DOMAIN_SEPARATOR = '>';
+	/**
+	 * the entry point we started building the graph from
+	 */
+    MetadataGraphVertex entry;
+    
+    Map<String, MetadataGraphVertex> vertices;
     Map<String, List<MetadataGraphEdge>> edges;
+    
+    /**
+     *  null in dirty graph, actual scope for transformed graph
+     */
+    ArtifactScopeEnum scope;
 
     //------------------------------------------------------------------------
+    /**
+     * construct graph from a "dirty" tree
+     */
+    public MetadataGraph( int nVertices, int nEdges )
+    throws MetadataResolutionException
+    {
+    	edges = new HashMap<String, List<MetadataGraphEdge>>( nEdges );
+    	vertices = new HashMap<String, MetadataGraphVertex>( nVertices );
+    }
+    //------------------------------------------------------------------------
+    /**
+     * construct a single vertice
+     */
+    public MetadataGraph( MetadataGraphVertex entry )
+    throws MetadataResolutionException
+    {
+    	if( entry == null || entry.getMd() == null )
+    		throw new MetadataResolutionException("cannot create a MetadataGraph out of empty vertice");
+    	vertices = new HashMap<String, MetadataGraphVertex>( 1 );
+    	vertices.put( entry.getMd().toDomainString(), entry );
+    	
+    	this.entry = entry;
+    }
+    //------------------------------------------------------------------------
+    /**
+     * construct graph from a "dirty" tree
+     */
     public MetadataGraph( MetadataTreeNode tree )
-        throws MetadataResolutionException
+    throws MetadataResolutionException
     {
         if ( tree == null )
         {
@@ -23,17 +67,19 @@ public class MetadataGraph
         }
 
         int count = countNodes( tree );
-        vertices = new HashMap<String, MetadataGraphVertice>( count );
+        vertices = new HashMap<String, MetadataGraphVertex>( count );
         edges = new HashMap<String, List<MetadataGraphEdge>>( count + ( count / 2 ) );
 
-        processNodes( null, tree, 0 );
+        processNodes( null, tree, 0, 0 );
     }
 
     //------------------------------------------------------------------------
-    private void processNodes( MetadataGraphVertice parentVertice,
-                               MetadataTreeNode node,
-                               int depth )
-        throws MetadataResolutionException
+    private void processNodes(   MetadataGraphVertex parentVertice
+                               , MetadataTreeNode node
+                               , int depth
+                               , int pomOrder
+    						)
+    throws MetadataResolutionException
     {
         if ( node == null )
         {
@@ -41,15 +87,15 @@ public class MetadataGraph
         }
 
         String nodeHash = node.graphHash();
-        MetadataGraphVertice vertice = vertices.get( nodeHash );
+        MetadataGraphVertex vertice = vertices.get( nodeHash );
         if ( vertice == null )
         { // does not exist yet ?
-            vertice = new MetadataGraphVertice( node.md );
+            vertice = new MetadataGraphVertex( node.md );
             vertices.put( nodeHash, vertice );
         }
 
         if ( parentVertice != null )
-        { // then create links
+        { // then create edges
             String edgeId = edgeHash( parentVertice, vertice );
             List<MetadataGraphEdge> edgeList = edges.get( edgeId );
             if ( edgeList == null )
@@ -58,15 +104,22 @@ public class MetadataGraph
                 edges.put( edgeId, edgeList );
             }
 
-            MetadataGraphEdge e = new MetadataGraphEdge( node.md.version, node.md.artifactScope, depth );
+            ArtifactMetadata md = node.getMd();
+            MetadataGraphEdge e = new MetadataGraphEdge( md.version, md.resolved, md.artifactScope, md.artifactUri, depth, pomOrder );
             if ( !edgeList.contains( e ) )
             {
+            	e.setSource( parentVertice.getMd() );
+            	e.setTarget( md );
                 edgeList.add( e );
             }
             else
             {
                 e = null;
             }
+        }
+        else
+        {
+        	entry = vertice;
         }
 
         MetadataTreeNode[] kids = node.getChildren();
@@ -75,23 +128,56 @@ public class MetadataGraph
             return;
         }
 
-        for ( MetadataTreeNode n : kids )
+        for( int i = 0; i< kids.length; i++ )
         {
-            processNodes( vertice, n, depth + 1 );
+        	MetadataTreeNode n = kids[i];
+            processNodes( vertice, n, depth + 1, i );
         }
     }
 
     //------------------------------------------------------------------------
-    public static String edgeHash( MetadataGraphVertice v1,
-                                   MetadataGraphVertice v2 )
+    public static String edgeHash( MetadataGraphVertex v1,
+                                   MetadataGraphVertex v2 )
     {
-        return v1.md.toDomainString() + ">" + v2.md.toDomainString();
+        return v1.md.toDomainString() + DEFAULT_DOMAIN_SEPARATOR + v2.md.toDomainString();
 //		return h1.compareTo(h2) > 0
 //				? h1.hashCode()+""+h2.hashCode()
 //				: h2.hashCode()+""+h1.hashCode()
 //		;
     }
 
+    //------------------------------------------------------------------------
+    public MetadataGraph addVertice( MetadataGraphVertex v )
+    {
+    	if( v == null || v.getMd() == null )
+    		return this;
+   
+    	if( vertices == null )
+    		vertices = new HashMap<String, MetadataGraphVertex>();
+    	vertices.put(v.getMd().toDomainString(), v );
+    	
+    	return this;
+    }
+    //------------------------------------------------------------------------
+    public MetadataGraph addEdge( String key, MetadataGraphEdge e )
+    {
+    	if( e == null )
+    		return this;
+   
+    	if( edges == null )
+    		edges = new HashMap<String, List<MetadataGraphEdge>>();
+    	
+    	List<MetadataGraphEdge> eList = edges.get(key);
+    	if( eList == null ) {
+    		eList = new ArrayList<MetadataGraphEdge>();
+        	edges.put( key, eList );
+    	}
+    	
+    	if( ! eList.contains(e) )
+    		eList.add(e);
+    	
+    	return this;
+    }
     //------------------------------------------------------------------------
     private static int countNodes( MetadataTreeNode tree )
     {
@@ -115,22 +201,22 @@ public class MetadataGraph
     }
 
     //------------------------------------------------------------------------
-    public MetadataGraphVertice getEntry()
+    public MetadataGraphVertex getEntry()
     {
         return entry;
     }
 
-    public void setEntry( MetadataGraphVertice entry )
+    public void setEntry( MetadataGraphVertex entry )
     {
         this.entry = entry;
     }
 
-    public Map<String, MetadataGraphVertice> getVertices()
+    public Map<String, MetadataGraphVertex> getVertices()
     {
         return vertices;
     }
 
-    public void setVertices( Map<String, MetadataGraphVertice> vertices )
+    public void setVertices( Map<String, MetadataGraphVertex> vertices )
     {
         this.vertices = vertices;
     }
@@ -144,6 +230,32 @@ public class MetadataGraph
     {
         this.edges = edges;
     }
+	public ArtifactScopeEnum getScope()
+	{
+		return scope;
+	}
+	public void setScope(ArtifactScopeEnum scope)
+	{
+		this.scope = scope;
+	}
+    //------------------------------------------------------------------------
+	public boolean isEmpty()
+	{
+		return
+			entry == null
+			|| vertices == null
+			|| vertices.isEmpty()
+		;
+	}
+    //------------------------------------------------------------------------
+	public boolean isEmptyEdges()
+	{
+		return
+			   isEmpty()
+			|| edges == null
+			|| edges.isEmpty()
+		;
+	}
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 }
