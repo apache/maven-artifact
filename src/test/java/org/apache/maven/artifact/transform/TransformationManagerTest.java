@@ -2,7 +2,6 @@ package org.apache.maven.artifact.transform;
 
 import org.codehaus.plexus.PlexusTestCase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /** @author Jason van Zyl */
@@ -24,4 +23,5 @@ public class TransformationManagerTest
 
         assertTrue( "We expected the snapshot transformation and got " + tms.get(2), tms.get(2) instanceof SnapshotTransformation );
     }
+
 }

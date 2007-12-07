@@ -21,6 +21,7 @@ package org.apache.maven.artifact.repository;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Describes a set of policies for a repository to use under certain conditions.
@@ -115,11 +116,13 @@ public class ArtifactRepositoryPolicy
         else if ( UPDATE_POLICY_DAILY.equals( updatePolicy ) )
         {
             // Get midnight boundary
-            Calendar cal = Calendar.getInstance();
+            Calendar cal = Calendar.getInstance( TimeZone.getTimeZone( "UTC" ) );
+
             cal.set( Calendar.HOUR_OF_DAY, 0 );
             cal.set( Calendar.MINUTE, 0 );
             cal.set( Calendar.SECOND, 0 );
             cal.set( Calendar.MILLISECOND, 0 );
+
             if ( cal.getTime().after( lastModified ) )
             {
                 checkForUpdates = true;

@@ -24,15 +24,18 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
+import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Date;
@@ -52,11 +55,23 @@ public class DefaultRepositoryMetadataManager
     /** @plexus.requirement */
     private WagonManager wagonManager;
 
+    protected DefaultRepositoryMetadataManager( WagonManager wagonManager, Logger logger )
+    {
+        this.wagonManager = wagonManager;
+        enableLogging( logger );
+    }
+
+    public DefaultRepositoryMetadataManager()
+    {
+    }
+
     public void resolve( RepositoryMetadata metadata,
                          List remoteRepositories,
                          ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {
+//        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
+
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
             ArtifactRepository repository = (ArtifactRepository) i.next();
@@ -77,6 +92,11 @@ public class DefaultRepositoryMetadataManager
                 File file = new File( localRepository.getBasedir(),
                     localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
+//                Date lastMod = touchfile.getLastModified( repository.getId(), getLogger() );
+
+//                boolean checkForUpdates =
+//                    ( lastMod == null ) || policy.checkOutOfDate( lastMod ) || !file.exists();
+
                 boolean checkForUpdates =
                     policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
 
@@ -93,6 +113,10 @@ public class DefaultRepositoryMetadataManager
                         // TODO: [jc; 08-Nov-2005] revisit this for 2.1
                         // suppressing logging to avoid logging this error twice.
                     }
+//                    finally
+//                    {
+//                        touchfile.touch( repository.getId(), getLogger() );
+//                    }
                 }
 
                 // TODO: should this be inside the above check?
@@ -184,7 +208,7 @@ public class DefaultRepositoryMetadataManager
                 }
                 else
                 {
-                    if ( m.getVersioning() != null && m.getVersioning().getSnapshot() != null &&
+                    if ( ( m.getVersioning() != null ) && ( m.getVersioning().getSnapshot() != null ) &&
                         m.getVersioning().getSnapshot().isLocalCopy() )
                     {
                         m.getVersioning().getSnapshot().setLocalCopy( false );
@@ -213,7 +237,7 @@ public class DefaultRepositoryMetadataManager
         {
             Metadata metadata = readMetadata( metadataFile );
 
-            if ( repoMetadata.isSnapshot() && previousMetadata != null )
+            if ( repoMetadata.isSnapshot() && ( previousMetadata != null ) )
             {
                 previousMetadata.put( remoteRepository, metadata );
             }
@@ -340,10 +364,7 @@ public class DefaultRepositoryMetadataManager
             getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
 
             // delete the local copy so the old details aren't used.
-            if ( file.exists() )
-            {
-                file.delete();
-            }
+            createMetadataStub( metadata, file );
         }
         catch ( TransferFailedException e )
         {
@@ -354,6 +375,36 @@ public class DefaultRepositoryMetadataManager
             repository.setBlacklisted( allowBlacklisting );
 
             throw e;
+        }
+    }
+
+    private void createMetadataStub( ArtifactMetadata metadata, File file )
+    {
+        Metadata md = new Metadata();
+
+        md.setArtifactId( metadata.getArtifactId() );
+        md.setGroupId( metadata.getGroupId() );
+        md.setVersion( metadata.getBaseVersion() );
+
+        Versioning versioning = new Versioning();
+        versioning.updateTimestamp();
+
+        md.setVersioning( versioning );
+
+        FileWriter writer = null;
+        try
+        {
+            file.getParentFile().mkdirs();
+            writer = new FileWriter( file );
+            new MetadataXpp3Writer().write( writer, md );
+        }
+        catch ( IOException e )
+        {
+            getLogger().debug( "Failed to write stub metadata to: " + file, e );
+        }
+        finally
+        {
+            IOUtil.close( writer );
         }
     }
 
