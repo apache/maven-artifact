@@ -364,7 +364,7 @@ public class DefaultRepositoryMetadataManager
             getLogger().debug( metadata
                                + " could not be found on repository: "
                                + repository.getId()
-                               + ". It will be stubbed out here to avoid re-checking for the specfied updateInterval." );
+                               + ". It will be stubbed out to: " + file + " here to avoid re-checking for the specfied updateInterval." );
 
             createMetadataStub( metadata, file );
         }
