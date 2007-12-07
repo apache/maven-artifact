@@ -361,9 +361,11 @@ public class DefaultRepositoryMetadataManager
         }
         catch ( ResourceDoesNotExistException e )
         {
-            getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
+            getLogger().debug( metadata
+                               + " could not be found on repository: "
+                               + repository.getId()
+                               + ". It will be stubbed out here to avoid re-checking for the specfied updateInterval." );
 
-            // delete the local copy so the old details aren't used.
             createMetadataStub( metadata, file );
         }
         catch ( TransferFailedException e )
