@@ -24,7 +24,6 @@ import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
-import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -35,7 +34,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Date;
@@ -70,7 +68,7 @@ public class DefaultRepositoryMetadataManager
                          ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {
-//        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
+        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
 
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
@@ -92,13 +90,11 @@ public class DefaultRepositoryMetadataManager
                 File file = new File( localRepository.getBasedir(),
                     localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
 
-//                Date lastMod = touchfile.getLastModified( repository.getId(), getLogger() );
-
-//                boolean checkForUpdates =
-//                    ( lastMod == null ) || policy.checkOutOfDate( lastMod ) || !file.exists();
+                Date lastMod = touchfile.getLastCheckDate( repository.getId(), file.getName(), getLogger() );
+                getLogger().debug( "Got last-check-date of: " + lastMod + "\nfor metadata: " + metadata + "\nwith filename: " + file.getName() + "\nin repository: " + repository.getId() );
 
                 boolean checkForUpdates =
-                    policy.checkOutOfDate( new Date( file.lastModified() ) ) || !file.exists();
+                    ( lastMod == null ) || policy.checkOutOfDate( lastMod );
 
                 if ( checkForUpdates )
                 {
@@ -106,17 +102,13 @@ public class DefaultRepositoryMetadataManager
 
                     try
                     {
-                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), true );
+                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), touchfile, true );
                     }
                     catch ( TransferFailedException e )
                     {
                         // TODO: [jc; 08-Nov-2005] revisit this for 2.1
                         // suppressing logging to avoid logging this error twice.
                     }
-//                    finally
-//                    {
-//                        touchfile.touch( repository.getId(), getLogger() );
-//                    }
                 }
 
                 // TODO: should this be inside the above check?
@@ -308,7 +300,9 @@ public class DefaultRepositoryMetadataManager
 
         try
         {
-            resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, false );
+            MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
+
+            resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile, false );
         }
         catch ( TransferFailedException e )
         {
@@ -336,6 +330,7 @@ public class DefaultRepositoryMetadataManager
                                 ArtifactRepository repository,
                                 File file,
                                 String checksumPolicy,
+                                MetadataTouchfile touchfile,
                                 boolean allowBlacklisting )
         throws RepositoryMetadataResolutionException, TransferFailedException
     {
@@ -363,10 +358,8 @@ public class DefaultRepositoryMetadataManager
         {
             getLogger().debug( metadata
                                + " could not be found on repository: "
-                               + repository.getId()
-                               + ". It will be stubbed out to: " + file + " here to avoid re-checking for the specfied updateInterval." );
+                               + repository.getId() );
 
-//            createMetadataStub( metadata, file );
             if ( file.exists() )
             {
                 file.delete();
@@ -382,35 +375,9 @@ public class DefaultRepositoryMetadataManager
 
             throw e;
         }
-    }
-
-    private void createMetadataStub( ArtifactMetadata metadata, File file )
-    {
-        Metadata md = new Metadata();
-
-        md.setArtifactId( metadata.getArtifactId() );
-        md.setGroupId( metadata.getGroupId() );
-        md.setVersion( metadata.getBaseVersion() );
-
-        Versioning versioning = new Versioning();
-        versioning.updateTimestamp();
-
-        md.setVersioning( versioning );
-
-        FileWriter writer = null;
-        try
-        {
-            file.getParentFile().mkdirs();
-            writer = new FileWriter( file );
-            new MetadataXpp3Writer().write( writer, md );
-        }
-        catch ( IOException e )
-        {
-            getLogger().debug( "Failed to write stub metadata to: " + file, e );
-        }
         finally
         {
-            IOUtil.close( writer );
+            touchfile.touch( repository.getId(), file.getName(), getLogger() );
         }
     }
 
@@ -433,7 +400,9 @@ public class DefaultRepositoryMetadataManager
 
         try
         {
-            resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, false );
+            MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
+
+            resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile, false );
         }
         catch ( RepositoryMetadataResolutionException e )
         {
