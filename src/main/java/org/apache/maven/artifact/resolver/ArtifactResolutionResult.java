@@ -81,6 +81,11 @@ public class ArtifactResolutionResult
         return this;
     }
 
+    /**
+     * 
+     * @return set of Artifact instances
+     */
+    
     public Set getArtifacts()
     {
         if ( artifacts == null )
@@ -98,6 +103,10 @@ public class ArtifactResolutionResult
         return artifacts;
     }
 
+    /**
+     * 
+     * @return Set of ResolutionNode instances
+     */
     public Set getArtifactResolutionNodes()
     {
         return resolutionNodes == null ? Collections.EMPTY_SET : resolutionNodes;
