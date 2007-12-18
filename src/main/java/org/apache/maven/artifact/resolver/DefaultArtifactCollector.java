@@ -97,7 +97,9 @@ public class DefaultArtifactCollector
                                              List conflictResolvers )
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
-
+        
+        result.ListOriginatingArtifact( originatingArtifact );
+        
         if ( conflictResolvers == null )
         {
             // TODO: warn that we're using the default conflict resolver
@@ -108,7 +110,7 @@ public class DefaultArtifactCollector
         Map resolvedArtifacts = new LinkedHashMap();
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
-
+        
         try
         {
             root.addDependencies( artifacts, remoteRepositories, filter );
