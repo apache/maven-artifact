@@ -70,7 +70,7 @@ public class ResolutionNode
         this.parents.add( parent.getKey() );
         this.parent = parent;
     }
-
+    
     public Artifact getArtifact()
     {
         return artifact;
@@ -155,6 +155,10 @@ public class ResolutionNode
         return children != null;
     }
 
+    /**
+     * test whether the node is direct or transitive dependency.
+     * @return
+     */
     public boolean isChildOfRootNode()
     {
         return parent != null && parent.parent == null;
