@@ -116,8 +116,8 @@ public class DefaultArtifactResolver
 
             if ( systemFile == null )
             {
-                throw new ArtifactResolutionException(
-                    "systemPath not set for system-scoped artifact: " + artifact.getId(), artifact );
+                throw new ArtifactNotFoundException(
+                    "System artifact: " + artifact + " has no file attached", artifact );
             }
             else if ( !systemFile.exists() )
             {
