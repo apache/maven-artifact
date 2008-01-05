@@ -270,10 +270,7 @@ public class AbstractArtifactResolutionException
             sb.append( groupId );
             sb.append( " -DartifactId=" );
             sb.append( artifactId );
-            sb.append( " \\\n" );
-            sb.append( indentation );
-            sb.append( "        " );
-            sb.append( "-Dversion=" );
+            sb.append( " -Dversion=" );
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
@@ -288,7 +285,8 @@ public class AbstractArtifactResolutionException
             sb.append( LS );
 
             // If people want to deploy it
-
+            sb.append( LS );
+            sb.append( indentation );
             sb.append( "Alternatively, if you host your own repository you can deploy the file there: " );
             sb.append( LS );
             sb.append( indentation );
@@ -296,10 +294,7 @@ public class AbstractArtifactResolutionException
             sb.append( groupId );
             sb.append( " -DartifactId=" );
             sb.append( artifactId );
-            sb.append( " \\\n" );
-            sb.append( indentation );
-            sb.append( "        " );
-            sb.append( "-Dversion=" );
+            sb.append( " -Dversion=" );
             sb.append( version );
 
             //insert classifier only if it was used in the artifact
@@ -311,9 +306,6 @@ public class AbstractArtifactResolutionException
             sb.append( " -Dpackaging=" );
             sb.append( type );
             sb.append( " -Dfile=/path/to/file" );
-            sb.append( " \\\n" );
-            sb.append( indentation );
-            sb.append( "        " );
             sb.append( " -Durl=[url] -DrepositoryId=[id]" );
             sb.append( LS );
         }
