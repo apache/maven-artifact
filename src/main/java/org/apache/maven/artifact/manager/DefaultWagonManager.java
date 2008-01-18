@@ -40,9 +40,9 @@ import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
-import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -98,7 +98,7 @@ public class DefaultWagonManager
     private boolean interactive = true;
 
     private RepositoryPermissions defaultRepositoryPermissions;
-    
+
     // Components
 
     /** @plexus.requirement */
@@ -312,6 +312,9 @@ public class DefaultWagonManager
         }
     }
 
+
+    // NOTE: It is not possible that this method throws TransferFailedException under current conditions.
+    // FIXME: Change the throws clause to reflect the fact that we're never throwing TransferFailedException
     public void getArtifact( Artifact artifact,
                              List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException
@@ -821,7 +824,7 @@ public class DefaultWagonManager
         authenticationInfoMap.put( repositoryId, authInfo );
     }
 
-    // This is the new way of handling authentication that will allow us to help users setup 
+    // This is the new way of handling authentication that will allow us to help users setup
     // authentication requirements.
     public void addAuthenticationCredentials( String repositoryId
         ,
@@ -916,6 +919,7 @@ public class DefaultWagonManager
     }
 
     /** @deprecated Wagons are discovered in plugin and extension realms now. */
+    @Deprecated
     public void registerWagons( Collection wagons,
                                 PlexusContainer extensionContainer )
     {
@@ -992,7 +996,7 @@ public class DefaultWagonManager
 
     public void registerCredentialsDataSource( CredentialsDataSource cds )
     {
-        this.credentialsDataSource = cds;
+        credentialsDataSource = cds;
     }
 
 
