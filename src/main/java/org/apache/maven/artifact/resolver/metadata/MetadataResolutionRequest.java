@@ -9,8 +9,6 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 public class MetadataResolutionRequest
 {
     protected ArtifactMetadata query;
-    protected MetadataResolutionRequestTypeEnum type;
-
     protected ArtifactRepository localRepository;
     protected List<ArtifactRepository> remoteRepositories;
 
@@ -20,12 +18,10 @@ public class MetadataResolutionRequest
     }
 
     //--------------------------------------------------------------------
-    public MetadataResolutionRequest( MetadataResolutionRequestTypeEnum type,
-                                      ArtifactMetadata query,
+    public MetadataResolutionRequest( ArtifactMetadata query,
                                       ArtifactRepository localRepository,
                                       List<ArtifactRepository> remoteRepositories )
     {
-        this.type = type;
         this.query = query;
         this.localRepository = localRepository;
         this.remoteRepositories = remoteRepositories;

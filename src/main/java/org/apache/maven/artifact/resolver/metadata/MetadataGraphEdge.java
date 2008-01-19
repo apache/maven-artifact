@@ -26,8 +26,8 @@ public class MetadataGraphEdge
      * 
      *   In the first implementation only source used for explanatory function
      */
-    ArtifactMetadata  source;
-    ArtifactMetadata  target;
+    MetadataGraphVertex  source;
+    MetadataGraphVertex  target;
 
     //----------------------------------------------------------------------------
     public MetadataGraphEdge( String version
@@ -76,6 +76,7 @@ public class MetadataGraphEdge
         if ( o instanceof MetadataGraphEdge )
         {
             MetadataGraphEdge e = (MetadataGraphEdge) o;
+            
             return
                 objectsEqual( version, e.version )
                 && ArtifactScopeEnum.checkScope(scope).getScope().equals( 
@@ -147,26 +148,32 @@ public class MetadataGraphEdge
 		this.artifactUri = artifactUri;
 	}
 	
-	public ArtifactMetadata getSource()
+	public MetadataGraphVertex getSource()
 	{
 		return source;
 	}
-	public void setSource(ArtifactMetadata source)
+	public void setSource(MetadataGraphVertex source)
 	{
 		this.source = source;
 	}
-	public ArtifactMetadata getTarget()
+	public MetadataGraphVertex getTarget()
 	{
 		return target;
 	}
-	public void setTarget(ArtifactMetadata target)
+	public void setTarget(MetadataGraphVertex target)
 	{
 		this.target = target;
 	}
 	@Override
 	public String toString()
 	{
-		return "[version="+version+", scope="+(scope == null ? "null" : scope.getScope())+", depth="+depth+"]";
+		return "[ " 
+				+ "FROM:("+( source==null?"no source":(source.md==null?"no source MD":source.md.toString()) )+") "
+				+ "TO:("+( target==null?"no target":(target.md==null?"no target MD":target.md.toString()) )+") "
+					+"version="+version
+					+", scope="+(scope == null ? "null" : scope.getScope())
+					+", depth="+depth+"]"
+				;
 	}
     //----------------------------------------------------------------------------
     //----------------------------------------------------------------------------

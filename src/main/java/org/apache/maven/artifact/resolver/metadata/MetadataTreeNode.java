@@ -1,14 +1,19 @@
 package org.apache.maven.artifact.resolver.metadata;
 
-import java.util.List;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactScopeEnum;
+/**
+ * metadata [dirty] Tree
+ * 
+ * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
+ *
+ */
 
 public class MetadataTreeNode
 {
     ArtifactMetadata md; // this node
-    MetadataTreeNode parent; // papa of cause
+
+    MetadataTreeNode parent; // papa
 
     /** default # of children. Used for tree creation optimization only */
     int nChildren = 8;
@@ -37,7 +42,7 @@ public class MetadataTreeNode
     {
         if ( md != null )
         {
-            md.setArtifactScope( scope );
+            md.setArtifactScope( ArtifactScopeEnum.checkScope(scope) );
             md.setResolved(resolved);
         }
 
@@ -48,7 +53,8 @@ public class MetadataTreeNode
     public MetadataTreeNode( Artifact af,
                              MetadataTreeNode parent,
                              boolean resolved,
-                             ArtifactScopeEnum scope )
+                             ArtifactScopeEnum scope
+                           )
     {
         this( new ArtifactMetadata( af ), parent, resolved, scope );
     }
@@ -65,7 +71,6 @@ public class MetadataTreeNode
         
         children[index % nChildren] = kid;
     }
-
     //------------------------------------------------------------------
     @Override
     public String toString()
@@ -91,7 +96,6 @@ public class MetadataTreeNode
     {
         return children != null;
     }
-
     //------------------------------------------------------------------------
     public ArtifactMetadata getMd()
     {
@@ -122,7 +126,6 @@ public class MetadataTreeNode
     {
         this.children = children;
     }
-
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 

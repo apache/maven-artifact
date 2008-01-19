@@ -10,6 +10,7 @@ import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.logging.Logger;
 
 /**
  *
@@ -21,13 +22,11 @@ import org.codehaus.plexus.PlexusTestCase;
 public class DefaultGraphConflictResolverTest
 extends PlexusTestCase
 {
+	Logger log;
+	
 	GraphConflictResolver resolver;
 	
 	MetadataGraph graph;
-
-	MetadataGraphEdge e1;
-	MetadataGraphEdge e2;
-	MetadataGraphEdge e3;
 
 	MetadataGraphVertex v1;
 	MetadataGraphVertex v2;
@@ -39,54 +38,35 @@ extends PlexusTestCase
 	{
 		super.setUp();
 		resolver = (GraphConflictResolver) lookup( GraphConflictResolver.ROLE, "default" );
+
+		// logging
+		getContainer().getLoggerManager().setThresholds( Logger.LEVEL_DEBUG );
+		log = getContainer().getLoggerManager().getLoggerForComponent( this.getClass().getName() );
     	
-		e1 = new MetadataGraphEdge( "1.1", true, null, null, 2, 1 );
-    	e2 = new MetadataGraphEdge( "1.2", true, null, null, 3, 2 );
-    	e3 = new MetadataGraphEdge( "1.2", true, null, null, 2, 3 );
-    	
-    	v1 = new MetadataGraphVertex(new ArtifactMetadata("g","a1","1.0"));
-    	v2 = new MetadataGraphVertex(new ArtifactMetadata("g","a2","1.0"));
-    	v3 = new MetadataGraphVertex(new ArtifactMetadata("g","a3","1.0"));
-    	v4 = new MetadataGraphVertex(new ArtifactMetadata("g","a4","1.0"));
-    	
-    	graph = new MetadataGraph( 4, 3 );
-    	graph.setEntry(v1);
-    	Map< String, MetadataGraphVertex> v = graph.getVertices();
-    	Map<String,List<MetadataGraphEdge>> e = graph.getEdges();
-    	
-    	v.put(v1.getMd().toDomainString(), v1);
-    	v.put(v2.getMd().toDomainString(), v2);
-    	v.put(v3.getMd().toDomainString(), v3);
-    	v.put(v4.getMd().toDomainString(), v4);
     	/*
     	 *       v2
     	 *   v1<
     	 *      v3-v4
     	 * 
     	 */
-    	String key;
-    	List<MetadataGraphEdge> le;
-    	
+    	graph = new MetadataGraph( 4, 3 );
+    	v1 = graph.addVertex(new ArtifactMetadata("g","a1","1.0"));
+    	graph.setEntry(v1);
+    	v2 = graph.addVertex(new ArtifactMetadata("g","a2","1.0"));
+    	v3 = graph.addVertex(new ArtifactMetadata("g","a3","1.0"));
+    	v4 = graph.addVertex(new ArtifactMetadata("g","a4","1.0"));
+
     	// v1-->v2
-    	key = MetadataGraph.edgeHash(v1, v2);
-    	le = new ArrayList<MetadataGraphEdge>(2);
-    	le.add( new MetadataGraphEdge( "1.1", true, null, null, 2, 1 ) );
-    	le.add( new MetadataGraphEdge( "1.2", true, null, null, 2, 2 ) );
-    	e.put( key, le );
+    	graph.addEdge(v1, v2, new MetadataGraphEdge( "1.1", true, null, null, 2, 1 ) );
+    	graph.addEdge(v1, v2, new MetadataGraphEdge( "1.2", true, null, null, 2, 2 ) );
     	
     	// v1-->v3
-    	key = MetadataGraph.edgeHash(v1, v3);
-    	le = new ArrayList<MetadataGraphEdge>(2);
-    	le.add( new MetadataGraphEdge( "1.1", true, null, null, 2, 1 ) );
-    	le.add( new MetadataGraphEdge( "1.2", true, null, null, 4, 2 ) );
-    	e.put( key, le );
+    	graph.addEdge(v1, v3, new MetadataGraphEdge( "1.1", true, null, null, 2, 1 ) );
+    	graph.addEdge(v1, v3, new MetadataGraphEdge( "1.2", true, null, null, 4, 2 ) );
     	
     	// v3-->v4
-    	key = MetadataGraph.edgeHash(v3, v4);
-    	le = new ArrayList<MetadataGraphEdge>(2);
-    	le.add( new MetadataGraphEdge( "1.1", true, ArtifactScopeEnum.runtime, null, 2, 1 ) );
-    	le.add( new MetadataGraphEdge( "1.2", true, ArtifactScopeEnum.provided, null, 2, 2 ) );
-    	e.put( key, le );
+    	graph.addEdge(v3, v4, new MetadataGraphEdge( "1.1", true, ArtifactScopeEnum.runtime, null, 2, 1 ) );
+    	graph.addEdge(v3, v4, new MetadataGraphEdge( "1.2", true, ArtifactScopeEnum.provided, null, 2, 2 ) );
 	}
     //------------------------------------------------------------------------------------------
     public void testCompileResolution()
@@ -98,22 +78,20 @@ extends PlexusTestCase
     	
     	assertNotNull("null graph after resolver", res );
     	assertNotNull("no vertices in the resulting graph after resolver", res.getVertices() );
-    	assertNotNull("no edges in the resulting graph after resolver", res.getEdges() );
+
+    	assertNotNull("no edges in the resulting graph after resolver", res.getExcidentEdges(v1) );
 
     	assertEquals( "wrong # of vertices in the resulting graph after resolver", 4, res.getVertices().size() );
-    	assertEquals( "wrong # of edges in the resulting graph after resolver", 3, res.getEdges().size() );
+    	assertEquals( "wrong # of excident edges in the resulting graph entry after resolver", 2, res.getExcidentEdges(v1).size() );
 
-    	String key = MetadataGraph.edgeHash( v1, v2 );
-    	assertEquals( "wrong # of edges v1-v2 in the resulting graph after resolver", 1, res.getEdges().get(key).size() );
-    	assertEquals( "wrong edge v1-v2 in the resulting graph after resolver", "1.2", res.getEdges().get(key).get(0).getVersion() );
+    	assertEquals( "wrong # of v2 incident edges in the resulting graph after resolver", 1, res.getIncidentEdges(v2).size() );
+    	assertEquals( "wrong edge v1-v2 in the resulting graph after resolver", "1.2", res.getIncidentEdges(v2).get(0).getVersion() );
 
-    	key = MetadataGraph.edgeHash( v1, v3 );
-    	assertEquals( "wrong # of edges v1-v3 in the resulting graph after resolver", 1, res.getEdges().get(key).size() );
-    	assertEquals( "wrong edge v1-v3 in the resulting graph after resolver", "1.1", res.getEdges().get(key).get(0).getVersion() );
+    	assertEquals( "wrong # of edges v1-v3 in the resulting graph after resolver", 1, res.getIncidentEdges(v3).size() );
+    	assertEquals( "wrong edge v1-v3 in the resulting graph after resolver", "1.1", res.getIncidentEdges(v3).get(0).getVersion() );
 
-    	key = MetadataGraph.edgeHash( v3, v4 );
-    	assertEquals( "wrong # of edges v3-v4 in the resulting graph after resolver", 1, res.getEdges().get(key).size() );
-    	assertEquals( "wrong edge v3-v4 in the resulting graph after resolver", "1.2", res.getEdges().get(key).get(0).getVersion() );
+    	assertEquals( "wrong # of edges v3-v4 in the resulting graph after resolver", 1, res.getIncidentEdges(v4).size() );
+    	assertEquals( "wrong edge v3-v4 in the resulting graph after resolver", "1.2", res.getIncidentEdges(v4).get(0).getVersion() );
     }
     //------------------------------------------------------------------------------------------
     public void testRuntimeResolution()
@@ -125,22 +103,43 @@ extends PlexusTestCase
     	
     	assertNotNull("null graph after resolver", res );
     	assertNotNull("no vertices in the resulting graph after resolver", res.getVertices() );
-    	assertNotNull("no edges in the resulting graph after resolver", res.getEdges() );
+    	assertNotNull("no edges in the resulting graph after resolver", res.getExcidentEdges(v1) );
 
     	assertEquals( "wrong # of vertices in the resulting graph after resolver", 4, res.getVertices().size() );
-    	assertEquals( "wrong # of edges in the resulting graph after resolver", 3, res.getEdges().size() );
+    	assertEquals( "wrong # of excident edges in the resulting graph entry after resolver", 2, res.getExcidentEdges(v1).size() );
 
-    	String key = MetadataGraph.edgeHash( v1, v2 );
-    	assertEquals( "wrong # of edges v1-v2 in the resulting graph after resolver", 1, res.getEdges().get(key).size() );
-    	assertEquals( "wrong edge v1-v2 in the resulting graph after resolver", "1.2", res.getEdges().get(key).get(0).getVersion() );
+    	assertEquals( "wrong # of v2 incident edges in the resulting graph after resolver", 1, res.getIncidentEdges(v2).size() );
+    	assertEquals( "wrong edge v1-v2 in the resulting graph after resolver", "1.2", res.getIncidentEdges(v2).get(0).getVersion() );
 
-    	key = MetadataGraph.edgeHash( v1, v3 );
-    	assertEquals( "wrong # of edges v1-v3 in the resulting graph after resolver", 1, res.getEdges().get(key).size() );
-    	assertEquals( "wrong edge v1-v3 in the resulting graph after resolver", "1.1", res.getEdges().get(key).get(0).getVersion() );
+    	assertEquals( "wrong # of edges v1-v3 in the resulting graph after resolver", 1, res.getIncidentEdges(v3).size() );
+    	assertEquals( "wrong edge v1-v3 in the resulting graph after resolver", "1.1", res.getIncidentEdges(v3).get(0).getVersion() );
 
-    	key = MetadataGraph.edgeHash( v3, v4 );
-    	assertEquals( "wrong # of edges v3-v4 in the resulting graph after resolver", 1, res.getEdges().get(key).size() );
-    	assertEquals( "wrong edge v3-v4 in the resulting graph after resolver", "1.1", res.getEdges().get(key).get(0).getVersion() );
+    	assertEquals( "wrong # of edges v3-v4 in the resulting graph after resolver", 1, res.getIncidentEdges(v4).size() );
+    	assertEquals( "wrong edge v3-v4 in the resulting graph after resolver", "1.1", res.getIncidentEdges(v4).get(0).getVersion() );
+    }
+    //------------------------------------------------------------------------------------------
+    public void testTestResolution()
+    throws Exception
+    {
+    	MetadataGraph res;
+    	
+    	res = resolver.resolveConflicts( graph, ArtifactScopeEnum.test );
+    	
+    	assertNotNull("null graph after resolver", res );
+    	assertNotNull("no vertices in the resulting graph after resolver", res.getVertices() );
+    	assertNotNull("no edges in the resulting graph after resolver", res.getExcidentEdges(v1) );
+
+    	assertEquals( "wrong # of vertices in the resulting graph after resolver", 4, res.getVertices().size() );
+    	assertEquals( "wrong # of excident edges in the resulting graph entry after resolver", 2, res.getExcidentEdges(v1).size() );
+
+    	assertEquals( "wrong # of v2 incident edges in the resulting graph after resolver", 1, res.getIncidentEdges(v2).size() );
+    	assertEquals( "wrong edge v1-v2 in the resulting graph after resolver", "1.2", res.getIncidentEdges(v2).get(0).getVersion() );
+
+    	assertEquals( "wrong # of edges v1-v3 in the resulting graph after resolver", 1, res.getIncidentEdges(v3).size() );
+    	assertEquals( "wrong edge v1-v3 in the resulting graph after resolver", "1.1", res.getIncidentEdges(v3).get(0).getVersion() );
+
+    	assertEquals( "wrong # of edges v3-v4 in the resulting graph after resolver", 1, res.getIncidentEdges(v4).size() );
+    	assertEquals( "wrong edge v3-v4 in the resulting graph after resolver", "1.2", res.getIncidentEdges(v4).get(0).getVersion() );
     }
     //------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------

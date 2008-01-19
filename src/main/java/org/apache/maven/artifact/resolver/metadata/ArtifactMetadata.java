@@ -40,7 +40,6 @@ public class ArtifactMetadata
     
     /** does the actual artifact for this metadata exists */
     protected boolean artifactExists = false;
-
     /** artifact URI */
     protected String artifactUri;
 
@@ -145,6 +144,31 @@ public class ArtifactMetadata
         this.resolved = resolved;
         this.error = error;
     }
+    //------------------------------------------------------------------
+    public ArtifactMetadata( String groupId
+    						, String name
+                             , String version
+                             , String type
+                             , String scopeString
+                             , String classifier
+                             , String artifactUri
+                             , String why
+                             , boolean resolved
+                             , String error
+                             )
+    {
+        this( groupId
+        	, name
+        	, version
+        	, type
+    		, scopeString == null ? ArtifactScopeEnum.DEFAULT_SCOPE : ArtifactScopeEnum.valueOf(scopeString)
+    		, classifier
+    		, artifactUri
+    		, why
+    		, resolved
+    		, error
+    		);
+    }
 
     //------------------------------------------------------------------
     public ArtifactMetadata( Artifact af )
@@ -217,6 +241,11 @@ public class ArtifactMetadata
     public String getType()
     {
         return type;
+    }
+
+    public String getCheckedType()
+    {
+        return type == null ? "jar" : type;
     }
 
     public void setType( String type )

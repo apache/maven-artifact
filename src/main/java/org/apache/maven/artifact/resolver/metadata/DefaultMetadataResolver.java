@@ -3,10 +3,8 @@ package org.apache.maven.artifact.resolver.metadata;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
@@ -55,12 +53,7 @@ public class DefaultMetadataResolver
         {
             getLogger().debug( "Received request for: " + req.getQuery() );
 
-            MetadataResolutionResult res = new MetadataResolutionResult( conflictResolver, classpathTransformation);
-
-            if ( req.type == null )
-            {
-                throw new MetadataResolutionException( "no type in the request" );
-            }
+            MetadataResolutionResult res = new MetadataResolutionResult();
 
             MetadataTreeNode tree = resolveMetadataTree( req.getQuery()
             											, null
@@ -96,8 +89,8 @@ public class DefaultMetadataResolver
                   query.getGroupId()
                 , query.getArtifactId()
                 , query.getVersion()
-                , null
-                , "pom"
+                , query.getScope()
+                , query.getType() == null ? "jar" : query.getType()
             );
 
             getLogger().debug( "resolveMetadata request:"
@@ -156,14 +149,8 @@ public class DefaultMetadataResolver
                 																);
                 ArtifactMetadata found = metadataResolution.getArtifactMetadata();
                 
-                // TODO 
-                // Oleg: this is a shortcut to get AMd artifact location URI
-                // it is only valid because artifact (A) resolution is done BEFORE 
-                // Md resolution. 
-                //
-                // Should be done inside Md Source instead
-                //
-                found.setArtifactUri( pomArtifact.getFile().toURI().toString() );
+                if( pomArtifact.getFile() != null && pomArtifact.getFile().toURI() != null )
+                	found.setArtifactUri( pomArtifact.getFile().toURI().toString() );
 
                 MetadataTreeNode node = new MetadataTreeNode( found
                 											, parent
@@ -198,6 +185,42 @@ public class DefaultMetadataResolver
             throw new MetadataResolutionException( anyEx );
         }
     }
+    //------------------------------------------------------------------------
+	public List<Artifact> resolveArtifact(
+								List<ArtifactMetadata> mdCollection
+								, ArtifactRepository localRepository
+							    , List<ArtifactRepository> remoteRepositories
+												)
+	throws ArtifactResolutionException
+	{
+		if( mdCollection == null || mdCollection.isEmpty() )
+			return null;
+		
+		ArrayList<Artifact> res = new ArrayList<Artifact>( mdCollection.size() );
+		Artifact artifact = null;
+        try {
+        	// TODO: optimize retrieval by zipping returns from repo managers (nexus)
+        	for( ArtifactMetadata md : mdCollection )
+			{
+	            artifact = artifactFactory.createArtifact(
+	                  md.getGroupId()
+	                , md.getArtifactId()
+	                , md.getVersion()
+	                , md.getScope()
+	                , md.getType() == null ? "jar" : md.getType()
+	            );
+				artifactResolver.resolve( artifact, remoteRepositories , localRepository );
+				res.add(artifact);
+			}
+			return res;
+		} catch (ArtifactNotFoundException e) {
+			e.printStackTrace();
+			throw new ArtifactResolutionException( e.getMessage()
+													, artifact
+													, remoteRepositories
+												);
+		}
+	}
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 }
