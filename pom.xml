@@ -154,6 +154,7 @@ under the License.
             </goals>
             <configuration>
               <embed>true</embed>
+              <replace>true</replace>
             </configuration>
           </execution>
         </executions>
