@@ -67,6 +67,11 @@ under the License.
       <version>1.2_Java1.3</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>net.sf.retrotranslator</groupId>
+      <artifactId>retrotranslator-runtime</artifactId>
+      <version>1.2.1</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -112,25 +117,6 @@ under the License.
           <source>1.5</source>
         </configuration>
       </plugin>
-      <!-- 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>aspectj-maven-plugin</artifactId>
-        <version>1.0-beta-2</version>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <source>1.5</source>
-              <target>1.5</target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      -->
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-maven-plugin</artifactId>
@@ -153,7 +139,6 @@ under the License.
               <goal>translate-project</goal>
             </goals>
             <configuration>
-              <embed>true</embed>
               <replace>true</replace>
             </configuration>
           </execution>
