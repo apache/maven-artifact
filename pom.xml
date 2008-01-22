@@ -144,6 +144,40 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <artifactId>shade-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <version>1.0-alpha-12</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
+              <transformers>
+                <transformer implementation="org.codehaus.mojo.shade.resource.ComponentsXmlResourceTransformer"/>
+              </transformers>
+              <artifactSet>
+                <includes>
+                  <include>net.sf.retrotranslator:retrotranslator-runtime</include>
+                  <include>backport-util-concurrent:backport-util-concurrent</include>
+                </includes>
+              </artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>net.sf.retrotranslator.runtime</pattern>
+                </relocation>
+                <relocation>
+                  <pattern>edu.emory.mathcs</pattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>
