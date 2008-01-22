@@ -144,6 +144,7 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <!--
       <plugin>
         <artifactId>shade-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
@@ -178,6 +179,7 @@ under the License.
           </execution>
         </executions>
       </plugin>
+    -->
     </plugins>
   </build>
 </project>
