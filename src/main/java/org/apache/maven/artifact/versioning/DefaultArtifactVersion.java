@@ -45,6 +45,18 @@ public class DefaultArtifactVersion
         parseVersion( version );
     }
 
+    @Override
+    public int hashCode()
+    {
+        return 11 + toString().hashCode();
+    }
+
+    @Override
+    public boolean equals( Object other )
+    {
+        return compareTo( other ) == 0;
+    }
+
     public int compareTo( Object o )
     {
         DefaultArtifactVersion otherVersion = (DefaultArtifactVersion) o;
@@ -60,7 +72,7 @@ public class DefaultArtifactVersion
         }
         if ( result == 0 )
         {
-            if ( buildNumber != null || otherVersion.buildNumber != null )
+            if ( ( buildNumber != null ) || ( otherVersion.buildNumber != null ) )
             {
                 result = compareIntegers( buildNumber, otherVersion.buildNumber );
             }
@@ -68,13 +80,13 @@ public class DefaultArtifactVersion
             {
                 if ( otherVersion.qualifier != null )
                 {
-                    if ( qualifier.length() > otherVersion.qualifier.length() &&
+                    if ( ( qualifier.length() > otherVersion.qualifier.length() ) &&
                         qualifier.startsWith( otherVersion.qualifier ) )
                     {
                         // here, the longer one that otherwise match is considered older
                         result = -1;
                     }
-                    else if ( qualifier.length() < otherVersion.qualifier.length() &&
+                    else if ( ( qualifier.length() < otherVersion.qualifier.length() ) &&
                         otherVersion.qualifier.startsWith( qualifier ) )
                     {
                         // here, the longer one that otherwise match is considered older
@@ -168,7 +180,7 @@ public class DefaultArtifactVersion
         {
             try
             {
-                if ( part2.length() == 1 || !part2.startsWith( "0" ) )
+                if ( ( part2.length() == 1 ) || !part2.startsWith( "0" ) )
                 {
                     buildNumber = Integer.valueOf( part2 );
                 }
@@ -183,7 +195,7 @@ public class DefaultArtifactVersion
             }
         }
 
-        if ( part1.indexOf( "." ) < 0 && !part1.startsWith( "0" ) )
+        if ( ( part1.indexOf( "." ) < 0 ) && !part1.startsWith( "0" ) )
         {
             try
             {
@@ -236,13 +248,14 @@ public class DefaultArtifactVersion
     private static Integer getNextIntegerToken( StringTokenizer tok )
     {
         String s = tok.nextToken();
-        if ( s.length() > 1 && s.startsWith( "0" ) )
+        if ( ( s.length() > 1 ) && s.startsWith( "0" ) )
         {
             throw new NumberFormatException( "Number part has a leading 0: '" + s + "'" );
         }
         return Integer.valueOf( s );
     }
 
+    @Override
     public String toString()
     {
         StringBuffer buf = new StringBuffer();
