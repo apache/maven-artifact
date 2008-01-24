@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 public final class ArtifactUtils
 {
@@ -37,9 +38,22 @@ public final class ArtifactUtils
 
     public static boolean isSnapshot( String version )
     {
-        return version != null &&
+        return ( version != null ) &&
             ( version.toUpperCase().endsWith( "SNAPSHOT" ) || Artifact.VERSION_FILE_PATTERN.matcher( version )
                 .matches() );
+    }
+
+    public static String toSnapshotVersion( String version )
+    {
+        Matcher m = Artifact.VERSION_FILE_PATTERN.matcher( version );
+        if ( m.matches() )
+        {
+            return m.group( 1 ) + "-" + Artifact.SNAPSHOT_VERSION;
+        }
+        else
+        {
+            return version;
+        }
     }
 
     public static String versionlessKey( Artifact artifact )
