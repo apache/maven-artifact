@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
+ * @author Jason van Zyl
  * @version $Id$
  * @todo this should possibly be replaced by type handler
  */
@@ -48,13 +48,6 @@ public class DefaultArtifact
 
     private String artifactId;
 
-    /**
-     * The resolved version for the artifact after conflict resolution, that has not been transformed.
-     *
-     * @todo should be final
-     */
-    private String baseVersion;
-
     private final String type;
 
     private final String classifier;
@@ -63,15 +56,24 @@ public class DefaultArtifact
 
     private File file;
 
+    // Why is this here? What repository is determined at runtime and is therefore a
+    // runtime charactistic. This needs to go. jvz.
     private ArtifactRepository repository;
 
     private String downloadUrl;
 
+    // Why is this here? jvz.
     private ArtifactFilter dependencyFilter;
 
-    private ArtifactHandler artifactHandler;
-
+    // Why is this here? jvz?
     private List dependencyTrail;
+
+    /**
+     * The resolved version for the artifact after conflict resolution, that has not been transformed.
+     *
+     * @todo should be final
+     */
+    private String baseVersion;
 
     private String version;
 
@@ -79,12 +81,15 @@ public class DefaultArtifact
 
     private boolean resolved;
 
+    // This is specific to maven. jvz.
     private boolean release;
 
+    // If the version is stored here (above), why on earth do we store the available versions here? jvz.
     private List availableVersions;
 
     private Map metadataMap;
 
+    // This is Maven specific. jvz/
     private boolean optional;
 
     public DefaultArtifact( String groupId,
@@ -92,10 +97,9 @@ public class DefaultArtifact
                             VersionRange versionRange,
                             String scope,
                             String type,
-                            String classifier,
-                            ArtifactHandler artifactHandler )
+                            String classifier )
     {
-        this( groupId, artifactId, versionRange, scope, type, classifier, artifactHandler, false );
+        this( groupId, artifactId, versionRange, scope, type, classifier, false );
     }
 
     public DefaultArtifact( String groupId,
@@ -104,7 +108,6 @@ public class DefaultArtifact
                             String scope,
                             String type,
                             String classifier,
-                            ArtifactHandler artifactHandler,
                             boolean optional )
     {
         this.groupId = groupId;
@@ -115,16 +118,9 @@ public class DefaultArtifact
 
         selectVersionFromNewRangeIfAvailable();
 
-        this.artifactHandler = artifactHandler;
-
         this.scope = scope;
 
         this.type = type;
-
-        if ( classifier == null )
-        {
-            classifier = artifactHandler.getClassifier();
-        }
 
         this.classifier = classifier;
 
@@ -474,11 +470,6 @@ public class DefaultArtifact
         dependencyFilter = artifactFilter;
     }
 
-    public ArtifactHandler getArtifactHandler()
-    {
-        return artifactHandler;
-    }
-
     public List getDependencyTrail()
     {
         return dependencyTrail;
@@ -561,11 +552,6 @@ public class DefaultArtifact
     {
         this.version = version;
         // retain baseVersion
-    }
-
-    public void setArtifactHandler( ArtifactHandler artifactHandler )
-    {
-        this.artifactHandler = artifactHandler;
     }
 
     public void setRelease( boolean release )

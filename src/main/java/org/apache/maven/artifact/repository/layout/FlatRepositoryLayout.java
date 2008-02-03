@@ -2,9 +2,9 @@ package org.apache.maven.artifact.repository.layout;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
+import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 /**
  * The code in this class is taken from DefaultRepositorylayout, located at:
@@ -20,9 +20,12 @@ public class FlatRepositoryLayout
 
     private static final char GROUP_SEPARATOR = '.';
 
+    /** @plexus.requirement */
+    private ArtifactHandlerManager artifactHandlerManager;
+
     public String pathOf( Artifact artifact )
     {
-        ArtifactHandler artifactHandler = artifact.getArtifactHandler();
+        ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
 
         StringBuffer path = new StringBuffer();
 
