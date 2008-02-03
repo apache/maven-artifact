@@ -20,7 +20,6 @@ package org.apache.maven.artifact.installer;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataInstallationException;
@@ -47,9 +46,6 @@ public class DefaultArtifactInstaller
     /** @plexus.requirement */
     private RepositoryMetadataManager repositoryMetadataManager;
 
-    /** @plexus.requirement */
-    private ArtifactHandlerManager artifactHandlerManager;
-    
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     public void install( String basedir,
                          String finalName,
@@ -57,8 +53,7 @@ public class DefaultArtifactInstaller
                          ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).getExtension();
-
+        String extension = artifact.getArtifactHandler().getExtension();
         File source = new File( basedir, finalName + "." + extension );
 
         install( source, artifact, localRepository );

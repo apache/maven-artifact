@@ -119,6 +119,8 @@ public interface Artifact
 
     void setDependencyFilter( ArtifactFilter artifactFilter );
 
+    ArtifactHandler getArtifactHandler();
+
     List getDependencyTrail();
 
     void setDependencyTrail( List dependencyTrail );
@@ -142,6 +144,9 @@ public interface Artifact
     boolean isResolved();
 
     void setResolvedVersion( String version );
+
+    /** @todo remove, a quick hack for the lifecycle executor */
+    void setArtifactHandler( ArtifactHandler handler );
 
     boolean isRelease();
 

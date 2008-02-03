@@ -21,7 +21,6 @@ package org.apache.maven.artifact.repository.layout;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 
@@ -38,12 +37,9 @@ public class DefaultRepositoryLayout
 
     private static final char ARTIFACT_SEPARATOR = '-';
 
-    /** @plexus.requirement */
-    private ArtifactHandlerManager artifactHandlerManager;
-
     public String pathOf( Artifact artifact )
     {
-        ArtifactHandler artifactHandler = artifactHandlerManager.getArtifactHandler( artifact.getType() );
+        ArtifactHandler artifactHandler = artifact.getArtifactHandler();
 
         StringBuffer path = new StringBuffer();
 

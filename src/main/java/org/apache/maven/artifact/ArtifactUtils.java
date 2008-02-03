@@ -150,10 +150,10 @@ public final class ArtifactUtils
         {
             range = VersionRange.createFromVersion( artifact.getVersion() );
         }
-        
-        DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range.cloneOf(),
-            artifact.getScope(), artifact.getType(), artifact.getClassifier(), artifact.isOptional() );
 
+        DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), range.cloneOf(),
+            artifact.getScope(), artifact.getType(), artifact.getClassifier(),
+            artifact.getArtifactHandler(), artifact.isOptional() );
         clone.setRelease( artifact.isRelease() );
         clone.setResolvedVersion( artifact.getVersion() );
         clone.setResolved( artifact.isResolved() );

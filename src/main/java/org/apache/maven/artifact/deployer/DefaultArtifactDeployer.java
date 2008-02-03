@@ -20,7 +20,6 @@ package org.apache.maven.artifact.deployer;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -64,9 +63,6 @@ public class DefaultArtifactDeployer
     /** @plexus.requirement role-hint="default" */
     private ArtifactRepositoryLayout defaultLayout;
 
-    /** @plexus.requirement */
-    private ArtifactHandlerManager artifactHandlerManager;
-
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     public void deploy( String basedir,
                         String finalName,
@@ -75,8 +71,7 @@ public class DefaultArtifactDeployer
                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        String extension = artifactHandlerManager.getArtifactHandler( artifact.getType() ).getExtension();
-
+        String extension = artifact.getArtifactHandler().getExtension();
         File source = new File( basedir, finalName + "." + extension );
         deploy( source, artifact, deploymentRepository, localRepository );
     }

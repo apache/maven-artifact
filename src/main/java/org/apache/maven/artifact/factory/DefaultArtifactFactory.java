@@ -211,6 +211,9 @@ public class DefaultArtifactFactory
             desiredScope = Artifact.SCOPE_SYSTEM;
         }
 
-        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, optional );
+        ArtifactHandler handler = artifactHandlerManager.getArtifactHandler( type );
+
+        return new DefaultArtifact( groupId, artifactId, versionRange, desiredScope, type, classifier, handler,
+            optional );
     }
 }
