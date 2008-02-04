@@ -1,0 +1,28 @@
+Maven Artifact is supposed to be a general artifact mechanism for retrieving, installing, and deploying artifacts
+to repositories. Maven Artifact was originally decoupled from Maven proper and as such carries a lot of baggage
+which prevents it from being used generally and carries many notions that are very specific to Maven itself. Artifacts
+currently have a notion of scope, classifiers, and behavioral attributes such as whether scopes should be inherited.
+For any mechanism to work generally these baked in notions need to be removed, vetted, and then made compatible with
+notions currently in Maven. A list of things that should not be in the Artifact:
+
+ * scope
+ * classifier
+ * dependency filter
+ * dependency trail
+ * resolved
+ * released
+ * optional
+ * available versions
+
+These are all attributes of the target system
+
+*Removal of the ArtifactFactory
+        
+ 3 February 2008 (Sunday)
+
+ I have removed the factory and left only a small set of constructors (which I would like to reduce to one) so that you
+ have a valid artifact after construction. I have also started to hide the VersionRange creation. You just pass in
+ a string and the constructor for the DefaultArtifact will do the right thing. This will ultimately need to be more
+ pluggable as different versioning strategies happen. But variations of the theme like Maven, OSGi, will have their
+ own subclasses and tools to operate on the graphs of dependencies. 
+                
