@@ -20,7 +20,7 @@ package org.apache.maven.artifact.resolver.conflict;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.resolver.ResolutionNode;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -48,8 +48,6 @@ public abstract class AbstractConflictResolverTest
     protected Artifact b1;
 
     private final String roleHint;
-    
-    private ArtifactFactory artifactFactory;
 
     private ConflictResolver conflictResolver;
     
@@ -70,7 +68,6 @@ public abstract class AbstractConflictResolverTest
     {
         super.setUp();
 
-        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
         conflictResolver = (ConflictResolver) lookup( ConflictResolver.ROLE, roleHint );
         
         a1 = createArtifact( "a", "1.0" );
@@ -87,7 +84,6 @@ public abstract class AbstractConflictResolverTest
         a2 = null;
         b1 = null;
         
-        artifactFactory = null;
         conflictResolver = null;
         
         super.tearDown();
@@ -134,10 +130,7 @@ public abstract class AbstractConflictResolverTest
 
     protected Artifact createArtifact( String id, String version, String scope, String inheritedScope, boolean optional )
         throws InvalidVersionSpecificationException
-    {
-        VersionRange versionRange = VersionRange.createFromVersionSpec( version );
-        
-        return artifactFactory.createDependencyArtifact( GROUP_ID, id, versionRange, "jar", null, scope,
-                                                         inheritedScope, optional );
+    {        
+        return new DefaultArtifact( GROUP_ID, id, version, "jar" , null, optional, scope, inheritedScope );
     }
 }

@@ -137,8 +137,7 @@ public class DefaultWagonManagerTest
         try
         {
             tmpFile.deleteOnExit();
-            Artifact artifact = new DefaultArtifact( "sample.group", "sample-art", VersionRange
-                .createFromVersion( "1.0" ), "artifactScope", "type", "classifier" );
+            Artifact artifact = new DefaultArtifact( "sample.group", "sample-art", "1.0", "type", "artifactScope" );
             artifact.setFile( tmpFile );
             ArtifactRepository repo = new DefaultArtifactRepository( "id", "noop://url",
                                                                      new ArtifactRepositoryLayoutStub() );

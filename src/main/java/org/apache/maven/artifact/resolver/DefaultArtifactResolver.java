@@ -20,7 +20,6 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -64,9 +63,6 @@ public class DefaultArtifactResolver
 
     /** @plexus.requirement */
     private ArtifactTransformationManager transformationManager;
-
-    /** @plexus.requirement */
-    protected ArtifactFactory artifactFactory;
 
     /** @plexus.requirement */
     private ArtifactCollector artifactCollector;

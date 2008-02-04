@@ -38,20 +38,16 @@ public class DefaultArtifactTest
     private String snapshotSpecVersion = "1.0-SNAPSHOT";
     private String snapshotResolvedVersion = "1.0-20070606.010101-1";
 
-    private VersionRange versionRange;
-    private VersionRange snapshotVersionRange;
-
     private ArtifactHandlerMock artifactHandler;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        versionRange = VersionRange.createFromVersion( version );
-        artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, classifier );
 
-        snapshotVersionRange = VersionRange.createFromVersion( snapshotResolvedVersion );
-        snapshotArtifact = new DefaultArtifact( groupId, artifactId, snapshotVersionRange, scope, type, classifier );
+        artifact = new DefaultArtifact( groupId, artifactId, version, type, classifier, scope );
+
+        snapshotArtifact = new DefaultArtifact( groupId, artifactId, snapshotResolvedVersion, type, classifier, scope );
     }
 
     public void testGetVersionReturnsResolvedVersionOnSnapshot()
@@ -76,32 +72,37 @@ public class DefaultArtifactTest
     }
 
     public void testGetDependencyConflictIdNullClassifier()
+        throws Exception
     {
-        artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, null );
+        artifact = new DefaultArtifact( groupId, artifactId, version, type, null, scope );
         assertEquals( groupId + ":" + artifactId + ":" + type, artifact.getDependencyConflictId() );
     }
 
     public void testGetDependencyConflictIdNullScope()
+        throws Exception
     {
         artifact.setScope( null );
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier, artifact.getDependencyConflictId() );
     }
 
     public void testToString()
+        throws Exception
     {
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier + ":" + version + ":" + scope,
                       artifact.toString() );
     }
 
     public void testToStringNullGroupId()
+        throws Exception
     {
         artifact.setGroupId( null );
         assertEquals( artifactId + ":" + type + ":" + classifier + ":" + version + ":" + scope, artifact.toString() );
     }
 
     public void testToStringNullClassifier()
+        throws Exception
     {
-        artifact = new DefaultArtifact( groupId, artifactId, versionRange, scope, type, null );
+        artifact = new DefaultArtifact( groupId, artifactId, version, type, null, scope );
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + version + ":" + scope, artifact.toString() );
     }
 
@@ -110,5 +111,4 @@ public class DefaultArtifactTest
         artifact.setScope( null );
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + classifier + ":" + version, artifact.toString() );
     }
-
 }

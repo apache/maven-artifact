@@ -19,13 +19,13 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.codehaus.plexus.util.StringUtils;
 
 import java.io.File;
@@ -94,27 +94,64 @@ public class DefaultArtifact
 
     public DefaultArtifact( String groupId,
                             String artifactId,
-                            VersionRange versionRange,
-                            String scope,
-                            String type,
-                            String classifier )
+                            String version,
+                            String type )
     {
-        this( groupId, artifactId, versionRange, scope, type, classifier, false );
+        this( groupId, artifactId, version, type, null, false, null, null );
     }
 
     public DefaultArtifact( String groupId,
                             String artifactId,
-                            VersionRange versionRange,
-                            String scope,
+                            String version,
+                            String type,
+                            String scope )
+    {
+        this( groupId, artifactId, version, type, null, false, scope, null );
+    }
+
+    public DefaultArtifact( String groupId,
+                            String artifactId,
+                            String version,
                             String type,
                             String classifier,
-                            boolean optional )
+                            String scope )
+    {
+        this( groupId, artifactId, version, type, classifier, false, scope, null );
+    }
+
+    public DefaultArtifact( String groupId,
+                            String artifactId,
+                            String version,
+                            String type,
+                            String classifier,
+                            boolean optional,
+                            String scope,
+                            String inheritedScope )
     {
         this.groupId = groupId;
 
         this.artifactId = artifactId;
 
-        this.versionRange = versionRange;
+        if ( version == null )
+        {
+            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Version cannot be null." );
+        }
+
+        if ( version.startsWith( "[" ) || version.startsWith( "(" ) )
+        {
+            try
+            {
+                this.versionRange = VersionRange.createFromVersionSpec( version );
+            }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Invalid version." );
+            }
+        }
+        else
+        {
+            this.versionRange = VersionRange.createFromVersion( version );
+        }
 
         selectVersionFromNewRangeIfAvailable();
 
@@ -125,6 +162,41 @@ public class DefaultArtifact
         this.classifier = classifier;
 
         this.optional = optional;
+
+        String desiredScope = Artifact.SCOPE_RUNTIME;
+
+        if ( inheritedScope == null )
+        {
+            desiredScope = scope;
+        }
+        else if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_PROVIDED.equals( scope ) )
+        {
+            // Why on earth would we want to return null? jvz
+            //return null;
+        }
+        else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
+        {
+            // added to retain compile artifactScope. Remove if you want compile inherited as runtime
+            desiredScope = Artifact.SCOPE_COMPILE;
+        }
+
+        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
+        {
+            desiredScope = Artifact.SCOPE_TEST;
+        }
+
+        if ( Artifact.SCOPE_PROVIDED.equals( inheritedScope ) )
+        {
+            desiredScope = Artifact.SCOPE_PROVIDED;
+        }
+
+        if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
+        {
+            // system scopes come through unchanged...
+            desiredScope = Artifact.SCOPE_SYSTEM;
+        }
+
+        scope = desiredScope;
 
         validateIdentity();
     }

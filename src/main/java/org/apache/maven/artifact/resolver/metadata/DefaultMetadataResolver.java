@@ -5,7 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
@@ -32,9 +33,6 @@ public class DefaultMetadataResolver
 
     /** @plexus.requirement */
     ArtifactResolver artifactResolver;
-
-    /** @plexus.requirement */
-    ArtifactFactory artifactFactory;
 
     /** @plexus.requirement */
     MetadataSource metadataSource;
@@ -84,14 +82,8 @@ public class DefaultMetadataResolver
     {
         try
         {
-
-            Artifact pomArtifact = artifactFactory.createArtifact(
-                  query.getGroupId()
-                , query.getArtifactId()
-                , query.getVersion()
-                , query.getScope()
-                , query.getType() == null ? "jar" : query.getType()
-            );
+            Artifact pomArtifact = new DefaultArtifact( query.getGroupId(), query.getArtifactId(), query.getVersion(),
+                query.getType() == null ? "jar" : query.getType(), query.getScope() );
 
             getLogger().debug( "resolveMetadata request:"
                 + "\n> artifact   : " + pomArtifact.toString()
@@ -202,16 +194,14 @@ public class DefaultMetadataResolver
         	// TODO: optimize retrieval by zipping returns from repo managers (nexus)
         	for( ArtifactMetadata md : mdCollection )
 			{
-	            artifact = artifactFactory.createArtifact(
-	                  md.getGroupId()
-	                , md.getArtifactId()
-	                , md.getVersion()
-	                , md.getScope()
-	                , md.getType() == null ? "jar" : md.getType()
-	            );
-				artifactResolver.resolve( artifact, remoteRepositories , localRepository );
-				res.add(artifact);
-			}
+
+                artifact = new DefaultArtifact( md.getGroupId(), md.getArtifactId(), md.getVersion(),
+                    md.getType() == null ? "jar" : md.getType(), md.getScope() );
+
+                artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+
+                res.add( artifact );
+            }
 			return res;
 		} catch (ArtifactNotFoundException e) {
 			e.printStackTrace();

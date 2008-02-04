@@ -19,7 +19,6 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
@@ -248,9 +247,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
         throws Exception
     {
-        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-
-        return artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
+        return new DefaultArtifact( groupId, artifactId, version, type );
     }
 
     protected void deleteLocalArtifact( Artifact artifact )
