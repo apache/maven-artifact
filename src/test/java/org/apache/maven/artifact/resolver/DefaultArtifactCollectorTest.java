@@ -647,7 +647,7 @@ public class DefaultArtifactCollectorTest
         Artifact artifact = getArtifact( "d", res.getArtifacts() );
         assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
         assertEquals( "Check artifactScope", expectedScope, artifact.getScope() );
-        assertEquals( "Check version", expectedVersion, artifact.getVersion() );
+        assertEquals( "Check version with expect scope[" + expectedScope + "]", expectedVersion, artifact.getVersion() );
 
         ArtifactSpec d = createArtifactSpec( "d", "1.0" );
         res = collect( createSet( new Object[]{a.artifact, b.artifact, d.artifact} ), filter );

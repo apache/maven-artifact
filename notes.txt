@@ -53,6 +53,21 @@ These are all attributes of the target system
  superset of what we currently do for classifiers. I agree we need an mechanism for association, I don't think
  classifiers have worked all that well.
 
+ 5 February 2008 (Tuesday)
 
+ The rework of the artifact resolution mechanism is an attempt to entirely separate 1) the process of metadata retrieval into
+ a tree, 2) converting the tree to a graph by a process of conflict resolution, and 3) retrieving the complete set
+ of artifacts, and ultimately 4) Doing something in a particular fashion withe the retrieved set like make a classpath.
+ Currently we have an incremental processing model that doesn't let a complete graph be formed for analysis
+ which greatly complicates the process whereas having a graph and using standard graph analysis techniques and graph
+ optimization is the only reasonable way forward. There should be no doubt about what needs to be retrieved once the
+ analysis is complete. We could actually create an aggregrate request where instructions are sent to retrieve everything
+ required. The server could send a stream all the artifacts back in one shot.
+
+ What Oleg is attempting to do is create a working solution for 1) and 2) above. Along with the implementation we also
+ have a visualization tool that will help us determine what exactly the correct analysis is. The beauty of this is that
+ regardless of the analysis we arrive at a representation of the complete set can be modeled and we can start working on
+ the optimized retrieval mechanism. We still need to do some work to separate out 4) as we're doing some classpath
+ calculations already which we will need to further decouple but that should be relatively straight forward.
 
                 
