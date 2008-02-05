@@ -83,7 +83,7 @@ public class DefaultMetadataResolver
         try
         {
             Artifact pomArtifact = new DefaultArtifact( query.getGroupId(), query.getArtifactId(), query.getVersion(),
-                query.getType() == null ? "jar" : query.getType(), query.getScope() );
+                query.getType() == null ? "jar" : query.getType(), null, false, query.getScope(), null );
 
             getLogger().debug( "resolveMetadata request:"
                 + "\n> artifact   : " + pomArtifact.toString()
@@ -196,7 +196,7 @@ public class DefaultMetadataResolver
 			{
 
                 artifact = new DefaultArtifact( md.getGroupId(), md.getArtifactId(), md.getVersion(),
-                    md.getType() == null ? "jar" : md.getType(), md.getScope() );
+                    md.getType() == null ? "jar" : md.getType(), null, false, md.getScope(), null );
 
                 artifactResolver.resolve( artifact, remoteRepositories, localRepository );
 

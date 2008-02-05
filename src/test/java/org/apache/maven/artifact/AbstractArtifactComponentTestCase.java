@@ -247,7 +247,7 @@ public abstract class AbstractArtifactComponentTestCase
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
         throws Exception
     {
-        return new DefaultArtifact( groupId, artifactId, version, type );
+        return new DefaultArtifact( groupId, artifactId, version, type, null, false, null, null );
     }
 
     protected void deleteLocalArtifact( Artifact artifact )

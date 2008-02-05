@@ -45,9 +45,9 @@ public class DefaultArtifactTest
     {
         super.setUp();
 
-        artifact = new DefaultArtifact( groupId, artifactId, version, type, classifier, scope );
+        artifact = new DefaultArtifact( groupId, artifactId, version, type, classifier, false, scope, null );
 
-        snapshotArtifact = new DefaultArtifact( groupId, artifactId, snapshotResolvedVersion, type, classifier, scope );
+        snapshotArtifact = new DefaultArtifact( groupId, artifactId, snapshotResolvedVersion, type, classifier, false, scope, null );
     }
 
     public void testGetVersionReturnsResolvedVersionOnSnapshot()
@@ -74,7 +74,7 @@ public class DefaultArtifactTest
     public void testGetDependencyConflictIdNullClassifier()
         throws Exception
     {
-        artifact = new DefaultArtifact( groupId, artifactId, version, type, null, scope );
+        artifact = new DefaultArtifact( groupId, artifactId, version, type, null, false, scope, null );
         assertEquals( groupId + ":" + artifactId + ":" + type, artifact.getDependencyConflictId() );
     }
 
@@ -102,7 +102,7 @@ public class DefaultArtifactTest
     public void testToStringNullClassifier()
         throws Exception
     {
-        artifact = new DefaultArtifact( groupId, artifactId, version, type, null, scope );
+        artifact = new DefaultArtifact( groupId, artifactId, version, type, null, false, scope, null );
         assertEquals( groupId + ":" + artifactId + ":" + type + ":" + version + ":" + scope, artifact.toString() );
     }
 

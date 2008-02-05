@@ -848,12 +848,10 @@ public class DefaultArtifactCollectorTest
             String key = getKey( artifact );
 
             ArtifactSpec a = (ArtifactSpec) artifacts.get( key );
+
             try
             {
-                return new ResolutionGroup( artifact, createArtifacts( a.dependencies,
-                                                                       artifact.getScope(),
-                                                                       artifact.getDependencyFilter() ),
-                                                      Collections.EMPTY_LIST );
+                return new ResolutionGroup( artifact, createArtifacts( a.dependencies, artifact.getScope(), artifact.getDependencyFilter() ), Collections.EMPTY_LIST );
             }
             catch ( InvalidVersionSpecificationException e )
             {
@@ -876,16 +874,15 @@ public class DefaultArtifactCollectorTest
                 Artifact d = (Artifact) i.next();
 
                 Artifact artifact;
-                
+
                 if ( d.getScope().equals( Artifact.SCOPE_TEST ) || d.getScope().equals( Artifact.SCOPE_PROVIDED ) )
                 {
                     /* don't call createDependencyArtifact as it'll ignore test and provided scopes */
-                    artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getScope() );
-                    //artifact = null;
+                    artifact = null;
                 }
                 else
                 {
-                    artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(), d.getClassifier(), d.isOptional(), d.getScope(), inheritedScope );
+                    artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), d.getVersionRange(), d.getType(), d.getClassifier(), d.isOptional(), d.getScope(), inheritedScope );
                 }
 
                 if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
@@ -920,6 +917,7 @@ public class DefaultArtifactCollectorTest
             if ( artifactVersions == null )
             {
                 artifactVersions = new ArrayList();
+
                 versions.put( key, artifactVersions );
             }
             if ( spec.artifact.getVersion() != null )

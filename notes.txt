@@ -24,5 +24,35 @@ These are all attributes of the target system
  have a valid artifact after construction. I have also started to hide the VersionRange creation. You just pass in
  a string and the constructor for the DefaultArtifact will do the right thing. This will ultimately need to be more
  pluggable as different versioning strategies happen. But variations of the theme like Maven, OSGi, will have their
- own subclasses and tools to operate on the graphs of dependencies. 
+ own subclasses and tools to operate on the graphs of dependencies.
+
+ 4 February 2008 (Monday)
+
+ John:
+ Some notes about classifiers taken from the mailing list in a discussion with John about classifiers:
+ I'd tend to disagree about classifier not being a 'core' part of the artifact system...it distinguishes a main
+ artifact from one of its derivatives, and serves as a pretty foundational part of how we retrieve artifacts from existing
+ remote repositories. Without it, I doubt that you can reconstruct the path to some existing artifacts (like sources or javadocs)
+ reliably without bastardizing the version string.
+
+ We can see that the artifact system has certain inescapable identity attributes. Scope is obviously more related
+ to how an artifact is used, since you can't see any trace of scope in the artifact as it's been deployed on a remote
+ repository. Classifier, however, doesn't fit this criteria...it's not a usage marker, but an identity marker.
+
+ The rest I agree with.
+
+ Jason:
+ This is where I think you've already baked in what you think about Maven. Look at how we deploy our derivative
+ artifacts right now. We don't track any of it in the metadata when we deploy. We toss it up there and things hope
+ they are there. Like javadocs, or sources. I think what's more important is that the coordinate be unique and we
+ have a way to associate what ever artifacts together in a scalable way. So you say "I want to associate this artifact
+ with that one, this is how I would like to record that relationship in the metadata.". Subsequently you can query
+ the metadata and know these relationships. We currently don't do this. It generally boils down to a bunch of
+ coordinates in the repository. How we choose to relate them via the metadata. We have all sort of problems with
+ classifiers currently because it was an adhoc method of association. A general model of association would be a
+ superset of what we currently do for classifiers. I agree we need an mechanism for association, I don't think
+ classifiers have worked all that well.
+
+
+
                 

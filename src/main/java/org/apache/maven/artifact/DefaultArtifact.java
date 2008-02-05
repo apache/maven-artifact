@@ -48,25 +48,9 @@ public class DefaultArtifact
 
     private String artifactId;
 
-    private final String type;
-
-    private final String classifier;
-
-    private String scope;
+    private String type;
 
     private File file;
-
-    // Why is this here? What repository is determined at runtime and is therefore a
-    // runtime charactistic. This needs to go. jvz.
-    private ArtifactRepository repository;
-
-    private String downloadUrl;
-
-    // Why is this here? jvz.
-    private ArtifactFilter dependencyFilter;
-
-    // Why is this here? jvz?
-    private List dependencyTrail;
 
     /**
      * The resolved version for the artifact after conflict resolution, that has not been transformed.
@@ -79,45 +63,21 @@ public class DefaultArtifact
 
     private VersionRange versionRange;
 
-    private boolean resolved;
-
-    // This is specific to maven. jvz.
-    private boolean release;
-
-    // If the version is stored here (above), why on earth do we store the available versions here? jvz.
-    private List availableVersions;
-
     private Map metadataMap;
 
     // This is Maven specific. jvz/
+    private String classifier;
+    private String scope;
     private boolean optional;
-
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            String version,
-                            String type )
-    {
-        this( groupId, artifactId, version, type, null, false, null, null );
-    }
-
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            String version,
-                            String type,
-                            String scope )
-    {
-        this( groupId, artifactId, version, type, null, false, scope, null );
-    }
-
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            String version,
-                            String type,
-                            String classifier,
-                            String scope )
-    {
-        this( groupId, artifactId, version, type, classifier, false, scope, null );
-    }
+    private List availableVersions;
+    private boolean release;
+    private boolean resolved;
+    private ArtifactFilter dependencyFilter;
+    private List dependencyTrail;
+    // Why is this here? What repository is determined at runtime and is therefore a
+    // runtime charactistic. This needs to go. jvz.
+    private ArtifactRepository repository;
+    private String downloadUrl;
 
     public DefaultArtifact( String groupId,
                             String artifactId,
@@ -128,32 +88,51 @@ public class DefaultArtifact
                             String scope,
                             String inheritedScope )
     {
-        this.groupId = groupId;
-
-        this.artifactId = artifactId;
-
         if ( version == null )
         {
             throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Version cannot be null." );
         }
 
-        if ( version.startsWith( "[" ) || version.startsWith( "(" ) )
+        VersionRange versionRange;
+
+        try
         {
-            try
-            {
-                this.versionRange = VersionRange.createFromVersionSpec( version );
-            }
-            catch ( InvalidVersionSpecificationException e )
-            {
-                throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Invalid version." );
-            }
+            versionRange = VersionRange.createFromVersionSpec( version );
         }
-        else
+        catch ( InvalidVersionSpecificationException e )
         {
-            this.versionRange = VersionRange.createFromVersion( version );
+            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Invalid version." );
         }
 
-        selectVersionFromNewRangeIfAvailable();
+        initialize( groupId, artifactId, versionRange, type, classifier, optional, scope, inheritedScope );
+    }
+
+    public DefaultArtifact( String groupId,
+                            String artifactId,
+                            VersionRange versionRange,
+                            String type,
+                            String classifier,
+                            boolean optional,
+                            String scope,
+                            String inheritedScope )
+    {
+        initialize( groupId, artifactId, versionRange, type, classifier, optional, scope, inheritedScope );
+    }
+
+    private void initialize( String groupId,
+                             String artifactId,
+                             VersionRange versionRange,
+                             String type,
+                             String classifier,
+                             boolean optional,
+                             String scope,
+                             String inheritedScope )
+    {
+        this.versionRange = versionRange;
+
+        this.groupId = groupId;
+
+        this.artifactId = artifactId;
 
         this.scope = scope;
 
@@ -163,40 +142,33 @@ public class DefaultArtifact
 
         this.optional = optional;
 
-        String desiredScope = Artifact.SCOPE_RUNTIME;
-
         if ( inheritedScope == null )
         {
-            desiredScope = scope;
-        }
-        else if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_PROVIDED.equals( scope ) )
-        {
-            // Why on earth would we want to return null? jvz
-            //return null;
+            this.scope = scope;
         }
         else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
         {
             // added to retain compile artifactScope. Remove if you want compile inherited as runtime
-            desiredScope = Artifact.SCOPE_COMPILE;
+            this.scope = Artifact.SCOPE_COMPILE;
         }
 
         if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
         {
-            desiredScope = Artifact.SCOPE_TEST;
+            this.scope = Artifact.SCOPE_TEST;
         }
 
         if ( Artifact.SCOPE_PROVIDED.equals( inheritedScope ) )
         {
-            desiredScope = Artifact.SCOPE_PROVIDED;
+            this.scope = Artifact.SCOPE_PROVIDED;
         }
 
         if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
         {
             // system scopes come through unchanged...
-            desiredScope = Artifact.SCOPE_SYSTEM;
+            this.scope = Artifact.SCOPE_SYSTEM;
         }
 
-        scope = desiredScope;
+        selectVersionFromNewRangeIfAvailable();
 
         validateIdentity();
     }
