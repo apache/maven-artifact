@@ -41,6 +41,19 @@ public class ScopeArtifactFilter
 
     private final boolean systemScope;
 
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer()
+            .append( "\n" )
+            .append( "compile  = " ).append( compileScope ).append( "\n" )
+            .append( "runtime  = " ).append( runtimeScope ).append( "\n" )
+            .append( "test     = " ).append( testScope ).append( "\n" )
+            .append( "provided = " ).append( providedScope ).append( "\n" )
+            .append( "system   = " ).append( systemScope );
+
+        return sb.toString();
+    }
+
     public ScopeArtifactFilter( String scope )
     {
         if ( DefaultArtifact.SCOPE_COMPILE.equals( scope ) )

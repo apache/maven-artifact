@@ -70,4 +70,14 @@ These are all attributes of the target system
  the optimized retrieval mechanism. We still need to do some work to separate out 4) as we're doing some classpath
  calculations already which we will need to further decouple but that should be relatively straight forward.
 
-                
+ 7 February 2008 (Friday)
+
+ The number of methods in the artifact factory is simply insane, for each type that we ended up with in Maven just started
+ being effectively hard-coded in the factory which is totally unscalable, any new types with handlers become a nightmare
+ to maintain. I have reduced everything to two constructors in the DefaultArtifact and I would like to reduce it to being
+ one. Right now I have to account for needing to use a version string, or creating a range which is completely confusing
+ to anyone using the API. You should just need one constructor with a version string and everything else should be taken
+ care of for you. Right now there are bits of code all over the place that do the if/else versionRange detection. 
+
+ inheritedScope goes away entirely from the model when a graph is used because the scope selected will be a function of
+ how the graph is processed.

@@ -93,16 +93,7 @@ public class DefaultArtifact
             throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Version cannot be null." );
         }
 
-        VersionRange versionRange;
-
-        try
-        {
-            versionRange = VersionRange.createFromVersionSpec( version );
-        }
-        catch ( InvalidVersionSpecificationException e )
-        {
-            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Invalid version." );
-        }
+        VersionRange versionRange = VersionRange.createFromVersion( version );
 
         initialize( groupId, artifactId, versionRange, type, classifier, optional, scope, inheritedScope );
     }
@@ -128,11 +119,13 @@ public class DefaultArtifact
                              String scope,
                              String inheritedScope )
     {
-        this.versionRange = versionRange;
-
         this.groupId = groupId;
 
         this.artifactId = artifactId;
+
+        this.versionRange = versionRange;
+
+        selectVersionFromNewRangeIfAvailable();
 
         this.scope = scope;
 
@@ -140,11 +133,21 @@ public class DefaultArtifact
 
         this.classifier = classifier;
 
+        // We were relying on the artifact handler to get the classifier here. 
+
         this.optional = optional;
+
+        // Scope information
+
+        //this.scope = Artifact.SCOPE_RUNTIME;
 
         if ( inheritedScope == null )
         {
             this.scope = scope;
+        }
+        else if( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_PROVIDED.equals( scope ) )
+        {
+            // do nothing
         }
         else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
         {
@@ -167,8 +170,6 @@ public class DefaultArtifact
             // system scopes come through unchanged...
             this.scope = Artifact.SCOPE_SYSTEM;
         }
-
-        selectVersionFromNewRangeIfAvailable();
 
         validateIdentity();
     }

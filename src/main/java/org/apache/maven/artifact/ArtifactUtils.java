@@ -129,7 +129,6 @@ public final class ArtifactUtils
     }
 
     public static Artifact copyArtifact( Artifact artifact )
-        throws InvalidVersionSpecificationException
     {
         DefaultArtifact clone = new DefaultArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
             artifact.getType(), artifact.getClassifier(), artifact.isOptional(), artifact.getScope(), null );
