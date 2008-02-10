@@ -140,7 +140,7 @@ public class SnapshotTransformation
             if ( snapshot.getTimestamp() != null && snapshot.getBuildNumber() > 0 )
             {
                 String newVersion = snapshot.getTimestamp() + "-" + snapshot.getBuildNumber();
-                version = StringUtils.replace( baseVersion, "SNAPSHOT", newVersion );
+                version = StringUtils.replace( baseVersion, Artifact.SNAPSHOT_VERSION, newVersion );
             }
             else
             {
