@@ -2,18 +2,13 @@ package org.apache.maven.artifact.resolver.metadata;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
 
-import sun.misc.BASE64Encoder;
-
-
 /**
  * metadata graph vertice - just a wrapper around artifact's metadata
  * 
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
- *
  */
-
 public class MetadataGraphVertex
-implements Comparable<MetadataGraphVertex>
+    implements Comparable<MetadataGraphVertex>
 {
     ArtifactMetadata md;
 
