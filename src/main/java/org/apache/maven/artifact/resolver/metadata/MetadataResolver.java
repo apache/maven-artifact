@@ -7,7 +7,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 
-
 /**
  * entry point into metadata resolution component
  * 
@@ -37,10 +36,7 @@ public interface MetadataResolver
      * @return collection of resolved artifacts
      * @throws ArtifactResolutionException
      */
-	public List<Artifact> resolveArtifact(
-			List<ArtifactMetadata> mdCollection
-			, ArtifactRepository localRepository
-		    , List<ArtifactRepository> remoteRepositories
-							)
-	throws ArtifactResolutionException;
+    public List<Artifact> resolveArtifact( List<ArtifactMetadata> mdCollection, ArtifactRepository localRepository,
+                                           List<ArtifactRepository> remoteRepositories )
+        throws ArtifactResolutionException;
 }
