@@ -111,6 +111,10 @@ public class ResolutionNode
         trail = null;
     }
 
+    /**
+     * @return {@link List} &lt; {@link String} > with artifact ids
+     * @throws OverConstrainedVersionException
+     */
     public List getDependencyTrail()
         throws OverConstrainedVersionException
     {
