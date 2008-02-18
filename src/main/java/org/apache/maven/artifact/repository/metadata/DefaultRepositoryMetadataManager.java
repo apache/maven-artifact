@@ -98,14 +98,25 @@ public class DefaultRepositoryMetadataManager
 
                 if ( checkForUpdates )
                 {
-                    getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
-
                     try
                     {
-                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), touchfile, true );
+                        if ( wagonManager.isOnline() )
+                        {
+                            getLogger().info(
+                                metadata.getKey() + ": checking for updates from " + repository.getId() );
+                            resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), touchfile );
+                        }
+                        else
+                        {
+                            getLogger().debug( "System is offline. Cannot resolve metadata:\n" +
+                                metadata.extendedToString() + "\n\n" );
+                        }
                     }
                     catch ( TransferFailedException e )
                     {
+                        getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
+                        repository.setBlacklisted( true );
+
                         // TODO: [jc; 08-Nov-2005] revisit this for 2.1
                         // suppressing logging to avoid logging this error twice.
                     }
@@ -302,7 +313,7 @@ public class DefaultRepositoryMetadataManager
         {
             MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
 
-            resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile, false );
+            resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile );
         }
         catch ( TransferFailedException e )
         {
@@ -330,26 +341,9 @@ public class DefaultRepositoryMetadataManager
                                 ArtifactRepository repository,
                                 File file,
                                 String checksumPolicy,
-                                MetadataTouchfile touchfile,
-                                boolean allowBlacklisting )
-        throws RepositoryMetadataResolutionException, TransferFailedException
+                                MetadataTouchfile touchfile )
+        throws TransferFailedException
     {
-        if ( !wagonManager.isOnline() )
-        {
-            if ( allowBlacklisting )
-            {
-                getLogger().debug(
-                    "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
-                return;
-            }
-            else
-            {
-                // metadata is required for deployment, can't be offline
-                throw new RepositoryMetadataResolutionException(
-                    "System is offline. Cannot resolve required metadata:\n" + metadata.extendedToString() );
-            }
-        }
-
         try
         {
             wagonManager.getArtifactMetadata( metadata, repository, file, checksumPolicy );
@@ -369,9 +363,7 @@ public class DefaultRepositoryMetadataManager
         {
             getLogger().warn(
                 metadata + " could not be retrieved from repository: " + repository.getId() + " due to an error: " + e.getMessage() );
-            getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
             getLogger().debug( "Exception", e );
-            repository.setBlacklisted( allowBlacklisting );
 
             throw e;
         }
@@ -402,12 +394,7 @@ public class DefaultRepositoryMetadataManager
         {
             MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
 
-            resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile, false );
-        }
-        catch ( RepositoryMetadataResolutionException e )
-        {
-            throw new RepositoryMetadataDeploymentException(
-                "Unable to get previous metadata to update: " + e.getMessage(), e );
+            resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile );
         }
         catch ( TransferFailedException e )
         {
