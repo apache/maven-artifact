@@ -19,16 +19,6 @@ package org.apache.maven.artifact.repository.metadata;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Reader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.maven.artifact.manager.UpdateCheckManager;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -42,6 +32,16 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.Reader;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Jason van Zyl
  * @plexus.component
@@ -53,13 +53,9 @@ public class DefaultRepositoryMetadataManager
     /** @plexus.requirement */
     private WagonManager wagonManager;
 
-    /** @plexus.requirement */
-    private UpdateCheckManager updateCheckManager;
-
-    protected DefaultRepositoryMetadataManager( WagonManager wagonManager, UpdateCheckManager updateCheckManager, Logger logger )
+    protected DefaultRepositoryMetadataManager( WagonManager wagonManager, Logger logger )
     {
         this.wagonManager = wagonManager;
-        this.updateCheckManager = updateCheckManager;
         enableLogging( logger );
     }
 
@@ -72,6 +68,8 @@ public class DefaultRepositoryMetadataManager
                          ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {
+        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
+
         for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
         {
             ArtifactRepository repository = (ArtifactRepository) i.next();
@@ -79,42 +77,60 @@ public class DefaultRepositoryMetadataManager
             ArtifactRepositoryPolicy policy =
                 metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
-            File file = new File( localRepository.getBasedir(),
-                localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
-
-            if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
+            if ( !policy.isEnabled() )
             {
-                try
-                {
-                    if ( wagonManager.isOnline() )
-                    {
-                        getLogger().info(
-                            metadata.getKey() + ": checking for updates from " + repository.getId() );
-                        resolveAlways( metadata, repository, file, policy.getChecksumPolicy() );
-                    }
-                    else
-                    {
-                        getLogger().debug( "System is offline. Cannot resolve metadata:\n" +
-                            metadata.extendedToString() + "\n\n" );
-                    }
-                }
-                catch ( TransferFailedException e )
-                {
-                    getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
-                    repository.setBlacklisted( true );
-
-                    // TODO: [jc; 08-Nov-2005] revisit this for 2.1
-                    // suppressing logging to avoid logging this error twice.
-                }
+                getLogger().debug( "Skipping disabled repository " + repository.getId() );
             }
-
-            // TODO: should this be inside the above check?
-            // touch file so that this is not checked again until interval has passed
-            if ( file.exists() )
+            else if ( repository.isBlacklisted() )
             {
-                file.setLastModified( System.currentTimeMillis() );
+                getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
+            }
+            else
+            {
+                File file = new File( localRepository.getBasedir(),
+                    localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
+
+                Date lastMod = touchfile.getLastCheckDate( repository.getId(), file.getName(), getLogger() );
+                getLogger().debug( "Got last-check-date of: " + lastMod + "\nfor metadata: " + metadata + "\nwith filename: " + file.getName() + "\nin repository: " + repository.getId() );
+
+                boolean checkForUpdates =
+                    ( lastMod == null ) || policy.checkOutOfDate( lastMod );
+
+                if ( checkForUpdates )
+                {
+                    try
+                    {
+                        if ( wagonManager.isOnline() )
+                        {
+                            getLogger().info(
+                                metadata.getKey() + ": checking for updates from " + repository.getId() );
+                            resolveAlways( metadata, repository, file, policy.getChecksumPolicy(), touchfile );
+                        }
+                        else
+                        {
+                            getLogger().debug( "System is offline. Cannot resolve metadata:\n" +
+                                metadata.extendedToString() + "\n\n" );
+                        }
+                    }
+                    catch ( TransferFailedException e )
+                    {
+                        getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
+                        repository.setBlacklisted( true );
+
+                        // TODO: [jc; 08-Nov-2005] revisit this for 2.1
+                        // suppressing logging to avoid logging this error twice.
+                    }
+                }
+
+                // TODO: should this be inside the above check?
+                // touch file so that this is not checked again until interval has passed
+                if ( file.exists() )
+                {
+                    file.setLastModified( System.currentTimeMillis() );
+                }
             }
         }
+
         try
         {
             mergeMetadata( metadata, remoteRepositories, localRepository );
@@ -295,7 +311,9 @@ public class DefaultRepositoryMetadataManager
 
         try
         {
-            resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+            MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
+
+            resolveAlways( metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile );
         }
         catch ( TransferFailedException e )
         {
@@ -322,7 +340,8 @@ public class DefaultRepositoryMetadataManager
     private void resolveAlways( ArtifactMetadata metadata,
                                 ArtifactRepository repository,
                                 File file,
-                                String checksumPolicy )
+                                String checksumPolicy,
+                                MetadataTouchfile touchfile )
         throws TransferFailedException
     {
         try
@@ -350,10 +369,7 @@ public class DefaultRepositoryMetadataManager
         }
         finally
         {
-            if ( metadata instanceof RepositoryMetadata )
-            {
-                updateCheckManager.touch( (RepositoryMetadata) metadata, repository, file );
-            }
+            touchfile.touch( repository.getId(), file.getName(), getLogger() );
         }
     }
 
@@ -376,7 +392,9 @@ public class DefaultRepositoryMetadataManager
 
         try
         {
-            resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN );
+            MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepository );
+
+            resolveAlways( metadata, deploymentRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN, touchfile );
         }
         catch ( TransferFailedException e )
         {

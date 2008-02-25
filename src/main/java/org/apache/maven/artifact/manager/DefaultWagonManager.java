@@ -19,15 +19,6 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -120,9 +111,6 @@ public class DefaultWagonManager
 
     /** encapsulates access to Server credentials */
     private CredentialsDataSource credentialsDataSource;
-
-    /** @plexus.requirement */
-    private UpdateCheckManager updateCheckManager;
 
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
@@ -330,15 +318,7 @@ public class DefaultWagonManager
     // NOTE: It is not possible that this method throws TransferFailedException under current conditions.
     // FIXME: Change the throws clause to reflect the fact that we're never throwing TransferFailedException
     public void getArtifact( Artifact artifact,
-                             List remoteRepositories  )
-        throws TransferFailedException, ResourceDoesNotExistException
-	{
-    	getArtifact( artifact, remoteRepositories, true );
-	}
-
-    public void getArtifact( Artifact artifact,
-                             List remoteRepositories,
-                             boolean force )
+                             List remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         boolean successful = false;
@@ -349,7 +329,7 @@ public class DefaultWagonManager
 
             try
             {
-                getArtifact( artifact, repository, force );
+                getArtifact( artifact, repository );
 
                 successful = artifact.isResolved();
             }
@@ -375,17 +355,8 @@ public class DefaultWagonManager
         }
     }
 
-    public void getArtifact( Artifact artifact, 
-                             ArtifactRepository repository )
-        throws TransferFailedException, 
-               ResourceDoesNotExistException
-    {
-        getArtifact( artifact, repository, true );
-    }
-
     public void getArtifact( Artifact artifact,
-                             ArtifactRepository repository,
-                             boolean force )
+                             ArtifactRepository repository )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOf( artifact );
@@ -400,18 +371,11 @@ public class DefaultWagonManager
         {
             getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
         }
-        else if ( force || updateCheckManager.isUpdateRequired( artifact, repository ) )
+        else
         {
             getLogger().debug( "Trying repository " + repository.getId() );
 
-            try
-            {
-            	getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
-            }
-            finally
-            {
-            	updateCheckManager.touch( artifact, repository );
-            }
+            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
 
             getLogger().debug( "  Artifact resolved" );
 
