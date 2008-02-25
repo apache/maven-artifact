@@ -19,13 +19,21 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryMetadata;
@@ -36,16 +44,6 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Jason van Zyl
@@ -155,92 +153,40 @@ public class DefaultArtifactResolver
                 remoteRepositories,
                 localRepository );
 
-            boolean localCopy = false;
-
-            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
-            {
-                ArtifactMetadata m = (ArtifactMetadata) i.next();
-
-                if ( m instanceof SnapshotArtifactRepositoryMetadata )
-                {
-                    SnapshotArtifactRepositoryMetadata snapshotMetadata = (SnapshotArtifactRepositoryMetadata) m;
-
-                    Metadata metadata = snapshotMetadata.getMetadata();
-
-                    if ( metadata != null )
-                    {
-                        Versioning versioning = metadata.getVersioning();
-
-                        if ( versioning != null )
-                        {
-                            Snapshot snapshot = versioning.getSnapshot();
-
-                            if ( snapshot != null )
-                            {
-                                localCopy = snapshot.isLocalCopy();
-                            }
-                        }
-                    }
-                }
-            }
+            boolean localCopy = isLocalCopy( artifact );
 
             File destination = artifact.getFile();
 
-            List repositories = remoteRepositories;
-
-            // TODO: would prefer the snapshot transformation took care of this. Maybe we need a "shouldresolve" flag.
-            if ( artifact.isSnapshot() && artifact.getBaseVersion().equals( artifact.getVersion() ) &&
-                destination.exists() && !localCopy )
-            {
-                Date comparisonDate = new Date( destination.lastModified() );
-
-                // cull to list of repositories that would like an update
-                repositories = new ArrayList( remoteRepositories );
-                for ( Iterator i = repositories.iterator(); i.hasNext(); )
-                {
-                    ArtifactRepository repository = (ArtifactRepository) i.next();
-
-                    ArtifactRepositoryPolicy policy = repository.getSnapshots();
-
-                    if ( !policy.isEnabled() || !policy.checkOutOfDate( comparisonDate ) )
-                    {
-                        i.remove();
-                    }
-                }
-
-                if ( !repositories.isEmpty() )
-                {
-                    // someone wants to check for updates
-                    force = true;
-                }
-            }
             boolean resolved = false;
-            if ( !destination.exists() || force )
+            if ( !wagonManager.isOnline() )
             {
-                if ( !wagonManager.isOnline() )
+                if ( !destination.exists() )
                 {
                     throw new ArtifactNotFoundException(
                         "System is offline.",
                         artifact );
                 }
-
+            }
+            else if ( !artifact.isSnapshot() || !localCopy || force )
+            {
                 try
                 {
-                    // TODO: force should be passed to the wagon manager
                     if ( artifact.getRepository() != null )
                     {
                         // the transformations discovered the artifact - so use it exclusively
                         wagonManager.getArtifact(
                             artifact,
-                            artifact.getRepository() );
+                            artifact.getRepository(),
+                            force );
                     }
                     else
                     {
                         wagonManager.getArtifact(
                             artifact,
-                            repositories );
+                            remoteRepositories,
+                            force );
                     }
-
+    
                     if ( !artifact.isResolved() && !destination.exists() )
                     {
                         throw new ArtifactResolutionException(
@@ -265,10 +211,11 @@ public class DefaultArtifactResolver
                         remoteRepositories,
                         e );
                 }
-
+    
                 resolved = true;
             }
-            else if ( destination.exists() )
+
+            if ( destination.exists() )
             {
                 // locally resolved...no need to hit the remote repo.
                 artifact.setResolved( true );
@@ -310,7 +257,43 @@ public class DefaultArtifactResolver
         }
     }
 
-    public ArtifactResolutionResult resolveTransitively( Set artifacts,
+	private boolean isLocalCopy( Artifact artifact ) 
+	{
+
+		boolean localCopy = false;
+
+        for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+        {
+            ArtifactMetadata m = (ArtifactMetadata) i.next();
+
+            if ( m instanceof SnapshotArtifactRepositoryMetadata )
+            {
+                SnapshotArtifactRepositoryMetadata snapshotMetadata = (SnapshotArtifactRepositoryMetadata) m;
+
+                Metadata metadata = snapshotMetadata.getMetadata();
+
+                if ( metadata != null )
+                {
+                    Versioning versioning = metadata.getVersioning();
+
+                    if ( versioning != null )
+                    {
+                        Snapshot snapshot = versioning.getSnapshot();
+
+                        if ( snapshot != null )
+                        {
+                            // TODO is it possible to have more than one SnapshotArtifactRepositoryMetadata
+                            localCopy = snapshot.isLocalCopy();
+                        }
+                    }
+                }
+            }
+        }
+
+        return localCopy;
+    }
+
+	public ArtifactResolutionResult resolveTransitively( Set artifacts,
                                                          Artifact originatingArtifact,
                                                          ArtifactRepository localRepository,
                                                          List remoteRepositories,
