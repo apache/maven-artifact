@@ -43,7 +43,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
-      <version>1.0-alpha-43</version>
+      <version>1.0-alpha-44</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>

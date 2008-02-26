@@ -77,7 +77,17 @@ public interface WagonManager
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void getArtifact( Artifact artifact,
+                      List remoteRepositories,
+                      boolean forceUpdateCheck )
+    	throws TransferFailedException, ResourceDoesNotExistException;
+
+    void getArtifact( Artifact artifact,
                       ArtifactRepository repository )
+        throws TransferFailedException, ResourceDoesNotExistException;
+
+    void getArtifact( Artifact artifact,
+                      ArtifactRepository repository,
+                      boolean forceUpdateCheck )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void putArtifact( File source,

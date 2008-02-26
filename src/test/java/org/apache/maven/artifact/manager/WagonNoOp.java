@@ -20,6 +20,7 @@ package org.apache.maven.artifact.manager;
  */
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.wagon.AbstractWagon;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -42,14 +43,29 @@ public class WagonNoOp
         Resource resource = new Resource( resourceName );
         fireGetInitiated( resource, destination );
         fireGetStarted( resource, destination );
+        try
+        {
+            destination.createNewFile();
+        }
+        catch ( IOException e )
+        {
+            // ignored
+        }
         fireGetCompleted( resource, destination );
     }
 
     public boolean getIfNewer( String resourceName, File destination, long timestamp )
         throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException
     {
-        // NO-OP
-        return false;
+        try
+        {
+            destination.createNewFile();
+        }
+        catch ( IOException e )
+        {
+            return false;
+        }
+        return true;
     }
 
     public void openConnection()
