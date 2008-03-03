@@ -138,7 +138,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         Date end = new Date();
 
-        Date checkDate = updateCheckManager.getLastModifiedFromTouchfile( new File( dir, path ), localRepo.getId() );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, localRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
         assertTrue( checkDate.after( start ) );
@@ -228,7 +228,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         Date end = new Date();
 
-        Date checkDate = updateCheckManager.getLastModifiedFromTouchfile( new File( dir, path ), localRepo.getId() );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, localRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
         assertTrue( checkDate.after( start ) );
@@ -315,7 +315,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         Date end = new Date();
 
-        Date checkDate = updateCheckManager.getLastModifiedFromTouchfile( new File( dir, path ), localRepo.getId() );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, localRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
         assertTrue( checkDate.after( start ) );
@@ -426,13 +426,13 @@ public class DefaultRepositoryMetadataManagerTest
         RepositoryMetadataManager mgr = new DefaultRepositoryMetadataManager( wagonManager, updateCheckManager, logger );
         mgr.resolve( metadata, Collections.singletonList( remoteRepo ), localRepo );
 
-        Date checkDate = updateCheckManager.getLastModifiedFromTouchfile( new File( dir, path ), remoteRepo.getId() );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, remoteRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
 
         mgr.resolve( metadata, Collections.singletonList( remoteRepo ), localRepo );
 
-        checkDate = updateCheckManager.getLastModifiedFromTouchfile( new File( dir, path ), remoteRepo.getId() );
+        checkDate = updateCheckManager.readLastUpdated( metadata, remoteRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
 

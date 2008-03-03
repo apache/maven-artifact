@@ -38,7 +38,7 @@ public class DefaultUpdateCheckManager
 
     public static final String LAST_UPDATE_TAG = ".lastUpdated";
 
-    public static final String TOUCHFILE_NAME = "resolver-status.properties";
+    private static final String TOUCHFILE_NAME = "resolver-status.properties";
 
     public boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository )
     {
@@ -65,7 +65,8 @@ public class DefaultUpdateCheckManager
         }
         else
         {
-            lastCheckDate = getLastModifiedFromTouchfile( file, repository.getId() );
+            File touchfile = getTouchfile( artifact );
+            lastCheckDate = readLastUpdated( touchfile, repository.getId() );
         }
 
         return lastCheckDate == null || policy.checkOutOfDate( lastCheckDate );
@@ -86,35 +87,58 @@ public class DefaultUpdateCheckManager
             return true;
         }
 
-        Date lastCheckDate = getLastModifiedFromTouchfile( file, repository.getId() );
+        Date lastCheckDate = readLastUpdated( metadata, repository, file );
 
         return lastCheckDate == null || policy.checkOutOfDate( lastCheckDate );
+    }
+
+    public Date readLastUpdated( RepositoryMetadata metadata, ArtifactRepository repository, File file )
+    {
+        File touchfile = getTouchfile( metadata, file );
+        
+        String key = getMetadataKey( repository, file );
+        
+        return readLastUpdated( touchfile, key );
     }
 
     public void touch( Artifact artifact, ArtifactRepository repository )
     {
         File file = artifact.getFile();
 
-        touch( file, repository, false );
+        File touchfile = getTouchfile( artifact );
+        
+        if ( file.exists() )
+        {
+            touchfile.delete();
+        }
+        else
+        {
+            writeLastUpdated( touchfile, repository.getId() );
+        }
+
     }
 
     public void touch( RepositoryMetadata metadata, ArtifactRepository repository, File file )
     {
-        touch( file, repository, true );
+        File touchfile = getTouchfile( metadata, file );
+
+        String key = getMetadataKey( repository, file );
+
+        writeLastUpdated( touchfile, key );
     }
 
-    private void touch( File file, ArtifactRepository repository, boolean forceTouchFile )
+    public String getMetadataKey( ArtifactRepository repository, File file )
     {
-        String name = file.getName();
+        return repository.getId() + "." + file.getName() + LAST_UPDATE_TAG;
+    }
 
-        File touchfile = getTouchfile( file );
-
+    private void writeLastUpdated( File touchfile, String key )
+    {
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
             if ( !touchfile.getParentFile().exists() && !touchfile.getParentFile().mkdirs() )
             {
-                getLogger().debug(
-                                   "Failed to create directory: " + touchfile.getParent() +
+                getLogger().debug( "Failed to create directory: " + touchfile.getParent() +
                                        " for tracking artifact metadata resolution." );
                 return;
             }
@@ -140,42 +164,25 @@ public class DefaultUpdateCheckManager
                     props.load( stream );
                 }
 
-                String key = getKey( name, repository.getId() );
+                props.setProperty( key, Long.toString( System.currentTimeMillis() ) );
 
-                boolean modified = false;
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-                if ( !forceTouchFile && file.exists() )
-                {
-                    modified = props.remove( key ) != null;
-                }
-                else
-                {
-                    props.setProperty( key, Long.toString( System.currentTimeMillis() ) );
+                getLogger().debug( "Writing resolution-state to: " + touchfile );
+                props.store( stream, "Last modified on: " + new Date() );
 
-                    modified = true;
-                }
+                byte[] data = stream.toByteArray();
+                ByteBuffer buffer = ByteBuffer.allocate( data.length );
+                buffer.put( data );
+                buffer.flip();
 
-                if ( modified )
-                {
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-                    getLogger().debug( "Writing resolution-state to: " + touchfile );
-                    props.store( stream, "Last modified on: " + new Date() );
-
-                    byte[] data = stream.toByteArray();
-                    ByteBuffer buffer = ByteBuffer.allocate( data.length );
-                    buffer.put( data );
-                    buffer.flip();
-
-                    channel.position( 0 );
-                    channel.write( buffer );
-                }
+                channel.position( 0 );
+                channel.write( buffer );
             }
             catch ( IOException e )
             {
-                getLogger().debug(
-                                   "Failed to record lastUpdated information for metadata resolution.\nMetadata type: " +
-                                       name, e );
+                getLogger().debug( "Failed to record lastUpdated information for metadata resolution.\nMetadata type: " +
+                                       touchfile.toString() + "; key: " + key, e );
             }
             finally
             {
@@ -187,8 +194,7 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug(
-                                           "Error releasing exclusive lock for metadata resolution tracking file: " +
+                        getLogger().debug( "Error releasing exclusive lock for metadata resolution tracking file: " +
                                                touchfile, e );
                     }
                 }
@@ -201,8 +207,7 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug(
-                                           "Error closing FileChannel for metadata resolution tracking file: " +
+                        getLogger().debug( "Error closing FileChannel for metadata resolution tracking file: " +
                                                touchfile, e );
                     }
                 }
@@ -210,26 +215,15 @@ public class DefaultUpdateCheckManager
         }
     }
 
-    private String getKey( String name, String repositoryId )
+    public Date readLastUpdated( File touchfile, String key )
     {
-        return repositoryId + "." + name + LAST_UPDATE_TAG;
-    }
-
-    public Date getLastModifiedFromTouchfile( File file, String repositoryId )
-    {
-        File touchfile = getTouchfile( file );
-
         if ( !touchfile.canRead() )
         {
             return null;
         }
 
-        String name = file.getName();
-
         synchronized ( touchfile.getAbsolutePath().intern() )
         {
-            String key = getKey( name, repositoryId );
-
             getLogger().debug( "Searching for: " + key + " in touchfile." );
 
             Date result = null;
@@ -239,35 +233,31 @@ public class DefaultUpdateCheckManager
             {
                 Properties props = new Properties();
 
-                if ( touchfile.exists() )
+                stream = new FileInputStream( touchfile );
+                FileChannel channel = stream.getChannel();
+                lock = channel.lock( 0, channel.size(), true );
+
+                getLogger().debug( "Reading resolution-state from: " + touchfile );
+                props.load( stream );
+
+                String rawVal = props.getProperty( key );
+                if ( rawVal != null )
                 {
-                    stream = new FileInputStream( touchfile );
-                    FileChannel channel = stream.getChannel();
-                    lock = channel.lock( 0, channel.size(), true );
-
-                    getLogger().debug( "Reading resolution-state from: " + touchfile );
-                    props.load( stream );
-
-                    String rawVal = props.getProperty( key );
-                    if ( rawVal != null )
+                    try
                     {
-                        try
-                        {
-                            result = new Date( Long.parseLong( rawVal ) );
-                        }
-                        catch ( NumberFormatException e )
-                        {
-                            getLogger().debug( "Cannot parse lastUpdated date: \'" + rawVal + "\'. Ignoring.", e );
-                            result = null;
-                        }
+                        result = new Date( Long.parseLong( rawVal ) );
+                    }
+                    catch ( NumberFormatException e )
+                    {
+                        getLogger().debug( "Cannot parse lastUpdated date: \'" + rawVal + "\'. Ignoring.", e );
+                        result = null;
                     }
                 }
             }
             catch ( IOException e )
             {
-                getLogger().debug(
-                                   "Failed to read lastUpdated information for metadata resolution.\nMetadata type: " +
-                                       name, e );
+                getLogger().debug( "Failed to read lastUpdated information.\nFile: " +
+                                       touchfile.toString() + "; key: " + key, e );
             }
             finally
             {
@@ -279,8 +269,7 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug(
-                                           "Error releasing shared lock for metadata resolution tracking file: " +
+                        getLogger().debug( "Error releasing shared lock for metadata resolution tracking file: " +
                                                touchfile, e );
                     }
                 }
@@ -292,8 +281,23 @@ public class DefaultUpdateCheckManager
         }
     }
 
-    private File getTouchfile( File file )
+    public File getTouchfile( Artifact artifact )
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append( artifact.getArtifactId() );
+        sb.append( '-' ).append( artifact.getBaseVersion() );
+        if ( artifact.getClassifier() != null )
+        {
+            sb.append( '-' ).append( artifact.getClassifier() );
+        }
+        sb.append( '.' ).append( artifact.getType() ).append( LAST_UPDATE_TAG );
+        File touchfile = new File( artifact.getFile().getParentFile(), sb.toString() );
+        return touchfile;
+    }
+
+    public File getTouchfile( RepositoryMetadata metadata, File file )
     {
         return new File( file.getParent(), TOUCHFILE_NAME );
     }
+
 }
