@@ -81,7 +81,7 @@ public class ArtifactResolverTest
     public void testResolutionOfASingleArtifactWhereTheArtifactIsNotPresentLocallyAndMustBeRetrievedFromTheRemoteRepository()
         throws Exception
     {
-        Artifact b = createRemoteArtifact( "b", "1.0" );
+        Artifact b = createRemoteArtifact( "b", "1.0-SNAPSHOT" );
         deleteLocalArtifact( b );
 
         artifactResolver.resolve( b, remoteRepositories(), localRepository() );
@@ -154,10 +154,10 @@ public class ArtifactResolverTest
     public void testTransitiveResolutionWhereAllArtifactsAreNotPresentInTheLocalRepositoryAndMustBeRetrievedFromTheRemoteRepository()
         throws Exception
     {
-        Artifact i = createRemoteArtifact( "i", "1.0" );
+        Artifact i = createRemoteArtifact( "i", "1.0-SNAPSHOT" );
         deleteLocalArtifact( i );
 
-        Artifact j = createRemoteArtifact( "j", "1.0" );
+        Artifact j = createRemoteArtifact( "j", "1.0-SNAPSHOT" );
         deleteLocalArtifact( j );
 
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
@@ -173,7 +173,7 @@ public class ArtifactResolverTest
                     Artifact a = null;
                     try
                     {
-                        a = createArtifact( "org.apache.maven", "j", "1.0", "jar" );
+                        a = createArtifact( "org.apache.maven", "j", "1.0-SNAPSHOT", "jar" );
                         dependencies.add( a );
                     }
                     catch ( Exception e )
@@ -226,7 +226,7 @@ public class ArtifactResolverTest
     public void testResolutionOfAnArtifactWhereOneRemoteRepositoryIsBadButOneIsGood()
         throws Exception
     {
-        Artifact l = createRemoteArtifact( "l", "1.0" );
+        Artifact l = createRemoteArtifact( "l", "1.0-SNAPSHOT" );
         deleteLocalArtifact( l );
 
         List repositories = new ArrayList();

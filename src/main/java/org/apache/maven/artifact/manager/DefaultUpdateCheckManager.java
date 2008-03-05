@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 import java.util.Date;
 import java.util.Properties;
 
@@ -40,6 +41,13 @@ public class DefaultUpdateCheckManager
 
     public boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository )
     {
+        // TODO: Is there ever a reason why a release wouldn't be considered immutable?
+        // We probably don't need an updateInterval on the release policy in the POM.
+        if ( !artifact.isSnapshot() )
+        {
+            return false;
+        }
+
         ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
         File file = artifact.getFile();
@@ -142,13 +150,13 @@ public class DefaultUpdateCheckManager
             }
 
             FileChannel channel = null;
-//            FileLock lock = null;
+            FileLock lock = null;
             try
             {
                 Properties props = new Properties();
 
                 channel = new RandomAccessFile( touchfile, "rw" ).getChannel();
-//                lock = channel.lock( 0, channel.size(), false );
+                lock = channel.lock( 0, channel.size(), false );
 
                 if ( touchfile.canRead() )
                 {
@@ -184,18 +192,18 @@ public class DefaultUpdateCheckManager
             }
             finally
             {
-//                if ( lock != null )
-//                {
-//                    try
-//                    {
-//                        lock.release();
-//                    }
-//                    catch ( IOException e )
-//                    {
-//                        getLogger().debug( "Error releasing exclusive lock for resolution tracking file: " +
-//                                               touchfile, e );
-//                    }
-//                }
+                if ( lock != null )
+                {
+                    try
+                    {
+                        lock.release();
+                    }
+                    catch ( IOException e )
+                    {
+                        getLogger().debug( "Error releasing exclusive lock for resolution tracking file: " +
+                                               touchfile, e );
+                    }
+                }
 
                 if ( channel != null )
                 {
@@ -226,7 +234,7 @@ public class DefaultUpdateCheckManager
 
             Date result = null;
             FileInputStream stream = null;
-//            FileLock lock = null;
+            FileLock lock = null;
             FileChannel channel = null;
             try
             {
@@ -234,7 +242,7 @@ public class DefaultUpdateCheckManager
 
                 stream = new FileInputStream( touchfile );
                 channel = stream.getChannel();
-//                lock = channel.lock( 0, channel.size(), true );
+                lock = channel.lock( 0, channel.size(), true );
 
                 getLogger().debug( "Reading resolution-state from: " + touchfile );
                 props.load( stream );
@@ -260,18 +268,18 @@ public class DefaultUpdateCheckManager
             }
             finally
             {
-//                if ( lock != null )
-//                {
-//                    try
-//                    {
-//                        lock.release();
-//                    }
-//                    catch ( IOException e )
-//                    {
-//                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " +
-//                                               touchfile, e );
-//                    }
-//                }
+                if ( lock != null )
+                {
+                    try
+                    {
+                        lock.release();
+                    }
+                    catch ( IOException e )
+                    {
+                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " +
+                                               touchfile, e );
+                    }
+                }
 
                 if ( channel != null )
                 {

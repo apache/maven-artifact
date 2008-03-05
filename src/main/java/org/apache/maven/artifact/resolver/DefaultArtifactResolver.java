@@ -19,15 +19,6 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -44,6 +35,15 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Jason van Zyl
@@ -167,7 +167,8 @@ public class DefaultArtifactResolver
                         artifact );
                 }
             }
-            else if ( !artifact.isSnapshot() || !localCopy || force )
+            else if ( force || !destination.exists()
+                      || ( artifact.isSnapshot() && !localCopy ) )
             {
                 try
                 {
@@ -186,7 +187,7 @@ public class DefaultArtifactResolver
                             remoteRepositories,
                             force );
                     }
-    
+
                     if ( !artifact.isResolved() && !destination.exists() )
                     {
                         throw new ArtifactResolutionException(
@@ -211,7 +212,7 @@ public class DefaultArtifactResolver
                         remoteRepositories,
                         e );
                 }
-    
+
                 resolved = true;
             }
 
@@ -257,7 +258,7 @@ public class DefaultArtifactResolver
         }
     }
 
-	private boolean isLocalCopy( Artifact artifact ) 
+	private boolean isLocalCopy( Artifact artifact )
 	{
 
 		boolean localCopy = false;

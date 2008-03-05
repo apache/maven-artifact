@@ -19,10 +19,6 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.manager.WagonManager;
@@ -36,12 +32,16 @@ import org.apache.maven.artifact.repository.metadata.SnapshotArtifactRepositoryM
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.codehaus.plexus.util.FileUtils;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ArtifactUpdatePolicyTest
     extends AbstractArtifactComponentTestCase
 {
 
     private static final long TWO_SECONDS = 2 * 1000L;
-    
+
     private static final long TWO_DAYS = 2 * 86400L * 1000L;
 
     private ArtifactResolver artifactResolver;
@@ -56,11 +56,13 @@ public class ArtifactUpdatePolicyTest
 
     private DefaultArtifactRepository remoteRepository;
 
+    @Override
     protected String component()
     {
         return "artifact-update-policy";
     }
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -83,6 +85,7 @@ public class ArtifactUpdatePolicyTest
         FileUtils.deleteDirectory( new File( localRepository.getBasedir() ) );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
@@ -132,7 +135,7 @@ public class ArtifactUpdatePolicyTest
         metadata.setVersioning( versioning );
         snapshotMetadata.setMetadata( metadata );
         a.addMetadata( snapshotMetadata );
-        
+
         return a;
     }
 
@@ -143,10 +146,10 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
             "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", 
+            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1",
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
     }
 
@@ -157,7 +160,7 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
     }
 
@@ -169,10 +172,10 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
             "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", 
+            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1",
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
     }
 
@@ -200,10 +203,10 @@ public class ArtifactUpdatePolicyTest
             // expected
         }
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
-        
+
     }
 
     public void testSnapshotUpdate() throws Exception
@@ -214,10 +217,10 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolve( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
             "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", 
+            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1",
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
     }
 
@@ -231,7 +234,7 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolve( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
     }
 
@@ -269,10 +272,10 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
             "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", 
+            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1",
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
     }
 
@@ -308,7 +311,7 @@ public class ArtifactUpdatePolicyTest
             // expected
         }
 
-        assertTransfers( new String[] { 
+        assertTransfers( new String[] {
             "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
     }
 
@@ -330,22 +333,6 @@ public class ArtifactUpdatePolicyTest
 
         assertTrue( j.isResolved() );
         assertTrue( j.getFile().canRead() );
-    }
-
-    public void testReleaseUpdate()
-        throws Exception
-    {
-        Artifact a = createRemoteArtifact( "o", "1.0.1" );
-        createArtifact( a, localRepository );
-        setLastModified( a, System.currentTimeMillis() - TWO_DAYS, localRepository );
-
-        artifactResolver.resolve( a, remoteRepositories, localRepository );
-
-        assertTransfers( new String[] { 
-            "getIfNewer org.apache.maven/jars/o-1.0.1.jar",
-            "getTransfer org.apache.maven/jars/o-1.0.1.jar",
-            "get org.apache.maven/jars/o-1.0.1.jar.sha1", 
-            "get org.apache.maven/jars/o-1.0.1.jar.md5" } );
     }
 
     public void testResolveExistingLocalArtifactInOfflineMode()
@@ -382,7 +369,7 @@ public class ArtifactUpdatePolicyTest
         String path = "target/test-classes/repositories/" + component() + "/" + name;
 
         File f = new File( getBasedir(), path );
-        
+
         FileUtils.deleteDirectory( f );
 
         ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
