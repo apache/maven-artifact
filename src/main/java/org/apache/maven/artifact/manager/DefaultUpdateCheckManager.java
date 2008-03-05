@@ -1,5 +1,12 @@
 package org.apache.maven.artifact.manager;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -8,17 +15,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.Date;
 import java.util.Properties;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.IOUtil;
 
 /** @plexus.component */
 public class DefaultUpdateCheckManager
@@ -58,7 +56,7 @@ public class DefaultUpdateCheckManager
         }
 
         Date lastCheckDate;
-        
+
         if ( file.exists() )
         {
             lastCheckDate = new Date ( file.lastModified() );
@@ -69,7 +67,7 @@ public class DefaultUpdateCheckManager
             lastCheckDate = readLastUpdated( touchfile, repository.getId() );
         }
 
-        return lastCheckDate == null || policy.checkOutOfDate( lastCheckDate );
+        return ( lastCheckDate == null ) || policy.checkOutOfDate( lastCheckDate );
     }
 
     public boolean isUpdateRequired( RepositoryMetadata metadata, ArtifactRepository repository, File file )
@@ -89,15 +87,15 @@ public class DefaultUpdateCheckManager
 
         Date lastCheckDate = readLastUpdated( metadata, repository, file );
 
-        return lastCheckDate == null || policy.checkOutOfDate( lastCheckDate );
+        return ( lastCheckDate == null ) || policy.checkOutOfDate( lastCheckDate );
     }
 
     public Date readLastUpdated( RepositoryMetadata metadata, ArtifactRepository repository, File file )
     {
         File touchfile = getTouchfile( metadata, file );
-        
+
         String key = getMetadataKey( repository, file );
-        
+
         return readLastUpdated( touchfile, key );
     }
 
@@ -106,7 +104,7 @@ public class DefaultUpdateCheckManager
         File file = artifact.getFile();
 
         File touchfile = getTouchfile( artifact );
-        
+
         if ( file.exists() )
         {
             touchfile.delete();
@@ -144,13 +142,13 @@ public class DefaultUpdateCheckManager
             }
 
             FileChannel channel = null;
-            FileLock lock = null;
+//            FileLock lock = null;
             try
             {
                 Properties props = new Properties();
 
                 channel = new RandomAccessFile( touchfile, "rw" ).getChannel();
-                lock = channel.lock( 0, channel.size(), false );
+//                lock = channel.lock( 0, channel.size(), false );
 
                 if ( touchfile.canRead() )
                 {
@@ -181,23 +179,23 @@ public class DefaultUpdateCheckManager
             }
             catch ( IOException e )
             {
-                getLogger().debug( "Failed to record lastUpdated information for metadata resolution.\nMetadata type: " +
+                getLogger().debug( "Failed to record lastUpdated information for resolution.\nFile: " +
                                        touchfile.toString() + "; key: " + key, e );
             }
             finally
             {
-                if ( lock != null )
-                {
-                    try
-                    {
-                        lock.release();
-                    }
-                    catch ( IOException e )
-                    {
-                        getLogger().debug( "Error releasing exclusive lock for metadata resolution tracking file: " +
-                                               touchfile, e );
-                    }
-                }
+//                if ( lock != null )
+//                {
+//                    try
+//                    {
+//                        lock.release();
+//                    }
+//                    catch ( IOException e )
+//                    {
+//                        getLogger().debug( "Error releasing exclusive lock for resolution tracking file: " +
+//                                               touchfile, e );
+//                    }
+//                }
 
                 if ( channel != null )
                 {
@@ -207,7 +205,7 @@ public class DefaultUpdateCheckManager
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error closing FileChannel for metadata resolution tracking file: " +
+                        getLogger().debug( "Error closing FileChannel for resolution tracking file: " +
                                                touchfile, e );
                     }
                 }
@@ -228,14 +226,15 @@ public class DefaultUpdateCheckManager
 
             Date result = null;
             FileInputStream stream = null;
-            FileLock lock = null;
+//            FileLock lock = null;
+            FileChannel channel = null;
             try
             {
                 Properties props = new Properties();
 
                 stream = new FileInputStream( touchfile );
-                FileChannel channel = stream.getChannel();
-                lock = channel.lock( 0, channel.size(), true );
+                channel = stream.getChannel();
+//                lock = channel.lock( 0, channel.size(), true );
 
                 getLogger().debug( "Reading resolution-state from: " + touchfile );
                 props.load( stream );
@@ -261,20 +260,31 @@ public class DefaultUpdateCheckManager
             }
             finally
             {
-                if ( lock != null )
+//                if ( lock != null )
+//                {
+//                    try
+//                    {
+//                        lock.release();
+//                    }
+//                    catch ( IOException e )
+//                    {
+//                        getLogger().debug( "Error releasing shared lock for resolution tracking file: " +
+//                                               touchfile, e );
+//                    }
+//                }
+
+                if ( channel != null )
                 {
                     try
                     {
-                        lock.release();
+                        channel.close();
                     }
                     catch ( IOException e )
                     {
-                        getLogger().debug( "Error releasing shared lock for metadata resolution tracking file: " +
-                                               touchfile, e );
+                        getLogger().debug( "Error closing FileChannel for resolution tracking file: " +
+                                           touchfile, e );
                     }
                 }
-
-                IOUtil.close( stream );
             }
 
             return result;
