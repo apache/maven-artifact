@@ -41,14 +41,18 @@ public class DefaultUpdateCheckManager
 
     public boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository )
     {
-        // TODO: Is there ever a reason why a release wouldn't be considered immutable?
-        // We probably don't need an updateInterval on the release policy in the POM.
+        // Update intervals are never used for release artifacts. These intervals
+        // only exist on the release section of the repository definition in the POM for one reason:
+        // to specify how often artifact METADATA is checked. Here, we simply shortcut for non-snapshot
+        // artifacts.
         if ( !artifact.isSnapshot() )
         {
             return false;
         }
 
-        ArtifactRepositoryPolicy policy = artifact.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+        // we can safely assume that we're calculating based on the snapshot policy here if we've made it past the
+        // release-artifact short circuit above.
+        ArtifactRepositoryPolicy policy = repository.getSnapshots();
 
         File file = artifact.getFile();
 
@@ -80,6 +84,12 @@ public class DefaultUpdateCheckManager
 
     public boolean isUpdateRequired( RepositoryMetadata metadata, ArtifactRepository repository, File file )
     {
+        // Here, we need to determine which policy to use. Release updateInterval will be used when
+        // the metadata refers to a release artifact or meta-version, and snapshot updateInterval will be used when
+        // it refers to a snapshot artifact or meta-version.
+        // NOTE: Release metadata includes version information about artifacts that have been released, to allow
+        // meta-versions like RELEASE and LATEST to resolve, and also to allow retrieval of the range of valid, released
+        // artifacts available.
         ArtifactRepositoryPolicy policy = metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
         if ( !policy.isEnabled() )

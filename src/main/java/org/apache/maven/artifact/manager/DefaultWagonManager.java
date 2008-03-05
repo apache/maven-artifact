@@ -391,6 +391,9 @@ public class DefaultWagonManager
         {
             getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
         }
+        // If the artifact is a snapshot, we need to determine whether it's time to check this repository for an update:
+        // 1. If it's forced, then check
+        // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.
         else if ( artifact.isSnapshot() && ( force || updateCheckManager.isUpdateRequired( artifact, repository ) ) )
         {
             getLogger().debug( "Trying repository " + repository.getId() );
@@ -408,6 +411,12 @@ public class DefaultWagonManager
 
             artifact.setResolved( true );
         }
+        // If it's not a snapshot artifact, then we don't care what the force flag says. If it's on the local
+        // system, it's resolved. Releases are presumed to be immutable, so release artifacts are not ever updated.
+        // NOTE: This is NOT the case for metadata files on relese-only repositories. This metadata may contain information
+        // about successive releases, so it should be checked using the same updateInterval/force characteristics as snapshot
+        // artifacts, above.
+
         // don't write touch-file for release artifacts.
         else if ( !artifact.isSnapshot() )
         {

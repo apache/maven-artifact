@@ -167,6 +167,12 @@ public class DefaultArtifactResolver
                         artifact );
                 }
             }
+            // There are three conditions in which we'll go after the artifact here:
+            //   1. the force flag is set.
+            //   2. the artifact's file doesn't exist (this would be true for release or snapshot artifacts)
+            //   3. the artifact is a snapshot and is not a locally installed snapshot
+
+            // TODO: Should it matter whether it's a locally installed snapshot??
             else if ( force || !destination.exists()
                       || ( artifact.isSnapshot() && !localCopy ) )
             {
