@@ -400,7 +400,8 @@ public class DefaultWagonManager
 
             try
             {
-            	getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
+                getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor,
+                               policy.getChecksumPolicy(), false );
             }
             finally
             {
@@ -438,6 +439,15 @@ public class DefaultWagonManager
     {
         String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
 
+        getRemoteFile( getMirrorRepository( repository ), destination, remotePath, null, checksumPolicy, true );
+    }
+
+    public void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository repository,
+                                                             File destination, String checksumPolicy )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
+
         getRemoteFile( repository, destination, remotePath, null, checksumPolicy, true );
     }
 
@@ -452,15 +462,6 @@ public class DefaultWagonManager
         // TODO: better excetpions - transfer failed is not enough?
 
         failIfNotOnline();
-
-        ArtifactRepository mirror = getMirror( repository.getId() );
-
-        if ( mirror != null )
-        {
-            repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
-                repository.getLayout(), repository.getSnapshots(),
-                repository.getReleases() );
-        }
 
         String protocol = repository.getProtocol();
 

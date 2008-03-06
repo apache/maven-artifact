@@ -94,7 +94,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         try
         {
-            wagonManager.getArtifactMetadata( null, null, null, null );
+            wagonManager.getArtifactMetadataFromDeploymentRepository( null, null, null, null );
             wagonManagerCtl.setMatcher( MockControl.ALWAYS_MATCHER );
             wagonManagerCtl.setThrowable( new ResourceDoesNotExistException( "Test error" ) );
         }
@@ -184,7 +184,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         try
         {
-            wagonManager.getArtifactMetadata( null, null, null, null );
+            wagonManager.getArtifactMetadataFromDeploymentRepository( null, null, null, null );
             wagonManagerCtl.setMatcher( MockControl.ALWAYS_MATCHER );
             wagonManagerCtl.setThrowable( new TransferFailedException( "Test error" ) );
         }
@@ -219,9 +219,17 @@ public class DefaultRepositoryMetadataManagerTest
 
         Logger logger = new ConsoleLogger( Logger.LEVEL_DEBUG, "test" );
 
-        new DefaultRepositoryMetadataManager( wagonManager, updateCheckManager, logger ).resolveAlways( metadata,
-                                                                                                        localRepo,
-                                                                                                        localRepo );
+        try
+        {
+            new DefaultRepositoryMetadataManager( wagonManager, updateCheckManager, logger ).resolveAlways( metadata,
+                                                                                                            localRepo,
+                                                                                                            localRepo );
+            fail( "Should have thrown an exception due to transfer failure" );
+        }
+        catch ( RepositoryMetadataResolutionException e )
+        {
+            assertTrue( true );
+        }
 
         // helps the lastUpdate interval be significantly different.
         Thread.sleep( 1000 );
@@ -271,7 +279,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         try
         {
-            wagonManager.getArtifactMetadata( null, null, null, null );
+            wagonManager.getArtifactMetadataFromDeploymentRepository( null, null, null, null );
             wagonManagerCtl.setMatcher( MockControl.ALWAYS_MATCHER );
             wagonManagerCtl.setVoidCallable();
         }
