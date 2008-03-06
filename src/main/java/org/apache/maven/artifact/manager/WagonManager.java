@@ -164,4 +164,6 @@ public interface WagonManager
     void findAndRegisterWagons( PlexusContainer container );
 
     void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
+
+    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
 }

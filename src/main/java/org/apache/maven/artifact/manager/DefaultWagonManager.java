@@ -670,6 +670,18 @@ public class DefaultWagonManager
         }
     }
 
+    public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
+    {
+        ArtifactRepository mirror = getMirror( repository.getId() );
+        if ( mirror != null )
+        {
+            repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
+                                                                     repository.getLayout(), repository.getSnapshots(),
+                                                                     repository.getReleases() );
+        }
+        return repository;
+    }
+
     private void failIfNotOnline()
         throws TransferFailedException
     {
