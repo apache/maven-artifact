@@ -40,6 +40,12 @@ public class WagonNoOp
     public void get( String resourceName, File destination )
         throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException
     {
+        getIfNewer( resourceName, destination, 0 );
+    }
+
+    public boolean getIfNewer( String resourceName, File destination, long timestamp )
+        throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException
+    {
         Resource resource = new Resource( resourceName );
         fireGetInitiated( resource, destination );
         fireGetStarted( resource, destination );
@@ -49,22 +55,9 @@ public class WagonNoOp
         }
         catch ( IOException e )
         {
-            // ignored
-        }
-        fireGetCompleted( resource, destination );
-    }
-
-    public boolean getIfNewer( String resourceName, File destination, long timestamp )
-        throws TransferFailedException, ResourceDoesNotExistException, AuthorizationException
-    {
-        try
-        {
-            destination.createNewFile();
-        }
-        catch ( IOException e )
-        {
             return false;
         }
+        fireGetCompleted( resource, destination );
         return true;
     }
 

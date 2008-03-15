@@ -25,6 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
@@ -172,6 +173,178 @@ public class DefaultWagonManagerTest
         finally
         {
             tmpFile.delete();
+        }
+    }
+
+    /**
+     * Checks the verification of checksums.
+     */
+    public void testChecksumVerification()
+        throws Exception
+    {
+        ArtifactRepositoryPolicy policy =
+            new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                          ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
+        ArtifactRepository repo =
+            new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
+
+        File tmpFile = File.createTempFile( "mvn-cs-test", ".temp" );
+        File sha1File = new File( tmpFile.getPath() + ".sha1" );
+        File md5File = new File( tmpFile.getPath() + ".md5" );
+
+        try
+        {
+            Artifact artifact =
+                new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ), "scope",
+                                     "jar", "classifier", null );
+            artifact.setFile( tmpFile );
+
+            {
+                Xpp3Dom path = new Xpp3Dom( "path" );
+                path.setValue( "lower-case-checksum" );
+                Xpp3Dom sha1 = new Xpp3Dom( "path.sha1" );
+                sha1.setValue( "2a25dc564a3b34f68237fc849066cbc7bb7a36a1" );
+                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
+                resourceStrings.addChild( path );
+                resourceStrings.addChild( sha1 );
+                Xpp3Dom conf = new Xpp3Dom( "configuration" );
+                conf.addChild( resourceStrings );
+
+                wagonManager.addConfiguration( repo.getId(), conf );
+
+                try
+                {
+                    wagonManager.getArtifact( artifact, repo );
+                }
+                catch ( ChecksumFailedException e )
+                {
+                    fail( "Checksum verification did not pass: " + e.getMessage() );
+                }
+            }
+
+            {
+                Xpp3Dom path = new Xpp3Dom( "path" );
+                path.setValue( "upper-case-checksum" );
+                Xpp3Dom sha1 = new Xpp3Dom( "path.sha1" );
+                sha1.setValue( "B7BB97D7D0B9244398D9B47296907F73313663E6" );
+                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
+                resourceStrings.addChild( path );
+                resourceStrings.addChild( sha1 );
+                Xpp3Dom conf = new Xpp3Dom( "configuration" );
+                conf.addChild( resourceStrings );
+
+                wagonManager.addConfiguration( repo.getId(), conf );
+
+                try
+                {
+                    wagonManager.getArtifact( artifact, repo );
+                }
+                catch ( ChecksumFailedException e )
+                {
+                    fail( "Checksum verification did not pass: " + e.getMessage() );
+                }
+            }
+
+            {
+                Xpp3Dom path = new Xpp3Dom( "path" );
+                path.setValue( "expected-failure" );
+                Xpp3Dom sha1 = new Xpp3Dom( "path.sha1" );
+                sha1.setValue( "b7bb97d7d0b9244398d9b47296907f73313663e6" );
+                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
+                resourceStrings.addChild( path );
+                resourceStrings.addChild( sha1 );
+                Xpp3Dom conf = new Xpp3Dom( "configuration" );
+                conf.addChild( resourceStrings );
+
+                wagonManager.addConfiguration( repo.getId(), conf );
+
+                try
+                {
+                    wagonManager.getArtifact( artifact, repo );
+                    fail( "Checksum verification did not fail" );
+                }
+                catch ( ChecksumFailedException e )
+                {
+                    // expected
+                }
+            }
+
+            {
+                Xpp3Dom path = new Xpp3Dom( "path" );
+                path.setValue( "lower-case-checksum" );
+                Xpp3Dom md5 = new Xpp3Dom( "path.md5" );
+                md5.setValue( "50b2cf50a103a965efac62b983035cac" );
+                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
+                resourceStrings.addChild( path );
+                resourceStrings.addChild( md5 );
+                Xpp3Dom conf = new Xpp3Dom( "configuration" );
+                conf.addChild( resourceStrings );
+
+                wagonManager.addConfiguration( repo.getId(), conf );
+
+                try
+                {
+                    wagonManager.getArtifact( artifact, repo );
+                }
+                catch ( ChecksumFailedException e )
+                {
+                    fail( "Checksum verification did not pass: " + e.getMessage() );
+                }
+            }
+
+            {
+                Xpp3Dom path = new Xpp3Dom( "path" );
+                path.setValue( "upper-case-checksum" );
+                Xpp3Dom md5 = new Xpp3Dom( "path.md5" );
+                md5.setValue( "842F568FCCFEB7E534DC72133D42FFDC" );
+                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
+                resourceStrings.addChild( path );
+                resourceStrings.addChild( md5 );
+                Xpp3Dom conf = new Xpp3Dom( "configuration" );
+                conf.addChild( resourceStrings );
+
+                wagonManager.addConfiguration( repo.getId(), conf );
+
+                try
+                {
+                    wagonManager.getArtifact( artifact, repo );
+                }
+                catch ( ChecksumFailedException e )
+                {
+                    fail( "Checksum verification did not pass: " + e.getMessage() );
+                }
+            }
+
+            {
+                Xpp3Dom path = new Xpp3Dom( "path" );
+                path.setValue( "expected-failure" );
+                Xpp3Dom md5 = new Xpp3Dom( "path.md5" );
+                md5.setValue( "b7bb97d7d0b9244398d9b47296907f73313663e6" );
+                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
+                resourceStrings.addChild( path );
+                resourceStrings.addChild( md5 );
+                Xpp3Dom conf = new Xpp3Dom( "configuration" );
+                conf.addChild( resourceStrings );
+
+                wagonManager.addConfiguration( repo.getId(), conf );
+
+                try
+                {
+                    wagonManager.getArtifact( artifact, repo );
+                    fail( "Checksum verification did not fail" );
+                }
+                catch ( ChecksumFailedException e )
+                {
+                    // expected
+                }
+            }
+
+        }
+        finally
+        {
+            tmpFile.delete();
+            sha1File.delete();
+            md5File.delete();
         }
     }
 

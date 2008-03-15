@@ -45,6 +45,11 @@ under the License.
       <implementation>org.apache.maven.artifact.manager.WagonNoOp</implementation>
     </component>
     <component>
+      <role>org.apache.maven.wagon.Wagon</role>
+      <role-hint>string</role-hint>
+      <implementation>org.apache.maven.artifact.manager.WagonString</implementation>
+    </component>
+    <component>
       <role>org.apache.maven.artifact.repository.authentication.AuthenticationInfoProvider</role>
       <implementation>org.apache.maven.artifact.repository.authentication.DummyAuthenticationInfoProvider</implementation>
     </component>
