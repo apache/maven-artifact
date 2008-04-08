@@ -31,6 +31,8 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.ManagedVersionMap;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.codehaus.plexus.logging.LogEnabled;
+import org.codehaus.plexus.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,13 +55,14 @@ import java.util.Set;
  * @plexus.component
  */
 public class DefaultArtifactCollector
-    implements ArtifactCollector
+    implements ArtifactCollector, LogEnabled
 {
     /**
      * The conflict resolver to use when none is specified.
-     * @plexus.requirement role-hint="nearest" 
+     * @plexus.requirement role-hint="nearest"
      */
     private ConflictResolver defaultConflictResolver;
+    private Logger logger;
 
     public ArtifactResolutionResult collect( Set artifacts,
                                              Artifact originatingArtifact,
@@ -97,9 +100,9 @@ public class DefaultArtifactCollector
                                              List conflictResolvers )
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
-        
+
         result.ListOriginatingArtifact( originatingArtifact );
-        
+
         if ( conflictResolvers == null )
         {
             // TODO: warn that we're using the default conflict resolver
@@ -110,7 +113,7 @@ public class DefaultArtifactCollector
         Map resolvedArtifacts = new LinkedHashMap();
 
         ResolutionNode root = new ResolutionNode( originatingArtifact, remoteRepositories );
-        
+
         try
         {
             root.addDependencies( artifacts, remoteRepositories, filter );
@@ -130,8 +133,26 @@ public class DefaultArtifactCollector
 
         ManagedVersionMap versionMap = getManagedVersionsMap( originatingArtifact, managedVersions );
 
-        recurse( result, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
-            listeners, conflictResolvers );
+        try
+        {
+            recurse( result, root, resolvedArtifacts, versionMap, localRepository, remoteRepositories, source, filter,
+                listeners, conflictResolvers );
+        }
+        catch ( CyclicDependencyException e )
+        {
+            logger.debug( "While recursing: " + e.getMessage(), e );
+            result.addCircularDependencyException( e );
+        }
+        catch ( OverConstrainedVersionException e )
+        {
+            logger.debug( "While recursing: " + e.getMessage(), e );
+            result.addVersionRangeViolation( e );
+        }
+        catch ( ArtifactResolutionException e )
+        {
+            logger.debug( "While recursing: " + e.getMessage(), e );
+            result.addErrorArtifactException( e );
+        }
 
         Set set = new LinkedHashSet();
 
@@ -221,7 +242,7 @@ public class DefaultArtifactCollector
                           ArtifactFilter filter,
                           List listeners,
                           List conflictResolvers )
-    //throws ArtifactResolutionException
+        throws CyclicDependencyException, ArtifactResolutionException, OverConstrainedVersionException
     {
         fireEvent( ResolutionListener.TEST_ARTIFACT, listeners, node );
 
@@ -272,12 +293,46 @@ public class DefaultArtifactCollector
                             for ( int j = 0; j < 2; j++ )
                             {
                                 Artifact resetArtifact = resetNodes[j].getArtifact();
-                                if ( ( resetArtifact.getVersion() == null ) && ( resetArtifact.getVersionRange() != null ) &&
-                                    ( resetArtifact.getAvailableVersions() != null ) )
+
+                                //MNG-2123: if the previous node was not a range, then it wouldn't have any available
+                                //versions. We just clobbered the selected version above. (why? i have no idea.)
+                                //So since we are here and this is ranges we must go figure out the version (for a third time...)
+                                if ( resetArtifact.getVersion() == null && resetArtifact.getVersionRange() != null )
                                 {
 
-                                    resetArtifact.selectVersion( resetArtifact.getVersionRange().matchVersion(
-                                        resetArtifact.getAvailableVersions() ).toString() );
+                                    // go find the version. This is a total hack. See previous comment.
+                                    List versions = resetArtifact.getAvailableVersions();
+                                    if ( versions == null )
+                                    {
+                                        try
+                                        {
+                                            versions =
+                                                source.retrieveAvailableVersions( resetArtifact, localRepository,
+                                                                                  remoteRepositories );
+                                            resetArtifact.setAvailableVersions( versions );
+                                        }
+                                        catch ( ArtifactMetadataRetrievalException e )
+                                        {
+                                            resetArtifact.setDependencyTrail( node.getDependencyTrail() );
+                                            throw new ArtifactResolutionException(
+                                                                                   "Unable to get dependency information: " +
+                                                                                       e.getMessage(), resetArtifact,
+                                                                                   remoteRepositories, e );
+                                        }
+                                    }
+                                    //end hack
+
+                                    //MNG-2861: match version can return null
+                                    ArtifactVersion selectedVersion = resetArtifact.getVersionRange().matchVersion( resetArtifact.getAvailableVersions() );
+                                    if (selectedVersion != null)
+                                    {
+                                      resetArtifact.selectVersion( selectedVersion.toString() );
+                                    }
+                                    else
+                                    {
+                                      throw new OverConstrainedVersionException(" Unable to find a version in "+ resetArtifact.getAvailableVersions()+" to match the range "+ resetArtifact.getVersionRange(), resetArtifact);
+                                    }
+
                                     fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, resetNodes[j] );
                                 }
                             }
@@ -689,6 +744,11 @@ public class DefaultArtifactCollector
                     throw new IllegalStateException( "Unknown event: " + event );
             }
         }
+    }
+
+    public void enableLogging( Logger logger )
+    {
+        this.logger = logger;
     }
 
 }
