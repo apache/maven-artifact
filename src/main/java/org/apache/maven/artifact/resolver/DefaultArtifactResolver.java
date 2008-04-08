@@ -40,11 +40,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashMap;
 
 /**
  * @author Jason van Zyl
@@ -240,6 +240,8 @@ public class DefaultArtifactResolver
                         FileUtils.copyFile(
                             destination,
                             copy );
+
+                        copy.setLastModified( destination.lastModified() );
                     }
                     catch ( IOException e )
                     {
