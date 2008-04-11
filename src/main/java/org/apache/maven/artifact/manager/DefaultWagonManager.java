@@ -19,19 +19,6 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -67,6 +54,19 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /** @plexus.component */
 public class DefaultWagonManager
     extends AbstractLogEnabled
@@ -74,7 +74,7 @@ public class DefaultWagonManager
     Contextualizable
 {
     private static final String WILDCARD = "*";
-    
+
     private static final String EXTERNAL_WILDCARD = "external:*";
 
     private static final String[] CHECKSUM_IDS = {"md5", "sha1"};
@@ -428,7 +428,7 @@ public class DefaultWagonManager
         {
             getLogger().debug( "Trying repository " + repository.getId() );
 
-            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
+            getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
 
             getLogger().debug( "  Artifact resolved" );
 
@@ -688,6 +688,7 @@ public class DefaultWagonManager
                 id = repository.getId();
             }
 
+            getLogger().info( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
             repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
                                                                      repository.getLayout(), repository.getSnapshots(),
                                                                      repository.getReleases() );
@@ -781,7 +782,7 @@ public class DefaultWagonManager
         }
     }
 
-    
+
     private void disconnectWagon( Wagon wagon )
     {
         try
@@ -825,7 +826,7 @@ public class DefaultWagonManager
     /**
      * This method finds a matching mirror for the selected repository. If there is an exact match, this will be used.
      * If there is no exact match, then the list of mirrors is examined to see if a pattern applies.
-     * 
+     *
      * @param originalRepository See if there is a mirror for this repository.
      * @return the selected mirror or null if none are found.
      */
@@ -854,13 +855,13 @@ public class DefaultWagonManager
     }
 
     /**
-     * This method checks if the pattern matches the originalRepository. 
-     * Valid patterns: 
+     * This method checks if the pattern matches the originalRepository.
+     * Valid patterns:
      * * = everything
      * external:* = everything not on the localhost and not file based.
      * repo,repo1 = repo or repo1
      * *,!repo1 = everything except repo1
-     * 
+     *
      * @param originalRepository to compare for a match.
      * @param pattern used for match. Currently only '*' is supported.
      * @return true if the repository is a match to this pattern.
@@ -917,7 +918,7 @@ public class DefaultWagonManager
 
     /**
      * Checks the URL to see if this repository refers to an external repository
-     * 
+     *
      * @param originalRepository
      * @return true if external.
      */
@@ -935,10 +936,10 @@ public class DefaultWagonManager
             return false;
         }
     }
-    
+
     /**
      * Set the proxy used for a particular protocol.
-     * 
+     *
      * @param protocol the protocol (required)
      * @param host the proxy host name (required)
      * @param port the proxy port (required)
