@@ -40,6 +40,8 @@ public class DefaultArtifactVersion
 
     private String qualifier;
 
+    private ComparableVersion comparable;
+
     public DefaultArtifactVersion( String version )
     {
         parseVersion( version );
@@ -60,78 +62,7 @@ public class DefaultArtifactVersion
     public int compareTo( Object o )
     {
         DefaultArtifactVersion otherVersion = (DefaultArtifactVersion) o;
-
-        int result = compareIntegers( majorVersion, otherVersion.majorVersion );
-        if ( result == 0 )
-        {
-            result = compareIntegers( minorVersion, otherVersion.minorVersion );
-        }
-        if ( result == 0 )
-        {
-            result = compareIntegers( incrementalVersion, otherVersion.incrementalVersion );
-        }
-        if ( result == 0 )
-        {
-            if ( ( buildNumber != null ) || ( otherVersion.buildNumber != null ) )
-            {
-                result = compareIntegers( buildNumber, otherVersion.buildNumber );
-            }
-            else if ( qualifier != null )
-            {
-                if ( otherVersion.qualifier != null )
-                {
-                    if ( ( qualifier.length() > otherVersion.qualifier.length() ) &&
-                        qualifier.startsWith( otherVersion.qualifier ) )
-                    {
-                        // here, the longer one that otherwise match is considered older
-                        result = -1;
-                    }
-                    else if ( ( qualifier.length() < otherVersion.qualifier.length() ) &&
-                        otherVersion.qualifier.startsWith( qualifier ) )
-                    {
-                        // here, the longer one that otherwise match is considered older
-                        result = 1;
-                    }
-                    else
-                    {
-                        result = qualifier.compareTo( otherVersion.qualifier );
-                    }
-                }
-                else
-                {
-                    // otherVersion has no qualifier but we do - that's newer
-                    result = -1;
-                }
-            }
-            else if ( otherVersion.qualifier != null )
-            {
-                // otherVersion has a qualifier but we don't, we're newer
-                result = 1;
-            }
-        }
-        return result;
-    }
-
-    private int compareIntegers( Integer i1,
-                                 Integer i2 )
-    {
-        // treat null as 0 in comparison
-        if ( i1 == null ? i2 == null : i1.equals( i2 ) )
-        {
-            return 0;
-        }
-        else if ( i1 == null )
-        {
-            return -i2.intValue();
-        }
-        else if ( i2 == null )
-        {
-            return i1.intValue();
-        }
-        else
-        {
-            return i1.intValue() - i2.intValue();
-        }
+        return this.comparable.compareTo( otherVersion.comparable );
     }
 
     public int getMajorVersion()
@@ -161,6 +92,8 @@ public class DefaultArtifactVersion
 
     public final void parseVersion( String version )
     {
+        comparable = new ComparableVersion( version );
+
         int index = version.indexOf( "-" );
 
         String part1;
