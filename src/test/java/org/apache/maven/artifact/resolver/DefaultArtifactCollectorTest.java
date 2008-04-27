@@ -41,6 +41,7 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
 
@@ -339,7 +340,7 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( a );
 
-        assertTrue( res.hasVersionRangeViolations() );        
+        assertTrue( res.hasVersionRangeViolations() );
     }
 
     public void testUnboundedRangeBelowLastRelease()
@@ -686,6 +687,29 @@ public class DefaultArtifactCollectorTest
             assertTrue( e.getMessage().indexOf( "[1.0-SNAPSHOT]" ) < e.getMessage().indexOf( "[1.0,)" ) );
         }
         */
+    }
+
+    public void testOverConstrainedVersionException()
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifactSpec( "a", "1.0" );
+        a.addDependency( "b", "[1.0, 2.0)" );
+        a.addDependency( "c", "[3.3.0,4.0.0)" );
+
+        ArtifactSpec b = createArtifactSpec( "b", "1.0.0" );
+        b.addDependency( "c", "3.3.0-v3346" );
+
+        ArtifactSpec c = createArtifactSpec( "c", "3.2.1-v3235e" );
+
+        try
+        {
+            ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact} ) );
+        }
+        catch ( OverConstrainedVersionException e )
+        {
+            assertTrue( "Versions unordered", e.getMessage().indexOf( "[3.2.1-v3235e, 3.3.0-v3346]" ) != -1);
+            assertTrue( "DependencyTrail unresolved", e.getMessage().indexOf( "Path to dependency:" ) != -1);
+        }
     }
 
     private Artifact getArtifact( String id, Set artifacts )

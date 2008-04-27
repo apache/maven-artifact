@@ -480,24 +480,28 @@ public class DefaultArtifactCollector
                                         artifact.setAvailableVersions( versions );
                                     }
 
+                                    Collections.sort( versions );
+
                                     VersionRange versionRange = artifact.getVersionRange();
 
                                     version = versionRange.matchVersion( versions );
 
                                     if ( version == null )
                                     {
+                                        // Getting the dependency trail so it can be logged in the exception
+                                        artifact.setDependencyTrail( node.getDependencyTrail() );
+
                                         if ( versions.isEmpty() )
                                         {
                                             throw new OverConstrainedVersionException(
                                                 "No versions are present in the repository for the artifact with a range " +
                                                     versionRange, artifact, remoteRepositories );
                                         }
-                                        else
-                                        {
-                                            throw new OverConstrainedVersionException( "Couldn't find a version in " +
-                                                versions + " to match range " + versionRange, artifact,
-                                                remoteRepositories );
-                                        }
+
+
+                                        throw new OverConstrainedVersionException( "Couldn't find a version in " +
+                                            versions + " to match range " + versionRange, artifact,
+                                                                                          remoteRepositories );
                                     }
                                 }
                                 else
