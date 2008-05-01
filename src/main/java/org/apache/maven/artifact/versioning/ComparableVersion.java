@@ -336,7 +336,6 @@ public class ComparableVersion
                 {
                     list.add( parseItem( true, version.substring( startIndex, i ) ) );
                     startIndex = i;
-                    list.normalize(); // remove non-significative trailing zeros before a qualifier: 1.0a = 1a
                 }
 
                 isDigit = false;
@@ -345,10 +344,6 @@ public class ComparableVersion
 
         if ( version.length() > startIndex )
         {
-            if ( !isDigit )
-            {
-                list.normalize(); // 1.0.a = 1.a
-            }
             list.add( parseItem( isDigit, version.substring( startIndex ) ) );
         }
 

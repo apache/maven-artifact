@@ -41,7 +41,7 @@ public class ComparableVersionTest
     };
 
     private static final String[] VERSIONS_NUMBER = {
-        "2.0", "2-1", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1",
+        "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1",
         "2.2", "2.123", "11", "11b", "11c"
     };
 
@@ -102,9 +102,10 @@ public class ComparableVersionTest
         checkVersionsEqual( "1.0", "1.0-0" );
         checkVersionsEqual( "1a", "1.a" );
         checkVersionsEqual( "1a", "1-a" );
-        checkVersionsEqual( "1a", "1.0a" );
         checkVersionsEqual( "1a", "1.0-a" );
-        checkVersionsEqual( "1a", "1.0.a" );
+        checkVersionsEqual( "1a", "1.0.0-a" );
+        checkVersionsEqual( "1.0a", "1.0.a" );
+        checkVersionsEqual( "1.0.0a", "1.0.0.a" );
     }
 
     public void testVersionComparing()
