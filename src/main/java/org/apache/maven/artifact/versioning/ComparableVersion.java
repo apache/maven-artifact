@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Properties;
 import java.util.Locale;
 
 /**
@@ -52,6 +53,8 @@ public class ComparableVersion
         public int compareTo( Item item );
 
         public int getType();
+
+        public boolean isNull();
     }
 
     /**
@@ -70,6 +73,11 @@ public class ComparableVersion
         public int getType()
         {
             return INTEGER_ITEM;
+        }
+
+        public boolean isNull()
+        {
+            return ( value.intValue() == 0 );
         }
 
         public int compareTo( Item item )
@@ -107,10 +115,16 @@ public class ComparableVersion
     private static class StringItem
         implements Item
     {
-        private final static String[] QUALIFIERS = { "snapshot", "alpha", "beta", "rc", "", "ga", "sp" };
+        private final static String[] QUALIFIERS = { "snapshot", "alpha", "beta", "rc", "", "sp" };
 
         private final static List _QUALIFIERS = Arrays.asList( QUALIFIERS );
 
+        private final static Properties ALIASES = new Properties();
+        static {
+            ALIASES.put( "ga", "" );
+            ALIASES.put( "final", "" );
+            ALIASES.put( "cr", "rc" );
+        }
         /**
          * A comparable for the empty-string qualifier. This one is used to determine if a given qualifier makes the
          * version older than one without a qualifier, or more recent.
@@ -129,6 +143,11 @@ public class ComparableVersion
             return STRING_ITEM;
         }
 
+        public boolean isNull()
+        {
+            return ( comparableQualifier( value ).compareTo( RELEASE_VERSION_INDEX ) == 0 );
+        }
+
         /**
          * Returns a comparable for a qualifier.
          *
@@ -144,6 +163,8 @@ public class ComparableVersion
          */
         public static Comparable comparableQualifier( String qualifier )
         {
+            qualifier = ALIASES.getProperty( qualifier, qualifier );
+
             int i = _QUALIFIERS.indexOf( qualifier );
 
             return i == -1 ? _QUALIFIERS.size() + "-" + qualifier : String.valueOf( i );
@@ -191,14 +212,19 @@ public class ComparableVersion
             return LIST_ITEM;
         }
 
+        public boolean isNull()
+        {
+            return ( size() == 0 );
+        }
+
         void normalize()
         {
             for( ListIterator iterator = listIterator( size() ); iterator.hasPrevious(); )
             {
                 Item item = (Item) iterator.previous();
-                if ( item.getType() == INTEGER_ITEM && ( ( (IntegerItem) item ).value == 0 ) )
+                if ( item.isNull() )
                 {
-                    iterator.remove(); // remove trailing zeros
+                    iterator.remove(); // remove null trailing items: 0, "", empty list
                 }
                 else
                 {

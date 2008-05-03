@@ -38,8 +38,8 @@ public class ComparableVersionTest
     }
 
     private static final String[] VERSIONS_QUALIFIER = {
-        "1-SNAPSHOT", "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-rc", "1-rc2", "1-rc123",
-        "1", "1-ga", "1-sp2", "1-sp123", "1-abc", "1-def", "1-1-snapshot", "1-1", "1-2", "1-123"
+        "1-SNAPSHOT", "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-rc", "1-cr2", "1-rc123",
+        "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-1-snapshot", "1-1", "1-2", "1-123"
     };
 
     private static final String[] VERSIONS_NUMBER = {
@@ -108,6 +108,11 @@ public class ComparableVersionTest
         checkVersionsEqual( "1a", "1.0.0-a" );
         checkVersionsEqual( "1.0a", "1.0.a" );
         checkVersionsEqual( "1.0.0a", "1.0.0.a" );
+
+        // aliases
+        checkVersionsEqual( "1ga", "1" );
+        checkVersionsEqual( "1final", "1" );
+        checkVersionsEqual( "1cr", "1rc" );
     }
 
     public void testVersionComparing()
