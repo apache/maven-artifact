@@ -19,6 +19,8 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
+import java.util.Locale;
+
 import junit.framework.TestCase;
 
 /**
@@ -138,4 +140,23 @@ public class ComparableVersionTest
         checkVersionsOrder( "2.0.1", "2.0.1-123" );
         checkVersionsOrder( "2.0.1-xyz", "2.0.1-123" );
     }
+
+    public void testLocaleIndependent()
+    {
+        Locale orig = Locale.getDefault();
+        Locale[] locales = { Locale.ENGLISH, new Locale( "tr" ), Locale.getDefault() };
+        try
+        {
+            for ( int i = 0; i < locales.length; i++ )
+            {
+                Locale.setDefault( locales[i] );
+                checkVersionsEqual( "1-abcdefghijklmnopqrstuvwxyz", "1-ABCDEFGHIJKLMNOPQRSTUVWXYZ" );
+            }
+        }
+        finally
+        {
+            Locale.setDefault( orig );
+        }
+    }
+
 }

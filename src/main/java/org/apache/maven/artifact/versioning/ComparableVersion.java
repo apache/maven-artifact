@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 
 /**
  * Generic implementation of version comparison.
@@ -272,7 +273,7 @@ public class ComparableVersion
     {
         this.value = version;
 
-        version = version.toLowerCase();
+        version = version.toLowerCase( Locale.ENGLISH );
 
         ListItem list = items;
 
