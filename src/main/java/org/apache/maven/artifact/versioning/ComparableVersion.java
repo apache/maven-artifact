@@ -36,6 +36,9 @@ import java.util.Locale;
 public class ComparableVersion
     implements Comparable
 {
+
+    // FIXME: Implement equals() and hashCode()
+
     private String value;
 
     private ListItem items = new ListItem();
