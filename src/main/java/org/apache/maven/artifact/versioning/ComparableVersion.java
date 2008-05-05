@@ -40,9 +40,9 @@ public class ComparableVersion
 {
     private String value;
 
-    private String canonical = "";
+    private String canonical;
 
-    private ListItem items = new ListItem();
+    private ListItem items;
 
     private interface Item
     {
@@ -299,6 +299,8 @@ public class ComparableVersion
     public final void parseVersion( String version )
     {
         this.value = version;
+
+        items = new ListItem();
 
         version = version.toLowerCase( Locale.ENGLISH );
 

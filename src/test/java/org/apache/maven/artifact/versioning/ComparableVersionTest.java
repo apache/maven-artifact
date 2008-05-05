@@ -167,4 +167,13 @@ public class ComparableVersionTest
         }
     }
 
+    public void testReuse()
+    {
+        ComparableVersion c1 = new ComparableVersion( "1" );
+        c1.parseVersion( "2" );
+
+        Comparable c2 = newComparable( "2" );
+
+        assertEquals( "reused instance should be equivalent to new instance", c1, c2 );
+    }
 }
