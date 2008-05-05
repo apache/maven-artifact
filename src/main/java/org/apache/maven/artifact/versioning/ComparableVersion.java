@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 import java.util.Locale;
+import java.util.Stack;
 
 /**
  * Generic implementation of version comparison.
@@ -37,10 +38,9 @@ import java.util.Locale;
 public class ComparableVersion
     implements Comparable
 {
-
-    // FIXME: Implement equals() and hashCode()
-
     private String value;
+
+    private String canonical = "";
 
     private ListItem items = new ListItem();
 
@@ -135,7 +135,7 @@ public class ComparableVersion
 
         public StringItem( String value )
         {
-            this.value = value;
+            this.value = ALIASES.getProperty( value , value );
         }
 
         public int getType()
@@ -163,8 +163,6 @@ public class ComparableVersion
          */
         public static Comparable comparableQualifier( String qualifier )
         {
-            qualifier = ALIASES.getProperty( qualifier, qualifier );
-
             int i = _QUALIFIERS.indexOf( qualifier );
 
             return i == -1 ? _QUALIFIERS.size() + "-" + qualifier : String.valueOf( i );
@@ -306,6 +304,9 @@ public class ComparableVersion
 
         ListItem list = items;
 
+        Stack stack = new Stack();
+        stack.push( list );
+
         boolean isDigit = false;
 
         int startIndex = 0;
@@ -347,6 +348,8 @@ public class ComparableVersion
                         // new ListItem only if previous were digits and new char is a digit,
                         // ie need to differentiate only 1.1 from 1-1
                         list.add( list = new ListItem() );
+
+                        stack.push( list );
                     }
                 }
             }
@@ -377,7 +380,13 @@ public class ComparableVersion
             list.add( parseItem( isDigit, version.substring( startIndex ) ) );
         }
 
-        list.normalize();
+        while ( !stack.isEmpty() )
+        {
+            list = (ListItem) stack.pop();
+            list.normalize();
+        }
+
+        canonical = items.toString();
     }
 
     private static Item parseItem( boolean isDigit, String buf )
@@ -393,5 +402,15 @@ public class ComparableVersion
     public String toString()
     {
         return value;
+    }
+
+    public boolean equals( Object o )
+    {
+        return ( o instanceof ComparableVersion ) && canonical.equals( ( ( ComparableVersion )o ).canonical );
+    }
+
+    public int hashCode()
+    {
+        return canonical.hashCode();
     }
 }
