@@ -115,7 +115,7 @@ public class ComparableVersion
     private static class StringItem
         implements Item
     {
-        private final static String[] QUALIFIERS = { "snapshot", "alpha", "beta", "rc", "", "sp" };
+        private final static String[] QUALIFIERS = { "snapshot", "alpha", "beta", "milestone", "rc", "", "sp" };
 
         private final static List _QUALIFIERS = Arrays.asList( QUALIFIERS );
 
@@ -133,8 +133,24 @@ public class ComparableVersion
 
         private String value;
 
-        public StringItem( String value )
+        public StringItem( String value, boolean followedByDigit )
         {
+            if ( followedByDigit && value.length() == 1 )
+            {
+                // a1 = alpha-1, b1 = beta-1, m1 = milestone-1
+                switch ( value.charAt( 0 ) )
+                {
+                    case 'a':
+                        value = "alpha";
+                        break;
+                    case 'b':
+                        value = "beta";
+                        break;
+                    case 'm':
+                        value = "milestone";
+                        break;
+                }
+            }
             this.value = ALIASES.getProperty( value , value );
         }
 
@@ -359,7 +375,7 @@ public class ComparableVersion
             {
                 if ( !isDigit && i > startIndex )
                 {
-                    list.add( new StringItem( version.substring( startIndex, i ) ) );
+                    list.add( new StringItem( version.substring( startIndex, i ), true ) );
                     startIndex = i;
                 }
 
@@ -393,7 +409,7 @@ public class ComparableVersion
 
     private static Item parseItem( boolean isDigit, String buf )
     {
-        return isDigit ? new IntegerItem( new Integer( buf ) ) : new StringItem( buf );
+        return isDigit ? new IntegerItem( new Integer( buf ) ) : new StringItem( buf, false );
     }
 
     public int compareTo( Object o )
