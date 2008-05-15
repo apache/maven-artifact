@@ -150,6 +150,9 @@ public class VersionRangeTest
 
         range = VersionRange.createFromVersionSpec( "[1.0,1.1]" );
         assertTrue( range.containsVersion( new DefaultArtifactVersion( "1.1-SNAPSHOT" ) ) );
+
+        range = VersionRange.createFromVersionSpec( "[5.0.9.0,5.0.10.0)" );
+        assertTrue( range.containsVersion( new DefaultArtifactVersion( "5.0.9.0" ) ) );
     }
 
     public void testInvalidRanges()

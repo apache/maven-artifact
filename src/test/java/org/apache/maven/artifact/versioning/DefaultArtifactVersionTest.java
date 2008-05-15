@@ -93,7 +93,7 @@ public class DefaultArtifactVersionTest
 
         assertVersionOlder( "1.0-alpha-1", "1.0" );
         assertVersionOlder( "1.0-alpha-1", "1.0-alpha-2" );
-        //assertVersionOlder( "1.0-alpha-2", "1.0-alpha-15" );
+        assertVersionOlder( "1.0-alpha-2", "1.0-alpha-15" );
         assertVersionOlder( "1.0-alpha-1", "1.0-beta-1" );
 
         assertVersionOlder( "1.0-SNAPSHOT", "1.0-beta-1" );
@@ -108,7 +108,7 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "2.0-1", "2.0.1" );
 
         assertVersionOlder( "2.0.1-klm", "2.0.1-lmn" );
-        assertVersionOlder( "2.0.1-xyz", "2.0.1" );
+        //assertVersionOlder( "2.0.1-xyz", "2.0.1" );
 
         assertVersionOlder( "2.0.1", "2.0.1-123" );
         assertVersionOlder( "2.0.1-xyz", "2.0.1-123" );
@@ -135,25 +135,26 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "1.0-SNAPSHOT-SNAPSHOT", "1.0-SNAPSHOT" );
         assertVersionOlder( "1.0-alpha-1-SNAPSHOT-SNAPSHOT", "1.0-alpha-1-SNAPSHOT" );
 
-        //assertVersionOlder( "1.0-SNAPSHOT", "1.0-1-SNAPSHOT" );
-        //assertVersionOlder( "1.0-1-SNAPSHOT", "1.0-2-SNAPSHOT" );
+        assertVersionOlder( "1.0-SNAPSHOT", "1.0-1-SNAPSHOT" );
+        assertVersionOlder( "1.0-1-SNAPSHOT", "1.0-2-SNAPSHOT" );
         //assertVersionEqual( "2.0-0-SNAPSHOT", "2.0-SNAPSHOT" );
-        //assertVersionOlder( "2.0-SNAPSHOT", "2.0-1-SNAPSHOT" );
-        //assertVersionOlder( "2.0.0-SNAPSHOT", "2.0-1-SNAPSHOT" );
+        assertVersionOlder( "2.0-SNAPSHOT", "2.0-1-SNAPSHOT" );
+        assertVersionOlder( "2.0.0-SNAPSHOT", "2.0-1-SNAPSHOT" );
         assertVersionOlder( "2.0-1-SNAPSHOT", "2.0.1-SNAPSHOT" );
 
         assertVersionOlder( "2.0.1-klm-SNAPSHOT", "2.0.1-lmn-SNAPSHOT" );
         // assertVersionOlder( "2.0.1-xyz-SNAPSHOT", "2.0.1-SNAPSHOT" );
-        //assertVersionOlder( "2.0.1-SNAPSHOT", "2.0.1-123-SNAPSHOT" );
-        //assertVersionOlder( "2.0.1-xyz-SNAPSHOT", "2.0.1-123-SNAPSHOT" );
+        assertVersionOlder( "2.0.1-SNAPSHOT", "2.0.1-123-SNAPSHOT" );
+        assertVersionOlder( "2.0.1-xyz-SNAPSHOT", "2.0.1-123-SNAPSHOT" );
     }
 
 
     public void testSnapshotVsReleases()
     {
-        assertVersionOlder( "1.0-RC1", "1.0-SNAPSHOT" );
-        //assertVersionOlder( "1.0-rc1", "1.0-SNAPSHOT" );
-        //assertVersionOlder( "1.0-rc-1", "1.0-SNAPSHOT" );
+        //assertVersionOlder( "1.0-RC1", "1.0-SNAPSHOT" ); not feasible if "1.0-SNAPSHOT" < "1.0-beta-1" too
+        assertVersionOlder( "1.0-SNAPSHOT", "1.0-RC1" );
+        assertVersionOlder( "1.0-SNAPSHOT", "1.0-rc1" );
+        assertVersionOlder( "1.0-SNAPSHOT", "1.0-rc-1" );
     }
 
     private void assertVersionOlder( String left, String right )
