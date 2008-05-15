@@ -50,7 +50,7 @@ public class DefaultArtifactVersion
     @Override
     public int hashCode()
     {
-        return 11 + toString().hashCode();
+        return 11 + comparable.hashCode();
     }
 
     @Override
