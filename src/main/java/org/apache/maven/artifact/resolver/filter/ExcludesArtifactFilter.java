@@ -33,7 +33,7 @@ import java.util.List;
 public class ExcludesArtifactFilter
     extends IncludesArtifactFilter
 {
-    public ExcludesArtifactFilter( List patterns )
+    public ExcludesArtifactFilter( List<String> patterns )
     {
         super( patterns );
     }

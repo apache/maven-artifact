@@ -41,15 +41,15 @@ public class DefaultArtifactRepositoryFactory
     private String globalChecksumPolicy;
 
     // FIXME: This is a non-ThreadLocal cache!!
-    private final Map artifactRepositories = new HashMap();
+    private final Map<String,ArtifactRepository> artifactRepositories = new HashMap<String,ArtifactRepository>();
 
     /** @plexus.requirement role="org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout" */
-    private Map repositoryLayouts;
+    private Map<String,ArtifactRepositoryLayout> repositoryLayouts;
 
     public ArtifactRepositoryLayout getLayout( String layoutId )
         throws UnknownRepositoryLayoutException
     {
-        return (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
+        return repositoryLayouts.get( layoutId );
     }
 
     public ArtifactRepository createDeploymentArtifactRepository( String id,
@@ -58,7 +58,7 @@ public class DefaultArtifactRepositoryFactory
                                                                   boolean uniqueVersion )
         throws UnknownRepositoryLayoutException
     {
-        ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
+        ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
 
         checkLayout( id, layoutId, layout );
 
@@ -91,7 +91,7 @@ public class DefaultArtifactRepositoryFactory
                                                         ArtifactRepositoryPolicy releases )
         throws UnknownRepositoryLayoutException
     {
-        ArtifactRepositoryLayout layout = (ArtifactRepositoryLayout) repositoryLayouts.get( layoutId );
+        ArtifactRepositoryLayout layout = repositoryLayouts.get( layoutId );
 
         checkLayout( id, layoutId, layout );
 
@@ -107,7 +107,7 @@ public class DefaultArtifactRepositoryFactory
         boolean blacklisted = false;
         if ( artifactRepositories.containsKey( id ) )
         {
-            ArtifactRepository repository = (ArtifactRepository) artifactRepositories.get( id );
+            ArtifactRepository repository = artifactRepositories.get( id );
             // TODO: this should be an if there are duplicates?
             if ( repository.getUrl().equals( url ) )
             {
@@ -137,8 +137,7 @@ public class DefaultArtifactRepositoryFactory
             releases.setChecksumPolicy( globalChecksumPolicy );
         }
 
-        DefaultArtifactRepository repository = new DefaultArtifactRepository( id, url, repositoryLayout, snapshots,
-            releases );
+        DefaultArtifactRepository repository = new DefaultArtifactRepository( id, url, repositoryLayout, snapshots, releases );
         repository.setBlacklisted( blacklisted );
 
         artifactRepositories.put( id, repository );

@@ -20,11 +20,11 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,70 +49,56 @@ public class ArtifactResolutionResult
 {
     private Artifact originatingArtifact;
 
-    private List versionRangeViolations;
+    private List<Exception> versionRangeViolations;
 
-    private List metadataResolutionExceptions;
+    private List<ArtifactResolutionException> metadataResolutionExceptions;
 
-    private List missingArtifacts;
+    private List<Artifact> missingArtifacts;
 
-    private List circularDependencyExceptions;
+    private List<CyclicDependencyException> circularDependencyExceptions;
 
-    private List errorArtifactExceptions;
+    private List<ArtifactResolutionException> errorArtifactExceptions;
 
     // file system errors
 
-    private List repositories;
+    private List<ArtifactRepository> repositories;
 
-    private Set resolutionNodes;
+    private Set<ResolutionNode> resolutionNodes;
 
-    private Set artifacts;
-
-    //
+    private Set<Artifact> artifacts;
 
     public Artifact getOriginatingArtifact()
     {
         return originatingArtifact;
     }
 
-    public ArtifactResolutionResult ListOriginatingArtifact( Artifact originatingArtifact )
+    public ArtifactResolutionResult ListOriginatingArtifact( final Artifact originatingArtifact )
     {
         this.originatingArtifact = originatingArtifact;
 
         return this;
     }
 
-    /**
-     * 
-     * @return set of Artifact instances
-     */
-    
-    public Set getArtifacts()
+    public Set<Artifact> getArtifacts()
     {
         if ( artifacts == null )
         {
-            artifacts = new LinkedHashSet();
+            artifacts = new LinkedHashSet<Artifact>();
 
-            for ( Iterator i = resolutionNodes.iterator(); i.hasNext(); )
-            {
-                ResolutionNode node = (ResolutionNode) i.next();
-
-                artifacts.add( node.getArtifact() );
+            for (ResolutionNode node : resolutionNodes) {
+                artifacts.add(node.getArtifact());
             }
         }
 
         return artifacts;
     }
 
-    /**
-     * 
-     * @return Set of ResolutionNode instances
-     */
     public Set getArtifactResolutionNodes()
     {
         return resolutionNodes == null ? Collections.EMPTY_SET : resolutionNodes;
     }
 
-    public ArtifactResolutionResult setArtifactResolutionNodes( Set resolutionNodes )
+    public ArtifactResolutionResult setArtifactResolutionNodes( final Set<ResolutionNode> resolutionNodes )
     {
         this.resolutionNodes = resolutionNodes;
 
@@ -136,7 +122,7 @@ public class ArtifactResolutionResult
         return this;
     }
 
-    public ArtifactResolutionResult setUnresolvedArtifacts( List unresolvedArtifacts )
+    public ArtifactResolutionResult setUnresolvedArtifacts( final List<Artifact> unresolvedArtifacts )
     {
         this.missingArtifacts = unresolvedArtifacts;
 
@@ -196,7 +182,7 @@ public class ArtifactResolutionResult
 
     public ArtifactResolutionException getMetadataResolutionException( int i )
     {
-        return (ArtifactResolutionException) metadataResolutionExceptions.get( i );
+        return metadataResolutionExceptions.get( i );
     }
 
     public List getMetadataResolutionExceptions()
@@ -222,9 +208,13 @@ public class ArtifactResolutionResult
         return this;
     }
 
-    public List getErrorArtifactExceptions()
+    public List<ArtifactResolutionException> getErrorArtifactExceptions()
     {
-        return errorArtifactExceptions == null ? Collections.EMPTY_LIST : errorArtifactExceptions;
+        if (errorArtifactExceptions == null) {
+            return Collections.emptyList();
+        }
+
+        return errorArtifactExceptions;
     }
 
     // ------------------------------------------------------------------------
@@ -247,37 +237,47 @@ public class ArtifactResolutionResult
 
     public CyclicDependencyException getCircularDependencyException( int i )
     {
-        return (CyclicDependencyException) circularDependencyExceptions.get( i );
+        return circularDependencyExceptions.get( i );
     }
 
-    public List getCircularDependencyExceptions()
+    public List<CyclicDependencyException> getCircularDependencyExceptions()
     {
-        return circularDependencyExceptions == null ? Collections.EMPTY_LIST : circularDependencyExceptions;
+        if (circularDependencyExceptions == null) {
+            return Collections.emptyList();
+        }
+
+        return circularDependencyExceptions;
     }
 
     // ------------------------------------------------------------------------
-    //
-    // ------------------------------------------------------------------------
-
     // Repositories
+    // ------------------------------------------------------------------------
 
-    public List getRepositories()
+    public List<ArtifactRepository> getRepositories()
     {
-        return repositories == null ? Collections.EMPTY_LIST : repositories;
+        if (repositories == null) {
+            return Collections.emptyList();
+        }
+
+        return repositories;
     }
 
-    public ArtifactResolutionResult setRepositories( List repositories )
+    public ArtifactResolutionResult setRepositories( final List<ArtifactRepository> repositories )
     {
         this.repositories = repositories;
 
         return this;
     }
 
-    private List initList( List l )
+    //
+    // Internal
+    //
+    
+    private <T> List<T> initList( final List<T> l )
     {
         if ( l == null )
         {
-            return new ArrayList();
+            return new ArrayList<T>();
         }
         return l;
     }

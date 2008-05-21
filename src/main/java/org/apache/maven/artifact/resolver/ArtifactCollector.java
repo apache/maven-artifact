@@ -23,6 +23,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
 
 import java.util.List;
 import java.util.Map;
@@ -45,33 +46,33 @@ public interface ArtifactCollector
     String ROLE = ArtifactCollector.class.getName();
 
     // TODO: deprecate since conflict resolvers should always be specified
-    ArtifactResolutionResult collect( Set artifacts,
+    ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                       Artifact originatingArtifact,
                                       ArtifactRepository localRepository,
-                                      List remoteRepositories,
+                                      List<ArtifactRepository> remoteRepositories,
                                       ArtifactMetadataSource source,
                                       ArtifactFilter filter,
-                                      List listeners );
+                                      List<ResolutionListener> listeners );
 
     // TODO: deprecate since conflict resolvers should always be specified
-    ArtifactResolutionResult collect( Set artifacts,
+    ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                       Artifact originatingArtifact,
                                       Map managedVersions,
                                       ArtifactRepository localRepository,
-                                      List remoteRepositories,
+                                      List<ArtifactRepository> remoteRepositories,
                                       ArtifactMetadataSource source,
                                       ArtifactFilter filter,
-                                      List listeners );
+                                      List<ResolutionListener> listeners );
 
     /** @since 3.0 */
-    ArtifactResolutionResult collect( Set artifacts,
+    ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                       Artifact originatingArtifact,
                                       Map managedVersions,
                                       ArtifactRepository localRepository,
-                                      List remoteRepositories,
+                                      List<ArtifactRepository> remoteRepositories,
                                       ArtifactMetadataSource source,
                                       ArtifactFilter filter,
-                                      List listeners,
-                                      List conflictResolvers )
+                                      List<ResolutionListener> listeners,
+                                      List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException;
 }

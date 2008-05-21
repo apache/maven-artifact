@@ -23,6 +23,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
 
 import java.util.List;
 import java.util.Map;
@@ -48,79 +49,79 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactRepository localRepository,
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactRepository localRepository,
                                                   ArtifactMetadataSource source,
-                                                  List listeners )
+                                                  List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source,
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source,
                                                   ArtifactFilter filter )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source,
                                                   ArtifactFilter filter,
-                                                  List listeners )
+                                                  List<ResolutionListener> listeners )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /**
      * @since 3.0
      * @deprecated use {@link #resolve(ArtifactResolutionRequest)}
      */
-    ArtifactResolutionResult resolveTransitively( Set artifacts,
+    ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
                                                   ArtifactRepository localRepository,
-                                                  List remoteRepositories,
+                                                  List<ArtifactRepository> remoteRepositories,
                                                   ArtifactMetadataSource source,
                                                   ArtifactFilter filter,
-                                                  List listeners,
-                                                  List conflictResolvers )
+                                                  List<ResolutionListener> listeners,
+                                                  List<ConflictResolver> conflictResolvers )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
     void resolveAlways( Artifact artifact,
-                        List remoteRepositories,
+                        List<ArtifactRepository> remoteRepositories,
                         ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 

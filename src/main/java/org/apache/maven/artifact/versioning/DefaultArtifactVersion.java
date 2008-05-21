@@ -67,22 +67,22 @@ public class DefaultArtifactVersion
 
     public int getMajorVersion()
     {
-        return majorVersion != null ? majorVersion.intValue() : 0;
+        return majorVersion != null ? majorVersion : 0;
     }
 
     public int getMinorVersion()
     {
-        return minorVersion != null ? minorVersion.intValue() : 0;
+        return minorVersion != null ? minorVersion : 0;
     }
 
     public int getIncrementalVersion()
     {
-        return incrementalVersion != null ? incrementalVersion.intValue() : 0;
+        return incrementalVersion != null ? incrementalVersion : 0;
     }
 
     public int getBuildNumber()
     {
-        return buildNumber != null ? buildNumber.intValue() : 0;
+        return buildNumber != null ? buildNumber : 0;
     }
 
     public String getQualifier()

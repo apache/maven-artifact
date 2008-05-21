@@ -54,7 +54,7 @@ public class SnapshotTransformation
 
 
     public void transformForResolve( Artifact artifact,
-                                     List remoteRepositories,
+                                     List<ArtifactRepository> remoteRepositories,
                                      ArtifactRepository localRepository )
         throws ArtifactResolutionException
     {

@@ -77,14 +77,14 @@ public class ComparableVersion
 
         public boolean isNull()
         {
-            return ( value.intValue() == 0 );
+            return (value == 0 );
         }
 
         public int compareTo( Item item )
         {
             if ( item == null )
             {
-                return value.intValue() == 0 ? 0 : 1; // 1.0 == 1, 1.1 > 1
+                return value == 0 ? 0 : 1; // 1.0 == 1, 1.1 > 1
             }
 
             switch ( item.getType() )

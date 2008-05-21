@@ -27,7 +27,7 @@ import java.util.List;
 public interface RepositoryMetadataManager
 {
     void resolve( RepositoryMetadata repositoryMetadata,
-                  List repositories,
+                  List<ArtifactRepository> repositories,
                   ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException;
 

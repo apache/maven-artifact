@@ -72,7 +72,7 @@ public class DefaultArtifact
 
     private ArtifactHandler artifactHandler;
 
-    private List dependencyTrail;
+    private List<String> dependencyTrail;
 
     private String version;
 
@@ -84,7 +84,7 @@ public class DefaultArtifact
 
     private List availableVersions;
 
-    private Map metadataMap;
+    private Map<Object,ArtifactMetadata> metadataMap;
 
     private boolean optional;
 
@@ -262,10 +262,10 @@ public class DefaultArtifact
     {
         if ( metadataMap == null )
         {
-            metadataMap = new HashMap();
+            metadataMap = new HashMap<Object,ArtifactMetadata>();
         }
 
-        ArtifactMetadata m = (ArtifactMetadata) metadataMap.get( metadata.getKey() );
+        ArtifactMetadata m = metadataMap.get( metadata.getKey() );
         if ( m != null )
         {
             m.merge( metadata );
@@ -276,9 +276,13 @@ public class DefaultArtifact
         }
     }
 
-    public Collection getMetadataList()
+    public Collection<ArtifactMetadata> getMetadataList()
     {
-        return metadataMap == null ? Collections.EMPTY_LIST : metadataMap.values();
+        if (metadataMap == null) {
+            return Collections.emptyList();
+        }
+
+        return metadataMap.values();
     }
 
     // ----------------------------------------------------------------------
@@ -481,12 +485,12 @@ public class DefaultArtifact
         return artifactHandler;
     }
 
-    public List getDependencyTrail()
+    public List<String> getDependencyTrail()
     {
         return dependencyTrail;
     }
 
-    public void setDependencyTrail( List dependencyTrail )
+    public void setDependencyTrail( List<String> dependencyTrail )
     {
         this.dependencyTrail = dependencyTrail;
     }

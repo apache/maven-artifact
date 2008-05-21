@@ -5,12 +5,8 @@ package org.apache.maven.artifact.transform;
  *
  */
 public class MetadataGraphTransformationException
-extends Exception
+    extends Exception
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4029897098314019152L;
 
 	public MetadataGraphTransformationException()

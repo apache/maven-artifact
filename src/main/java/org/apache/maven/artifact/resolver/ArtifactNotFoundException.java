@@ -20,6 +20,7 @@ package org.apache.maven.artifact.resolver;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class ArtifactNotFoundException
 
     protected ArtifactNotFoundException( String message,
                                          Artifact artifact,
-                                         List remoteRepositories )
+                                         List<ArtifactRepository> remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
     }
@@ -49,7 +50,7 @@ public class ArtifactNotFoundException
 
     protected ArtifactNotFoundException( String message,
                                          Artifact artifact,
-                                         List remoteRepositories,
+                                         List<ArtifactRepository> remoteRepositories,
                                          ResourceDoesNotExistException cause )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),
@@ -63,7 +64,7 @@ public class ArtifactNotFoundException
                                       String version,
                                       String type,
                                       String classifier,
-                                      List remoteRepositories,
+                                      List<ArtifactRepository> remoteRepositories,
                                       String downloadUrl,
                                       List path,
                                       ResourceDoesNotExistException cause )
@@ -81,7 +82,7 @@ public class ArtifactNotFoundException
                                        String version,
                                        String type,
                                        String classifier,
-                                       List remoteRepositories,
+                                       List<ArtifactRepository> remoteRepositories,
                                        String downloadUrl,
                                        List path )
     {

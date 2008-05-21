@@ -33,9 +33,9 @@ import java.util.List;
 public class IncludesArtifactFilter
     implements ArtifactFilter
 {
-    private final List patterns;
+    private final List<String> patterns;
 
-    public IncludesArtifactFilter( List patterns )
+    public IncludesArtifactFilter( List<String> patterns )
     {
         this.patterns = patterns;
     }

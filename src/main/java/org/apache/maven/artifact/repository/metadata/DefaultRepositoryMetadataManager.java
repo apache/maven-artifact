@@ -68,68 +68,55 @@ public class DefaultRepositoryMetadataManager
     }
 
     public void resolve( RepositoryMetadata metadata,
-                         List remoteRepositories,
+                         List<ArtifactRepository> remoteRepositories,
                          ArtifactRepository localRepository )
         throws RepositoryMetadataResolutionException
     {
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-        {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
+        for (ArtifactRepository repository : remoteRepositories) {
             ArtifactRepositoryPolicy policy =
-                metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+                    metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
-            File file = new File( localRepository.getBasedir(),
-                localRepository.pathOfLocalRepositoryMetadata( metadata, repository ) );
+            File file = new File(localRepository.getBasedir(),
+                    localRepository.pathOfLocalRepositoryMetadata(metadata, repository));
 
-            if ( wagonManager.isOnline() )
-            {
-                if ( updateCheckManager.isUpdateRequired( metadata, repository, file ) )
-                {
-                    getLogger().info( metadata.getKey() + ": checking for updates from " + repository.getId() );
-                    try
-                    {
-                        wagonManager.getArtifactMetadata( metadata, repository, file, policy.getChecksumPolicy() );
+            if (wagonManager.isOnline()) {
+                if (updateCheckManager.isUpdateRequired(metadata, repository, file)) {
+                    getLogger().info(metadata.getKey() + ": checking for updates from " + repository.getId());
+                    try {
+                        wagonManager.getArtifactMetadata(metadata, repository, file, policy.getChecksumPolicy());
                     }
-                    catch ( ResourceDoesNotExistException e )
-                    {
-                        getLogger().debug( metadata + " could not be found on repository: " + repository.getId() );
+                    catch (ResourceDoesNotExistException e) {
+                        getLogger().debug(metadata + " could not be found on repository: " + repository.getId());
 
                         // delete the local copy so the old details aren't used.
-                        if ( file.exists() )
-                        {
+                        if (file.exists()) {
                             file.delete();
                         }
                     }
-                    catch ( TransferFailedException e )
-                    {
-                        getLogger().warn( metadata + " could not be retrieved from repository: " + repository.getId() +
-                            " due to an error: " + e.getMessage() );
-                        getLogger().debug( "Exception", e );
+                    catch (TransferFailedException e) {
+                        getLogger().warn(metadata + " could not be retrieved from repository: " + repository.getId() +
+                                " due to an error: " + e.getMessage());
+                        getLogger().debug("Exception", e);
 
-                        getLogger().info( "Repository '" + repository.getId() + "' will be blacklisted" );
-                        repository.setBlacklisted( true );
+                        getLogger().info("Repository '" + repository.getId() + "' will be blacklisted");
+                        repository.setBlacklisted(true);
 
                         // TODO: [jc; 08-Nov-2005] revisit this for 2.1
                         // suppressing logging to avoid logging this error twice.
                     }
-                    finally
-                    {
-                        updateCheckManager.touch( metadata, repository, file );
+                    finally {
+                        updateCheckManager.touch(metadata, repository, file);
                     }
                 }
-            }
-            else
-            {
+            } else {
                 getLogger().debug(
-                    "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n" );
+                        "System is offline. Cannot resolve metadata:\n" + metadata.extendedToString() + "\n\n");
             }
 
             // TODO: should this be inside the above check?
             // touch file so that this is not checked again until interval has passed
-            if ( file.exists() )
-            {
-                file.setLastModified( System.currentTimeMillis() );
+            if (file.exists()) {
+                file.setLastModified(System.currentTimeMillis());
             }
         }
         try
@@ -149,7 +136,7 @@ public class DefaultRepositoryMetadataManager
     }
 
     private void mergeMetadata( RepositoryMetadata metadata,
-                                List remoteRepositories,
+                                List<ArtifactRepository> remoteRepositories,
                                 ArtifactRepository localRepository )
         throws RepositoryMetadataStoreException, RepositoryMetadataReadException
     {
@@ -160,17 +147,13 @@ public class DefaultRepositoryMetadataManager
 
         Map previousMetadata = new HashMap();
         ArtifactRepository selected = null;
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext(); )
-        {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
+        for (ArtifactRepository repository : remoteRepositories) {
             ArtifactRepositoryPolicy policy =
-                metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
+                    metadata.isSnapshot() ? repository.getSnapshots() : repository.getReleases();
 
-            if ( ( policy.isEnabled() && !repository.isBlacklisted() )
-                && ( loadMetadata( metadata, repository, localRepository, previousMetadata ) ) )
-            {
-                metadata.setRepository( repository );
+            if ((policy.isEnabled() && !repository.isBlacklisted())
+                    && (loadMetadata(metadata, repository, localRepository, previousMetadata))) {
+                metadata.setRepository(repository);
                 selected = repository;
             }
         }

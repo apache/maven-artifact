@@ -24,14 +24,12 @@ import org.apache.maven.artifact.versioning.VersionRange;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
 public final class ArtifactUtils
 {
-
     private ArtifactUtils()
     {
     }
@@ -93,34 +91,28 @@ public final class ArtifactUtils
             baseVersion;
     }
 
-    public static Map artifactMapByVersionlessId( Collection artifacts )
+    public static Map<String,Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
     {
-        Map artifactMap = new HashMap();
+        Map<String,Artifact> artifactMap = new HashMap<String,Artifact>();
 
         if ( artifacts != null )
         {
-            for ( Iterator it = artifacts.iterator(); it.hasNext(); )
-            {
-                Artifact artifact = (Artifact) it.next();
-
-                artifactMap.put( versionlessKey( artifact ), artifact );
+            for (Artifact artifact : artifacts) {
+                artifactMap.put(versionlessKey(artifact), artifact);
             }
         }
 
         return artifactMap;
     }
 
-    public static Map artifactMapByArtifactId( Collection artifacts )
+    public static Map<String,Artifact> artifactMapByArtifactId( Collection<Artifact> artifacts )
     {
-        Map artifactMap = new HashMap();
+        Map<String,Artifact> artifactMap = new HashMap<String,Artifact>();
 
         if ( artifacts != null )
         {
-            for ( Iterator it = artifacts.iterator(); it.hasNext(); )
-            {
-                Artifact artifact = (Artifact) it.next();
-
-                artifactMap.put( artifact.getId(), artifact );
+            for (Artifact artifact : artifacts) {
+                artifactMap.put(artifact.getId(), artifact);
             }
         }
 
@@ -169,13 +161,13 @@ public final class ArtifactUtils
         return clone;
     }
 
-    private static List copyList( List original )
+    private static <T> List<T> copyList( List<T> original )
     {
-        List copy = null;
+        List<T> copy = null;
 
         if ( original != null )
         {
-            copy = new ArrayList();
+            copy = new ArrayList<T>();
 
             if ( !original.isEmpty() )
             {

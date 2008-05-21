@@ -36,10 +36,10 @@ public class VersionRange
 {
     private final ArtifactVersion recommendedVersion;
 
-    private final List restrictions;
+    private final List<Restriction> restrictions;
 
     private VersionRange( ArtifactVersion recommendedVersion,
-                          List restrictions )
+                          List<Restriction> restrictions )
     {
         this.recommendedVersion = recommendedVersion;
         this.restrictions = restrictions;
@@ -57,11 +57,11 @@ public class VersionRange
 
     public VersionRange cloneOf()
     {
-        List copiedRestrictions = null;
+        List<Restriction> copiedRestrictions = null;
 
         if ( restrictions != null )
         {
-            copiedRestrictions = new ArrayList();
+            copiedRestrictions = new ArrayList<Restriction>();
 
             if ( !restrictions.isEmpty() )
             {
@@ -97,7 +97,7 @@ public class VersionRange
             return null;
         }
 
-        List restrictions = new ArrayList();
+        List<Restriction> restrictions = new ArrayList<Restriction>();
         String process = spec;
         ArtifactVersion version = null;
         ArtifactVersion upperBound = null;
@@ -251,12 +251,13 @@ public class VersionRange
      */
     public VersionRange restrict( VersionRange restriction )
     {
-        List r1 = this.restrictions;
-        List r2 = restriction.restrictions;
-        List restrictions;
+        List<Restriction> r1 = this.restrictions;
+        List<Restriction> r2 = restriction.restrictions;
+        List<Restriction> restrictions;
+
         if ( r1.isEmpty() || r2.isEmpty() )
         {
-            restrictions = Collections.EMPTY_LIST;
+            restrictions = Collections.emptyList();
         }
         else
         {
@@ -307,10 +308,9 @@ public class VersionRange
         return new VersionRange( version, restrictions );
     }
 
-    private List intersection( List r1,
-                               List r2 )
+    private List<Restriction> intersection( List<Restriction> r1, List<Restriction> r2 )
     {
-        List restrictions = new ArrayList( r1.size() + r2.size() );
+        List<Restriction> restrictions = new ArrayList<Restriction>( r1.size() + r2.size() );
         Iterator i1 = r1.iterator();
         Iterator i2 = r2.iterator();
         Restriction res1 = (Restriction) i1.next();
@@ -519,19 +519,15 @@ public class VersionRange
         }
     }
 
-    public ArtifactVersion matchVersion( List versions )
+    public ArtifactVersion matchVersion( List<ArtifactVersion> versions )
     {
         // TODO: could be more efficient by sorting the list and then moving along the restrictions in order?
 
         ArtifactVersion matched = null;
-        for ( Iterator i = versions.iterator(); i.hasNext(); )
-        {
-            ArtifactVersion version = (ArtifactVersion) i.next();
-            if ( containsVersion( version ) )
-            {
+        for (ArtifactVersion version : versions) {
+            if (containsVersion(version)) {
                 // valid - check if it is greater than the currently matched version
-                if ( matched == null || version.compareTo( matched ) > 0 )
-                {
+                if (matched == null || version.compareTo(matched) > 0) {
                     matched = version;
                 }
             }
@@ -541,11 +537,8 @@ public class VersionRange
 
     public boolean containsVersion( ArtifactVersion version )
     {
-        for ( Iterator i = restrictions.iterator(); i.hasNext(); )
-        {
-            Restriction restriction = (Restriction) i.next();
-            if ( restriction.containsVersion( version ) )
-            {
+        for (Restriction restriction : restrictions) {
+            if (restriction.containsVersion(version)) {
                 return true;
             }
         }

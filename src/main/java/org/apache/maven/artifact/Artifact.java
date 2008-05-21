@@ -104,7 +104,7 @@ public interface Artifact
 
     void addMetadata( ArtifactMetadata metadata );
 
-    Collection getMetadataList();
+    Collection<ArtifactMetadata> getMetadataList();
 
     void setRepository( ArtifactRepository remoteRepository );
 
@@ -126,12 +126,12 @@ public interface Artifact
     /**
      * @return {@link List} &lt; {@link String} > with artifact ids
      */
-    List getDependencyTrail();
+    List<String> getDependencyTrail();
 
     /**
      * @param dependencyTrail {@link List} &lt; {@link String} > with artifact ids
      */
-    void setDependencyTrail( List dependencyTrail );
+    void setDependencyTrail( List<String> dependencyTrail );
 
     void setScope( String scope );
 

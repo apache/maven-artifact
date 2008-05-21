@@ -34,7 +34,7 @@ import java.util.List;
 public class AndArtifactFilter
     implements ArtifactFilter
 {
-    private final List filters = new ArrayList();
+    private final List<ArtifactFilter> filters = new ArrayList<ArtifactFilter>();
 
     public boolean include( Artifact artifact )
     {

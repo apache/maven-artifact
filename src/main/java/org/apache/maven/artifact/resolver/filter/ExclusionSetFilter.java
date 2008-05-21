@@ -32,25 +32,20 @@ import java.util.Set;
 public class ExclusionSetFilter
     implements ArtifactFilter
 {
-    private Set excludes;
+    private Set<String> excludes;
 
     public ExclusionSetFilter( String[] excludes )
     {
-        this.excludes = new HashSet( Arrays.asList( excludes ) );
+        this.excludes = new HashSet<String>( Arrays.asList( excludes ) );
     }
 
-    public ExclusionSetFilter( Set excludes )
+    public ExclusionSetFilter( Set<String> excludes )
     {
         this.excludes = excludes;
     }
 
     public boolean include( Artifact artifact )
     {
-        if ( excludes.contains( artifact.getArtifactId() ) )
-        {
-            return false;
-        }
-
-        return true;
+        return !excludes.contains(artifact.getArtifactId());
     }
 }
