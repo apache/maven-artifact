@@ -34,6 +34,11 @@ under the License.
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/trunk</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/trunk</url>
   </scm>
+  <contributors>
+    <contributor>
+      <name>Oleg Gusakov</name>      
+    </contributor>
+  </contributors>
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
