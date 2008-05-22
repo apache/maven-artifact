@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
 import org.apache.maven.artifact.resolver.metadata.MetadataResolutionException;
 import org.apache.maven.artifact.resolver.metadata.MetadataTreeNode;
 

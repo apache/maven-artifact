@@ -24,10 +24,8 @@ public interface ClasspathTransformation
      * @return Collection of metadata objects in the linked subgraph of the graph which 
      *             contains the graph.getEntry() vertice
      */
-    ClasspathContainer transform( MetadataGraph dirtyGraph
-    									  , ArtifactScopeEnum scope
-    									  , boolean resolve
-    									  )
-    throws MetadataGraphTransformationException
-    ;
+    ClasspathContainer transform( MetadataGraph dirtyGraph,
+                                  ArtifactScopeEnum scope,
+                                  boolean resolve)
+    throws MetadataGraphTransformationException;
 }

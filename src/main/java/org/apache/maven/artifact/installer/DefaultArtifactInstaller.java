@@ -47,6 +47,7 @@ public class DefaultArtifactInstaller
     private RepositoryMetadataManager repositoryMetadataManager;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
+    @Deprecated
     public void install( String basedir,
                          String finalName,
                          Artifact artifact,

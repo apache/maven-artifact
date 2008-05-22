@@ -82,7 +82,7 @@ public class DefaultArtifact
 
     private boolean release;
 
-    private List availableVersions;
+    private List<ArtifactVersion> availableVersions;
 
     private Map<Object,ArtifactMetadata> metadataMap;
 
@@ -543,14 +543,7 @@ public class DefaultArtifact
 
     public boolean isSnapshot()
     {
-        if ( getBaseVersion() != null )
-        {
-            return getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION );
-        }
-        else
-        {
-            return false;
-        }
+        return getBaseVersion() != null && (getBaseVersion().endsWith(SNAPSHOT_VERSION) || getBaseVersion().equals(LATEST_VERSION));
     }
 
     public void setResolved( boolean resolved )
@@ -584,12 +577,12 @@ public class DefaultArtifact
         return release;
     }
 
-    public List getAvailableVersions()
+    public List<ArtifactVersion> getAvailableVersions()
     {
         return availableVersions;
     }
 
-    public void setAvailableVersions( List availableVersions )
+    public void setAvailableVersions( List<ArtifactVersion> availableVersions )
     {
         this.availableVersions = availableVersions;
     }

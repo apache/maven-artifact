@@ -338,8 +338,7 @@ public class DefaultUpdateCheckManager
             sb.append( '-' ).append( artifact.getClassifier() );
         }
         sb.append( '.' ).append( artifact.getType() ).append( LAST_UPDATE_TAG );
-        File touchfile = new File( artifact.getFile().getParentFile(), sb.toString() );
-        return touchfile;
+        return new File( artifact.getFile().getParentFile(), sb.toString() );
     }
 
     public File getTouchfile( RepositoryMetadata metadata, File file )

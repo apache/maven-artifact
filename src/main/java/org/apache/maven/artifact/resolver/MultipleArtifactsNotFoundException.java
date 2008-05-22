@@ -20,10 +20,10 @@ package org.apache.maven.artifact.resolver;
  */
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 /**
  * Exception caused when one or more artifacts can not be resolved because they are not found in the
@@ -32,15 +32,16 @@ import org.apache.maven.artifact.Artifact;
 public class MultipleArtifactsNotFoundException
     extends ArtifactResolutionException
 {
-    private final List resolvedArtifacts;
-    private final List missingArtifacts;
+    private final List<Artifact> resolvedArtifacts;
+    private final List<Artifact> missingArtifacts;
 
     /** @deprecated use {@link #MultipleArtifactsNotFoundException(Artifact, List, List, List)} */
+    @Deprecated
     public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
-                                               List missingArtifacts,
-                                               List remoteRepositories )
+                                               List<Artifact> missingArtifacts,
+                                               List<ArtifactRepository> remoteRepositories )
     {
-        this( originatingArtifact, new ArrayList(), missingArtifacts, remoteRepositories );
+        this( originatingArtifact, new ArrayList<Artifact>(), missingArtifacts, remoteRepositories );
     }
 
     /**
@@ -52,9 +53,9 @@ public class MultipleArtifactsNotFoundException
      * @param remoteRepositories  remote repositories where the missing artifacts were not found
      */
     public MultipleArtifactsNotFoundException( Artifact originatingArtifact,
-                                               List resolvedArtifacts,
-                                               List missingArtifacts,
-                                               List remoteRepositories )
+                                               List<Artifact> resolvedArtifacts,
+                                               List<Artifact> missingArtifacts,
+                                               List<ArtifactRepository> remoteRepositories )
     {
         super( constructMessage( missingArtifacts ), originatingArtifact, remoteRepositories );
         this.resolvedArtifacts = resolvedArtifacts;
@@ -66,7 +67,7 @@ public class MultipleArtifactsNotFoundException
      *
      * @return {@link List} of {@link Artifact}
      */
-    public List getResolvedArtifacts()
+    public List<Artifact> getResolvedArtifacts()
     {
         return resolvedArtifacts;
     }
@@ -76,12 +77,12 @@ public class MultipleArtifactsNotFoundException
      *
      * @return {@link List} of {@link Artifact}
      */
-    public List getMissingArtifacts()
+    public List<Artifact> getMissingArtifacts()
     {
         return missingArtifacts;
     }
 
-    private static String constructMessage( List artifacts )
+    private static String constructMessage( List<Artifact> artifacts )
     {
         StringBuffer buffer = new StringBuffer( "Missing:\n" );
 
@@ -89,15 +90,13 @@ public class MultipleArtifactsNotFoundException
 
         int counter = 0;
 
-        for ( Iterator i = artifacts.iterator(); i.hasNext(); )
-        {
-            Artifact artifact = (Artifact) i.next();
-            String message = ( ++counter ) + ") " + artifact.getId();
+        for (Artifact artifact : artifacts) {
+            String message = (++counter) + ") " + artifact.getId();
 
-            buffer.append( constructMissingArtifactMessage( message, "  ", artifact.getGroupId(), artifact
-                .getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
-                artifact.getDownloadUrl(), artifact
-                .getDependencyTrail() ) );
+            buffer.append(constructMissingArtifactMessage(message, "  ", artifact.getGroupId(), artifact
+                    .getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getClassifier(),
+                    artifact.getDownloadUrl(), artifact
+                    .getDependencyTrail()));
         }
 
         buffer.append( "----------\n" );

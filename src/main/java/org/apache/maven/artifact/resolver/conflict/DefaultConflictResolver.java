@@ -28,6 +28,7 @@ package org.apache.maven.artifact.resolver.conflict;
  * @deprecated As of 3.0, use a specific implementation instead, e.g. {@link NearestConflictResolver}
  * @plexus.component
  */
+@Deprecated
 public class DefaultConflictResolver
     extends NearestConflictResolver
 {

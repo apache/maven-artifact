@@ -39,9 +39,9 @@ public class AndArtifactFilter
     public boolean include( Artifact artifact )
     {
         boolean include = true;
-        for ( Iterator i = filters.iterator(); i.hasNext() && include; )
+        for ( Iterator<ArtifactFilter> i = filters.iterator(); i.hasNext() && include; )
         {
-            ArtifactFilter filter = (ArtifactFilter) i.next();
+            ArtifactFilter filter = i.next();
             if ( !filter.include( artifact ) )
             {
                 include = false;

@@ -20,6 +20,7 @@ package org.apache.maven.artifact.metadata;
  */
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.List;
 import java.util.Set;
@@ -27,15 +28,15 @@ import java.util.Set;
 public class ResolutionGroup
 {
 
-    private final Set artifacts;
+    private final Set<Artifact> artifacts;
 
-    private final List resolutionRepositories;
+    private final List<ArtifactRepository> resolutionRepositories;
 
     private final Artifact pomArtifact;
 
     public ResolutionGroup( Artifact pomArtifact,
-                            Set artifacts,
-                            List resolutionRepositories )
+                            Set<Artifact> artifacts,
+                            List<ArtifactRepository> resolutionRepositories )
     {
         this.pomArtifact = pomArtifact;
         this.artifacts = artifacts;
@@ -47,12 +48,12 @@ public class ResolutionGroup
         return pomArtifact;
     }
 
-    public Set getArtifacts()
+    public Set<Artifact> getArtifacts()
     {
         return artifacts;
     }
 
-    public List getResolutionRepositories()
+    public List<ArtifactRepository> getResolutionRepositories()
     {
         return resolutionRepositories;
     }

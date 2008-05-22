@@ -38,9 +38,8 @@ public interface MetadataResolver
      * @throws ArtifactResolutionException
      */
 	public List<Artifact> resolveArtifact(
-			List<ArtifactMetadata> mdCollection
-			, ArtifactRepository localRepository
-		    , List<ArtifactRepository> remoteRepositories
-							)
+		    List<ArtifactMetadata> mdCollection,
+            ArtifactRepository localRepository,
+            List<ArtifactRepository> remoteRepositories)
 	throws ArtifactResolutionException;
 }

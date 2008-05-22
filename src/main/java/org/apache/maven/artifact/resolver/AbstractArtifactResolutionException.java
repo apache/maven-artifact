@@ -47,7 +47,7 @@ public class AbstractArtifactResolutionException
 
     private Artifact artifact; 
 
-    private List remoteRepositories;
+    private List<ArtifactRepository> remoteRepositories;
 
     private final String originalMessage;
 
@@ -61,7 +61,7 @@ public class AbstractArtifactResolutionException
                                                    String version,
                                                    String type,
                                                    String classifier,
-                                                   List remoteRepositories,
+                                                   List<ArtifactRepository> remoteRepositories,
                                                    List path )
     {
         this( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, null );
@@ -73,7 +73,7 @@ public class AbstractArtifactResolutionException
                                                    String version,
                                                    String type,
                                                    String classifier,
-                                                   List remoteRepositories,
+                                                   List<ArtifactRepository> remoteRepositories,
                                                    List path,
                                                    Throwable t )
     {
@@ -97,14 +97,14 @@ public class AbstractArtifactResolutionException
 
     protected AbstractArtifactResolutionException( String message,
                                                    Artifact artifact,
-                                                   List remoteRepositories )
+                                                   List<ArtifactRepository> remoteRepositories )
     {
         this( message, artifact, remoteRepositories, null );
     }
 
     protected AbstractArtifactResolutionException( String message,
                                                    Artifact artifact,
-                                                   List remoteRepositories,
+                                                   List<ArtifactRepository> remoteRepositories,
                                                    Throwable t )
     {
         this( message, artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(),

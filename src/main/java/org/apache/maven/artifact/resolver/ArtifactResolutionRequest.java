@@ -21,7 +21,7 @@ public class ArtifactResolutionRequest
 {
     private Artifact artifact;
 
-    private Set artifactDependencies;
+    private Set<Artifact> artifactDependencies;
 
     private String groupId;
 
@@ -61,14 +61,14 @@ public class ArtifactResolutionRequest
         return artifact != null;
     }
 
-    public ArtifactResolutionRequest setArtifactDependencies( Set artifactDependencies )
+    public ArtifactResolutionRequest setArtifactDependencies( Set<Artifact> artifactDependencies )
     {
         this.artifactDependencies = artifactDependencies;
 
         return this;
     }
 
-    public Set getArtifactDependencies()
+    public Set<Artifact> getArtifactDependencies()
     {
         return artifactDependencies;
     }
@@ -136,7 +136,7 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public List getRemoteRepostories()
+    public List<ArtifactRepository> getRemoteRepostories()
     {
         return remoteRepostories;
     }
@@ -160,7 +160,7 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public List getListeners()
+    public List<ResolutionListener> getListeners()
     {
         return listeners;
     }
@@ -215,9 +215,11 @@ public class ArtifactResolutionRequest
     public String toString()
     {
         StringBuffer sb = new StringBuffer()
-                .append("groupId = ").append(getGroupId())
-                .append("artifactId = ").append(getArtifactId())
-                .append("version = ").append(getVersion());
+                .append(getGroupId())
+                .append(":")
+                .append(getArtifactId())
+                .append(":")
+                .append(getVersion());
 
         return sb.toString();
     }

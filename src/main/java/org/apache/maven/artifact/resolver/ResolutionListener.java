@@ -44,7 +44,7 @@ public interface ResolutionListener
 
     int UPDATE_SCOPE = 6;
 
-    /** @deprecated  */
+    @Deprecated
     int MANAGE_ARTIFACT = 7;
 
     int OMIT_FOR_CYCLE = 8;
@@ -79,7 +79,7 @@ public interface ResolutionListener
     void updateScope( Artifact artifact,
                       String scope );
 
-    /** @deprecated  */
+    @Deprecated
     void manageArtifact( Artifact artifact,
                          Artifact replacement );
 

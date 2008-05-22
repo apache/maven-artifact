@@ -100,7 +100,7 @@ public class MetadataGraph
         setVersionedVertices(versionedVertices);
         setScopedVertices(scopedVertices);
         
-        this.versionedVertices = scopedVertices ? true : versionedVertices;
+        this.versionedVertices = scopedVertices || versionedVertices;
         this.scopedVertices = scopedVertices;
         
         int count = countNodes( tree );

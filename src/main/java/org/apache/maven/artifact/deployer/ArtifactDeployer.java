@@ -40,6 +40,7 @@ public interface ArtifactDeployer
      * @throws ArtifactDeploymentException if an error occurred deploying the artifact
      * @deprecated to be removed before 2.0 after the instlal/deploy plugins use the alternate method
      */
+    @Deprecated
     void deploy( String basedir,
                  String finalName,
                  Artifact artifact,

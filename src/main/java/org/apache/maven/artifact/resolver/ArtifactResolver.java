@@ -43,12 +43,14 @@ public interface ArtifactResolver
     String ROLE = ArtifactResolver.class.getName();
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     void resolve( Artifact artifact,
-                  List remoteRepositories,
+                  List<ArtifactRepository> remoteRepositories,
                   ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   List<ArtifactRepository> remoteRepositories,
@@ -57,6 +59,7 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   List<ArtifactRepository> remoteRepositories,
@@ -66,6 +69,7 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   ArtifactRepository localRepository,
@@ -75,6 +79,7 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -84,6 +89,7 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -94,6 +100,7 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -108,6 +115,7 @@ public interface ArtifactResolver
      * @since 3.0
      * @deprecated use {@link #resolve(ArtifactResolutionRequest)}
      */
+    @Deprecated
     ArtifactResolutionResult resolveTransitively( Set<Artifact> artifacts,
                                                   Artifact originatingArtifact,
                                                   Map managedVersions,
@@ -120,6 +128,7 @@ public interface ArtifactResolver
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     /** @deprecated use {@link #resolve(ArtifactResolutionRequest)} */
+    @Deprecated
     void resolveAlways( Artifact artifact,
                         List<ArtifactRepository> remoteRepositories,
                         ArtifactRepository localRepository )
