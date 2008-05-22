@@ -28,9 +28,8 @@ import org.apache.maven.artifact.Artifact;
  * when the ResolutionListener interface deprecation of the manageArtifact
  * method (and the [yet to be done] addition of these methods to that
  * interface) has had a chance to propagate to all interested plugins.
- *
- * @deprecated
  */
+@Deprecated
 public interface ResolutionListenerForDepMgmt
 {
     void manageArtifactVersion( Artifact artifact,

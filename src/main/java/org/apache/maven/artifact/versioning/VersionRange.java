@@ -218,7 +218,8 @@ public class VersionRange
 
     public static VersionRange createFromVersion( String version )
     {
-        return new VersionRange( new DefaultArtifactVersion( version ), Collections.EMPTY_LIST );
+        List<Restriction> restrictions = Collections.emptyList();
+        return new VersionRange( new DefaultArtifactVersion( version ), restrictions );
     }
 
     /**

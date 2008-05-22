@@ -93,9 +93,13 @@ public class ArtifactResolutionResult
         return artifacts;
     }
 
-    public Set getArtifactResolutionNodes()
+    public Set<ResolutionNode> getArtifactResolutionNodes()
     {
-        return resolutionNodes == null ? Collections.EMPTY_SET : resolutionNodes;
+        if (resolutionNodes == null) {
+            return Collections.emptySet();
+        }
+
+        return resolutionNodes;
     }
 
     public ArtifactResolutionResult setArtifactResolutionNodes( final Set<ResolutionNode> resolutionNodes )

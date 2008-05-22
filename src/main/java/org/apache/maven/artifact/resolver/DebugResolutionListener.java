@@ -33,8 +33,7 @@ import java.util.HashSet;
  * @version $Id$
  */
 public class DebugResolutionListener
-    implements ResolutionListener,
-    ResolutionListenerForDepMgmt
+    implements ResolutionListener, ResolutionListenerForDepMgmt
 {
     private Logger logger;
 

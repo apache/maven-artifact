@@ -112,10 +112,9 @@ public class MetadataResolutionResult
         if( dirtyGraph == null )
         	return null;
         
-        ClasspathContainer cpc = classpathTransformation.transform( dirtyGraph, scope, false );
-        
-        return cpc;
+        return classpathTransformation.transform( dirtyGraph, scope, false );
     }
+    
     //----------------------------------------------------------------------------
     public MetadataTreeNode getClasspathTree( ArtifactScopeEnum scope )
     throws MetadataGraphTransformationException, MetadataResolutionException

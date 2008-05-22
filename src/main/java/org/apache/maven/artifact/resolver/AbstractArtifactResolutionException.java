@@ -45,7 +45,7 @@ public class AbstractArtifactResolutionException
 
     private String classifier;
 
-    private List remoteRepositories;
+    private List<ArtifactRepository> remoteRepositories;
 
     private final String originalMessage;
 
@@ -59,7 +59,7 @@ public class AbstractArtifactResolutionException
                                                    String version,
                                                    String type,
                                                    String classifier,
-                                                   List remoteRepositories,
+                                                   List<ArtifactRepository> remoteRepositories,
                                                    List path )
     {
         super( constructMessageBase( message, groupId, artifactId, version, type, remoteRepositories, path ) );
@@ -80,7 +80,7 @@ public class AbstractArtifactResolutionException
                                                    String version,
                                                    String type,
                                                    String classifier,
-                                                   List remoteRepositories,
+                                                   List<ArtifactRepository> remoteRepositories,
                                                    List path,
                                                    Throwable t )
     {

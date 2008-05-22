@@ -68,6 +68,7 @@ public class DefaultArtifactDeployer
     private ArtifactHandlerManager artifactHandlerManager;
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
+    @Deprecated
     public void deploy( String basedir,
                         String finalName,
                         Artifact artifact,

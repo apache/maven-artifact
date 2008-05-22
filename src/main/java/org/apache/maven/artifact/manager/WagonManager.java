@@ -73,11 +73,11 @@ public interface WagonManager
         throws UnsupportedProtocolException, WagonConfigurationException;
 
     void getArtifact( Artifact artifact,
-                      List remoteRepositories )
+                      List<ArtifactRepository> remoteRepositories )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void getArtifact( Artifact artifact,
-                      List remoteRepositories,
+                      List<ArtifactRepository> remoteRepositories,
                       boolean forceUpdateCheck )
     	throws TransferFailedException, ResourceDoesNotExistException;
 
@@ -162,6 +162,7 @@ public interface WagonManager
 
     void setInteractive( boolean interactive );
 
+    @Deprecated
     void registerWagons( Collection wagons,
                          PlexusContainer extensionContainer );
 

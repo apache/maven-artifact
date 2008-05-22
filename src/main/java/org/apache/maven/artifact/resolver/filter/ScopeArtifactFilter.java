@@ -20,7 +20,6 @@ package org.apache.maven.artifact.resolver.filter;
  */
 
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 
 /**
  * Filter to only retain objects in the given artifactScope or better.
@@ -56,7 +55,7 @@ public class ScopeArtifactFilter
 
     public ScopeArtifactFilter( String scope )
     {
-        if ( DefaultArtifact.SCOPE_COMPILE.equals( scope ) )
+        if ( Artifact.SCOPE_COMPILE.equals( scope ) )
         {
             systemScope = true;
             providedScope = true;
@@ -64,7 +63,7 @@ public class ScopeArtifactFilter
             runtimeScope = false;
             testScope = false;
         }
-        else if ( DefaultArtifact.SCOPE_RUNTIME.equals( scope ) )
+        else if ( Artifact.SCOPE_RUNTIME.equals( scope ) )
         {
             systemScope = false;
             providedScope = false;
@@ -72,7 +71,7 @@ public class ScopeArtifactFilter
             runtimeScope = true;
             testScope = false;
         }
-        else if ( DefaultArtifact.SCOPE_TEST.equals( scope ) )
+        else if ( Artifact.SCOPE_TEST.equals( scope ) )
         {
             systemScope = true;
             providedScope = true;

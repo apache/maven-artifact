@@ -30,22 +30,24 @@ import org.apache.maven.artifact.Artifact;
 public class ArtifactMetadataRetrievalException
     extends Exception
 {
-
     private Artifact artifact;
 
     /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
+    @Deprecated
     public ArtifactMetadataRetrievalException( String message )
     {
         this( message, null, null );
     }
 
     /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
+    @Deprecated
     public ArtifactMetadataRetrievalException( Throwable cause )
     {
         this( null, cause, null );
     }
 
     /** @deprecated use {@link #ArtifactMetadataRetrievalException(String, Throwable, Artifact)} */
+    @Deprecated
     public ArtifactMetadataRetrievalException( String message,
                                                Throwable cause )
     {

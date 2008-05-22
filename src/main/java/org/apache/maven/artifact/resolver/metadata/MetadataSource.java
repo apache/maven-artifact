@@ -36,6 +36,6 @@ public interface MetadataSource
 
     MetadataResolution retrieve( ArtifactMetadata artifact,
                                  ArtifactRepository localRepository,
-                                 List remoteRepositories )
+                                 List<ArtifactRepository> remoteRepositories )
         throws MetadataRetrievalException;
 }

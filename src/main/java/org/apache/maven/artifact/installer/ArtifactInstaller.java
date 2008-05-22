@@ -43,6 +43,7 @@ public interface ArtifactInstaller
      * @throws ArtifactInstallationException if an error occurred installing the artifact
      * @deprecated to be removed before 2.0 after the instlal/deploy plugins use the alternate method
      */
+    @Deprecated
     void install( String basedir,
                   String finalName,
                   Artifact artifact,

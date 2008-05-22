@@ -45,7 +45,6 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurationExceptio
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -61,7 +60,6 @@ import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,17 +84,17 @@ public class DefaultWagonManager
 
     // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
     // attached to ArtifactRepository before the method is called (so AR would be composed of WR, not inherit it)
-    private Map proxies = new HashMap();
+    private Map<String,ProxyInfo> proxies = new HashMap<String,ProxyInfo>();
 
-    private Map authenticationInfoMap = new HashMap();
+    private Map<String,AuthenticationInfo> authenticationInfoMap = new HashMap<String,AuthenticationInfo>();
 
-    private Map serverPermissionsMap = new HashMap();
+    private Map<String,RepositoryPermissions> serverPermissionsMap = new HashMap<String,RepositoryPermissions>();
 
     //used LinkedMap to preserve the order.
-    private Map mirrors = new LinkedHashMap();
+    private Map<String,ArtifactRepository> mirrors = new LinkedHashMap<String,ArtifactRepository>();
 
     /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
-    private Map serverConfigurationMap = new HashMap();
+    private Map<String,XmlPlexusConfiguration> serverConfigurationMap = new HashMap<String,XmlPlexusConfiguration>();
 
     private TransferListener downloadMonitor;
 
@@ -198,9 +196,9 @@ public class DefaultWagonManager
             wagon.addTransferListener( downloadMonitor );
         }
 
-        Map checksums = new HashMap( 2 );
+        Map<String,ChecksumObserver> checksums = new HashMap<String,ChecksumObserver>( 2 );
 
-        Map sums = new HashMap( 2 );
+        Map<String,String> sums = new HashMap<String,String>( 2 );
 
         // TODO: configure these on the repository
         for ( int i = 0; i < CHECKSUM_IDS.length; i++ )
@@ -216,8 +214,7 @@ public class DefaultWagonManager
 
                 if ( serverPermissionsMap.containsKey( repository.getId() ) )
                 {
-                    RepositoryPermissions perms = (RepositoryPermissions) serverPermissionsMap.get(
-                        repository.getId() );
+                    RepositoryPermissions perms = serverPermissionsMap.get( repository.getId() );
 
                     getLogger().debug(
                         "adding permissions to wagon connection: " + perms.getFileMode() + " " + perms.getDirectoryMode() );
@@ -248,24 +245,19 @@ public class DefaultWagonManager
             }
 
             // Pre-store the checksums as any future puts will overwrite them
-            for ( Iterator i = checksums.keySet().iterator(); i.hasNext(); )
-            {
-                String extension = (String) i.next();
-                ChecksumObserver observer = (ChecksumObserver) checksums.get( extension );
-                sums.put( extension, observer.getActualChecksum() );
+            for (String extension : checksums.keySet()) {
+                ChecksumObserver observer = checksums.get(extension);
+                sums.put(extension, observer.getActualChecksum());
             }
 
             // We do this in here so we can checksum the artifact metadata too, otherwise it could be metadata itself
-            for ( Iterator i = checksums.keySet().iterator(); i.hasNext(); )
-            {
-                String extension = (String) i.next();
-
+            for (String extension : checksums.keySet()) {
                 // TODO: shouldn't need a file intermediatary - improve wagon to take a stream
-                File temp = File.createTempFile( "maven-artifact", null );
+                File temp = File.createTempFile("maven-artifact", null);
                 temp.deleteOnExit();
-                FileUtils.fileWrite( temp.getAbsolutePath(), (String) sums.get( extension ) );
+                FileUtils.fileWrite(temp.getAbsolutePath(), sums.get(extension));
 
-                wagon.put( temp, remotePath + "." + extension );
+                wagon.put(temp, remotePath + "." + extension);
             }
         }
         catch ( ConnectionException e )
@@ -291,12 +283,10 @@ public class DefaultWagonManager
         finally
         {
             // Remove every checksum listener
-            for ( int i = 0; i < CHECKSUM_IDS.length; i++ )
-            {
-                TransferListener checksumListener = (TransferListener) checksums.get( CHECKSUM_IDS[i] );
-                if ( checksumListener != null )
-                {
-                    wagon.removeTransferListener( checksumListener );
+            for (String aCHECKSUM_IDS : CHECKSUM_IDS) {
+                TransferListener checksumListener = checksums.get(aCHECKSUM_IDS);
+                if (checksumListener != null) {
+                    wagon.removeTransferListener(checksumListener);
                 }
             }
 
@@ -326,23 +316,20 @@ public class DefaultWagonManager
     // NOTE: It is not possible that this method throws TransferFailedException under current conditions.
     // FIXME: Change the throws clause to reflect the fact that we're never throwing TransferFailedException
     public void getArtifact( Artifact artifact,
-                             List remoteRepositories  )
+                             List<ArtifactRepository> remoteRepositories  )
         throws TransferFailedException, ResourceDoesNotExistException
 	{
     	getArtifact( artifact, remoteRepositories, true );
 	}
 
     public void getArtifact( Artifact artifact,
-                             List remoteRepositories,
+                             List<ArtifactRepository> remoteRepositories,
                              boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         boolean successful = false;
 
-        for ( Iterator i = remoteRepositories.iterator(); i.hasNext() && !successful; )
-        {
-            ArtifactRepository repository = (ArtifactRepository) i.next();
-
+        for (ArtifactRepository repository : remoteRepositories) {
             try
             {
                 getArtifact( artifact, repository, force );
@@ -811,16 +798,15 @@ public class DefaultWagonManager
 
     public ProxyInfo getProxy( String protocol )
     {
-        return (ProxyInfo) proxies.get( protocol );
+        return proxies.get( protocol );
     }
 
     public AuthenticationInfo getAuthenticationInfo( String id )
         throws CredentialsDataSourceException
     {
         return credentialsDataSource == null
-            ? (AuthenticationInfo) authenticationInfoMap.get( id )
-            : credentialsDataSource.get( id )
-            ;
+            ? authenticationInfoMap.get( id )
+            : credentialsDataSource.get( id );
     }
 
     /**
@@ -832,20 +818,16 @@ public class DefaultWagonManager
      */
     public ArtifactRepository getMirror( ArtifactRepository originalRepository )
     {
-        ArtifactRepository selectedMirror = (ArtifactRepository) mirrors.get( originalRepository.getId() );
+        ArtifactRepository selectedMirror = mirrors.get( originalRepository.getId() );
         if ( null == selectedMirror )
         {
             // Process the patterns in order. First one that matches wins.
-            Set keySet = mirrors.keySet();
+            Set<String> keySet = mirrors.keySet();
             if ( keySet != null )
             {
-                Iterator iter = keySet.iterator();
-                while ( iter.hasNext() )
-                {
-                    String pattern = (String) iter.next();
-                    if ( matchPattern( originalRepository, pattern ) )
-                    {
-                        selectedMirror = (ArtifactRepository) mirrors.get( pattern );
+                for (String pattern : keySet) {
+                    if (matchPattern(originalRepository, pattern)) {
+                        selectedMirror = mirrors.get(pattern);
                     }
                 }
             }
@@ -880,34 +862,25 @@ public class DefaultWagonManager
         {
             // process the list
             String[] repos = pattern.split( "," );
-            for ( int i = 0; i < repos.length; i++ )
-            {
-                String repo = repos[i];
-
+            for (String repo : repos) {
                 // see if this is a negative match
-                if ( repo.length() > 1 && repo.startsWith( "!" ) )
-                {
-                    if ( originalId.equals( repo.substring( 1 ) ) )
-                    {
+                if (repo.length() > 1 && repo.startsWith("!")) {
+                    if (originalId.equals(repo.substring(1))) {
                         // explicitly exclude. Set result and stop processing.
                         result = false;
                         break;
                     }
                 }
                 // check for exact match
-                else if ( originalId.equals( repo ) )
-                {
+                else if (originalId.equals(repo)) {
                     result = true;
                     break;
                 }
                 // check for external:*
-                else if ( EXTERNAL_WILDCARD.equals( repo ) && isExternalRepo( originalRepository ) )
-                {
+                else if (EXTERNAL_WILDCARD.equals(repo) && isExternalRepo(originalRepository)) {
                     result = true;
                     // don't stop processing in case a future segment explicitly excludes this repo
-                }
-                else if ( WILDCARD.equals( repo ) )
-                {
+                } else if (WILDCARD.equals(repo)) {
                     result = true;
                     // don't stop processing in case a future segment explicitly excludes this repo
                 }
@@ -927,8 +900,7 @@ public class DefaultWagonManager
         try
         {
             URL url = new URL( originalRepository.getUrl() );
-            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals(
-                                                                                                                              "file" ) );
+            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals("file" ) );
         }
         catch ( MalformedURLException e )
         {
@@ -982,14 +954,10 @@ public class DefaultWagonManager
     // We are leaving this method here so that we can attempt to use the new maven-artifact
     // library from the 2.0.x code so that we aren't maintaining two lines of code
     // for the artifact management.
-    public void addAuthenticationInfo( String repositoryId
-        ,
-                                       String username
-        ,
-                                       String password
-        ,
-                                       String privateKey
-        ,
+    public void addAuthenticationInfo( String repositoryId,
+                                       String username,
+                                       String password,
+                                       String privateKey,
                                        String passphrase
     )
     {
@@ -1004,14 +972,10 @@ public class DefaultWagonManager
 
     // This is the new way of handling authentication that will allow us to help users setup
     // authentication requirements.
-    public void addAuthenticationCredentials( String repositoryId
-        ,
-                                              String username
-        ,
-                                              String password
-        ,
-                                              String privateKey
-        ,
+    public void addAuthenticationCredentials( String repositoryId,
+                                              String username,
+                                              String password,
+                                              String privateKey,
                                               String passphrase
     )
         throws CredentialsDataSourceException
@@ -1129,8 +1093,8 @@ public class DefaultWagonManager
             {
                 componentConfigurator = new BasicComponentConfigurator();
 
-                componentConfigurator.configureComponent( wagon, (PlexusConfiguration) serverConfigurationMap
-                    .get( repositoryId ), container.getContainerRealm() );
+                componentConfigurator.configureComponent( wagon,
+                        serverConfigurationMap.get( repositoryId ), container.getContainerRealm() );
             }
             catch ( ComponentConfigurationException e )
             {
@@ -1176,6 +1140,4 @@ public class DefaultWagonManager
     {
         credentialsDataSource = cds;
     }
-
-
 }

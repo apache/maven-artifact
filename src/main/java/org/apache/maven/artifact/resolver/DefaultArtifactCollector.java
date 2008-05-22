@@ -61,40 +61,40 @@ public class DefaultArtifactCollector
      */
     private ConflictResolver defaultConflictResolver;
 
-    public ArtifactResolutionResult collect( Set artifacts,
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                              Artifact originatingArtifact,
                                              ArtifactRepository localRepository,
-                                             List remoteRepositories,
+                                             List<ArtifactRepository> remoteRepositories,
                                              ArtifactMetadataSource source,
                                              ArtifactFilter filter,
-                                             List listeners )
+                                             List<ResolutionListener> listeners )
     {
         return collect( artifacts, originatingArtifact, Collections.EMPTY_MAP, localRepository, remoteRepositories,
             source, filter, listeners );
     }
 
-    public ArtifactResolutionResult collect( Set artifacts,
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                              Artifact originatingArtifact,
                                              Map managedVersions,
                                              ArtifactRepository localRepository,
-                                             List remoteRepositories,
+                                             List<ArtifactRepository> remoteRepositories,
                                              ArtifactMetadataSource source,
                                              ArtifactFilter filter,
-                                             List listeners )
+                                             List<ResolutionListener> listeners )
     {
         return collect( artifacts, originatingArtifact, managedVersions, localRepository, remoteRepositories, source,
             filter, listeners, null );
     }
 
-    public ArtifactResolutionResult collect( Set artifacts,
+    public ArtifactResolutionResult collect( Set<Artifact> artifacts,
                                              Artifact originatingArtifact,
                                              Map managedVersions,
                                              ArtifactRepository localRepository,
-                                             List remoteRepositories,
+                                             List<ArtifactRepository> remoteRepositories,
                                              ArtifactMetadataSource source,
                                              ArtifactFilter filter,
-                                             List listeners,
-                                             List conflictResolvers )
+                                             List<ResolutionListener> listeners,
+                                             List<ConflictResolver> conflictResolvers )
     {
         ArtifactResolutionResult result = new ArtifactResolutionResult();
         

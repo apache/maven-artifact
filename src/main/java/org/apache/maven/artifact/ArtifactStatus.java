@@ -53,7 +53,7 @@ public final class ArtifactStatus
 
     private final String key;
 
-    private static Map map;
+    private static Map<String,ArtifactStatus> map;
 
     private ArtifactStatus( String key,
                             int rank )
@@ -63,7 +63,7 @@ public final class ArtifactStatus
 
         if ( map == null )
         {
-            map = new HashMap();
+            map = new HashMap<String,ArtifactStatus>();
         }
         map.put( key, this );
     }
@@ -74,7 +74,7 @@ public final class ArtifactStatus
 
         if ( status != null )
         {
-            retVal = (ArtifactStatus) map.get( status );
+            retVal = map.get( status );
         }
 
         return retVal != null ? retVal : NONE;

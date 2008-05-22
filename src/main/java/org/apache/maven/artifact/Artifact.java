@@ -147,9 +147,9 @@ public interface Artifact
 
     void setRelease( boolean release );
 
-    List getAvailableVersions();
+    List<ArtifactVersion> getAvailableVersions();
 
-    void setAvailableVersions( List versions );
+    void setAvailableVersions( List<ArtifactVersion> versions );
 
     boolean isOptional();
 

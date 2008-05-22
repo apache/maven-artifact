@@ -35,12 +35,12 @@ public class UnresolvedArtifacts
         return originatingArtifact;
     }
 
-    public List getArtifacts()
+    public List<Artifact> getArtifacts()
     {
         return artifacts;
     }
 
-    public List getRemoteRepositories()
+    public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
     }

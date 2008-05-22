@@ -34,11 +34,11 @@ public class DefaultArtifactHandlerManager
     implements ArtifactHandlerManager
 {
     /** @plexus.requirement role="org.apache.maven.artifact.handler.ArtifactHandler" */
-    private Map artifactHandlers;
+    private Map<String,ArtifactHandler> artifactHandlers;
 
     public ArtifactHandler getArtifactHandler( String type )
     {
-        ArtifactHandler handler = (ArtifactHandler) artifactHandlers.get( type );
+        ArtifactHandler handler = artifactHandlers.get( type );
 
         if ( handler == null )
         {
@@ -48,12 +48,12 @@ public class DefaultArtifactHandlerManager
         return handler;
     }
 
-    public void addHandlers( Map handlers )
+    public void addHandlers( Map<String,ArtifactHandler> handlers )
     {
         artifactHandlers.putAll( handlers );
     }
 
-    public Set getHandlerTypes()
+    public Set<String> getHandlerTypes()
     {
         return artifactHandlers.keySet();
     }

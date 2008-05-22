@@ -44,14 +44,14 @@ public class ResolutionNode
 
     private final ResolutionNode parent;
 
-    private final List remoteRepositories;
+    private final List<ArtifactRepository> remoteRepositories;
 
     private boolean active = true;
 
     private List<Artifact> trail;
 
     public ResolutionNode( Artifact artifact,
-                           List remoteRepositories )
+                           List<ArtifactRepository> remoteRepositories )
     {
         this.artifact = artifact;
         this.remoteRepositories = remoteRepositories;
@@ -61,7 +61,7 @@ public class ResolutionNode
     }
 
     public ResolutionNode( Artifact artifact,
-                           List remoteRepositories,
+                           List<ArtifactRepository> remoteRepositories,
                            ResolutionNode parent )
     {
         this.artifact = artifact;
@@ -184,7 +184,7 @@ public class ResolutionNode
         return depth;
     }
 
-    public List getRemoteRepositories()
+    public List<ArtifactRepository> getRemoteRepositories()
     {
         return remoteRepositories;
     }
