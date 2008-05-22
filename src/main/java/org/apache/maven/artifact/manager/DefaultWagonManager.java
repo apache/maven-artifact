@@ -56,12 +56,16 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /** @plexus.component */
 public class DefaultWagonManager
@@ -70,6 +74,8 @@ public class DefaultWagonManager
     Contextualizable
 {
     private static final String WILDCARD = "*";
+
+    private static final String EXTERNAL_WILDCARD = "external:*";
 
     private static final String[] CHECKSUM_IDS = {"md5", "sha1"};
 
@@ -86,7 +92,8 @@ public class DefaultWagonManager
 
     private Map serverPermissionsMap = new HashMap();
 
-    private Map mirrors = new HashMap();
+    //used LinkedMap to preserve the order.
+    private Map mirrors = new LinkedHashMap();
 
     /** Map( String, XmlPlexusConfiguration ) with the repository id and the wagon configuration */
     private Map serverConfigurationMap = new HashMap();
@@ -109,6 +116,9 @@ public class DefaultWagonManager
 
     /** encapsulates access to Server credentials */
     private CredentialsDataSource credentialsDataSource;
+
+    /** @plexus.requirement */
+    private UpdateCheckManager updateCheckManager;
 
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
@@ -316,7 +326,15 @@ public class DefaultWagonManager
     // NOTE: It is not possible that this method throws TransferFailedException under current conditions.
     // FIXME: Change the throws clause to reflect the fact that we're never throwing TransferFailedException
     public void getArtifact( Artifact artifact,
-                             List remoteRepositories )
+                             List remoteRepositories  )
+        throws TransferFailedException, ResourceDoesNotExistException
+	{
+    	getArtifact( artifact, remoteRepositories, true );
+	}
+
+    public void getArtifact( Artifact artifact,
+                             List remoteRepositories,
+                             boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         boolean successful = false;
@@ -327,7 +345,7 @@ public class DefaultWagonManager
 
             try
             {
-                getArtifact( artifact, repository );
+                getArtifact( artifact, repository, force );
 
                 successful = artifact.isResolved();
             }
@@ -355,6 +373,15 @@ public class DefaultWagonManager
 
     public void getArtifact( Artifact artifact,
                              ArtifactRepository repository )
+        throws TransferFailedException,
+               ResourceDoesNotExistException
+    {
+        getArtifact( artifact, repository, true );
+    }
+
+    public void getArtifact( Artifact artifact,
+                             ArtifactRepository repository,
+                             boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOf( artifact );
@@ -369,11 +396,39 @@ public class DefaultWagonManager
         {
             getLogger().debug( "Skipping blacklisted repository " + repository.getId() );
         }
-        else
+        // If the artifact is a snapshot, we need to determine whether it's time to check this repository for an update:
+        // 1. If it's forced, then check
+        // 2. If the updateInterval has been exceeded since the last check for this artifact on this repository, then check.
+        else if ( artifact.isSnapshot() && ( force || updateCheckManager.isUpdateRequired( artifact, repository ) ) )
         {
             getLogger().debug( "Trying repository " + repository.getId() );
 
-            getRemoteFile( repository, artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
+            try
+            {
+                getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor,
+                               policy.getChecksumPolicy(), false );
+            }
+            finally
+            {
+            	updateCheckManager.touch( artifact, repository );
+            }
+
+            getLogger().debug( "  Artifact resolved" );
+
+            artifact.setResolved( true );
+        }
+        // If it's not a snapshot artifact, then we don't care what the force flag says. If it's on the local
+        // system, it's resolved. Releases are presumed to be immutable, so release artifacts are not ever updated.
+        // NOTE: This is NOT the case for metadata files on relese-only repositories. This metadata may contain information
+        // about successive releases, so it should be checked using the same updateInterval/force characteristics as snapshot
+        // artifacts, above.
+
+        // don't write touch-file for release artifacts.
+        else if ( !artifact.isSnapshot() )
+        {
+            getLogger().debug( "Trying repository " + repository.getId() );
+
+            getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
 
             getLogger().debug( "  Artifact resolved" );
 
@@ -385,6 +440,15 @@ public class DefaultWagonManager
                                      ArtifactRepository repository,
                                      File destination,
                                      String checksumPolicy )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
+
+        getRemoteFile( getMirrorRepository( repository ), destination, remotePath, null, checksumPolicy, true );
+    }
+
+    public void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository repository,
+                                                             File destination, String checksumPolicy )
         throws TransferFailedException, ResourceDoesNotExistException
     {
         String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
@@ -403,15 +467,6 @@ public class DefaultWagonManager
         // TODO: better excetpions - transfer failed is not enough?
 
         failIfNotOnline();
-
-        ArtifactRepository mirror = getMirror( repository.getId() );
-
-        if ( mirror != null )
-        {
-            repository = repositoryFactory.createArtifactRepository( mirror.getId(), mirror.getUrl(),
-                repository.getLayout(), repository.getSnapshots(),
-                repository.getReleases() );
-        }
 
         String protocol = repository.getProtocol();
 
@@ -621,6 +676,26 @@ public class DefaultWagonManager
         }
     }
 
+    public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
+    {
+        ArtifactRepository mirror = getMirror( repository );
+        if ( mirror != null )
+        {
+            String id = mirror.getId();
+            if ( id == null )
+            {
+                // TODO: this should be illegal in settings.xml
+                id = repository.getId();
+            }
+
+            getLogger().info( "Using mirror: " + mirror.getId() + " for repository: " + repository.getId() + "\n(mirror url: " + mirror.getUrl() + ")" );
+            repository = repositoryFactory.createArtifactRepository( id, mirror.getUrl(),
+                                                                     repository.getLayout(), repository.getSnapshots(),
+                                                                     repository.getReleases() );
+        }
+        return repository;
+    }
+
     private void failIfNotOnline()
         throws TransferFailedException
     {
@@ -685,7 +760,7 @@ public class DefaultWagonManager
                     expectedChecksum = expectedChecksum.substring( 0, spacePos );
                 }
             }
-            if ( expectedChecksum.equals( actualChecksum ) )
+            if ( expectedChecksum.equalsIgnoreCase( actualChecksum ) )
             {
                 File checksumFile = new File( destination + checksumFileExtension );
                 if ( checksumFile.exists() )
@@ -706,6 +781,7 @@ public class DefaultWagonManager
             throw new ChecksumFailedException( "Invalid checksum file", e );
         }
     }
+
 
     private void disconnectWagon( Wagon wagon )
     {
@@ -747,28 +823,130 @@ public class DefaultWagonManager
             ;
     }
 
-    public ArtifactRepository getMirror( String mirrorOf )
+    /**
+     * This method finds a matching mirror for the selected repository. If there is an exact match, this will be used.
+     * If there is no exact match, then the list of mirrors is examined to see if a pattern applies.
+     *
+     * @param originalRepository See if there is a mirror for this repository.
+     * @return the selected mirror or null if none are found.
+     */
+    public ArtifactRepository getMirror( ArtifactRepository originalRepository )
     {
-        ArtifactRepository repository = (ArtifactRepository) mirrors.get( mirrorOf );
-
-        if ( repository == null )
+        ArtifactRepository selectedMirror = (ArtifactRepository) mirrors.get( originalRepository.getId() );
+        if ( null == selectedMirror )
         {
-            repository = (ArtifactRepository) mirrors.get( WILDCARD );
-        }
+            // Process the patterns in order. First one that matches wins.
+            Set keySet = mirrors.keySet();
+            if ( keySet != null )
+            {
+                Iterator iter = keySet.iterator();
+                while ( iter.hasNext() )
+                {
+                    String pattern = (String) iter.next();
+                    if ( matchPattern( originalRepository, pattern ) )
+                    {
+                        selectedMirror = (ArtifactRepository) mirrors.get( pattern );
+                    }
+                }
+            }
 
-        return repository;
+        }
+        return selectedMirror;
+    }
+
+    /**
+     * This method checks if the pattern matches the originalRepository.
+     * Valid patterns:
+     * * = everything
+     * external:* = everything not on the localhost and not file based.
+     * repo,repo1 = repo or repo1
+     * *,!repo1 = everything except repo1
+     *
+     * @param originalRepository to compare for a match.
+     * @param pattern used for match. Currently only '*' is supported.
+     * @return true if the repository is a match to this pattern.
+     */
+    public boolean matchPattern( ArtifactRepository originalRepository, String pattern )
+    {
+        boolean result = false;
+        String originalId = originalRepository.getId();
+
+        // simple checks first to short circuit processing below.
+        if ( WILDCARD.equals( pattern ) || pattern.equals( originalId ) )
+        {
+            result = true;
+        }
+        else
+        {
+            // process the list
+            String[] repos = pattern.split( "," );
+            for ( int i = 0; i < repos.length; i++ )
+            {
+                String repo = repos[i];
+
+                // see if this is a negative match
+                if ( repo.length() > 1 && repo.startsWith( "!" ) )
+                {
+                    if ( originalId.equals( repo.substring( 1 ) ) )
+                    {
+                        // explicitly exclude. Set result and stop processing.
+                        result = false;
+                        break;
+                    }
+                }
+                // check for exact match
+                else if ( originalId.equals( repo ) )
+                {
+                    result = true;
+                    break;
+                }
+                // check for external:*
+                else if ( EXTERNAL_WILDCARD.equals( repo ) && isExternalRepo( originalRepository ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+                else if ( WILDCARD.equals( repo ) )
+                {
+                    result = true;
+                    // don't stop processing in case a future segment explicitly excludes this repo
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Checks the URL to see if this repository refers to an external repository
+     *
+     * @param originalRepository
+     * @return true if external.
+     */
+    public boolean isExternalRepo( ArtifactRepository originalRepository )
+    {
+        try
+        {
+            URL url = new URL( originalRepository.getUrl() );
+            return !( url.getHost().equals( "localhost" ) || url.getHost().equals( "127.0.0.1" ) || url.getProtocol().equals(
+                                                                                                                              "file" ) );
+        }
+        catch ( MalformedURLException e )
+        {
+            // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
+            return false;
+        }
     }
 
     /**
      * Set the proxy used for a particular protocol.
      *
-     * @param protocol      the protocol (required)
-     * @param host          the proxy host name (required)
-     * @param port          the proxy port (required)
-     * @param username      the username for the proxy, or null if there is none
-     * @param password      the password for the proxy, or null if there is none
-     * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system
-     *                      property format: <code>*.foo.com|localhost</code>.
+     * @param protocol the protocol (required)
+     * @param host the proxy host name (required)
+     * @param port the proxy port (required)
+     * @param username the username for the proxy, or null if there is none
+     * @param password the password for the proxy, or null if there is none
+     * @param nonProxyHosts the set of hosts not to use the proxy for. Follows Java system property format:
+     *            <code>*.foo.com|localhost</code>.
      * @todo [BP] would be nice to configure this via plexus in some way
      */
     public void addProxy( String protocol,

@@ -1,6 +1,7 @@
 package org.apache.maven.artifact.resolver;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 
 import java.util.List;
 
@@ -14,13 +15,13 @@ public class UnresolvedArtifacts
 {
     private Artifact originatingArtifact;
 
-    private List artifacts;
+    private List<Artifact> artifacts;
 
-    private List remoteRepositories;
+    private List<ArtifactRepository> remoteRepositories;
 
     public UnresolvedArtifacts( Artifact originatingArtifact,
-                                List artifacts,
-                                List remoteRepositories )
+                                List<Artifact> artifacts,
+                                List<ArtifactRepository> remoteRepositories )
     {
         this.originatingArtifact = originatingArtifact;
 

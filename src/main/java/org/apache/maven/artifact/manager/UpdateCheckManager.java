@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.filter;
+package org.apache.maven.artifact.manager;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,33 +19,22 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
+import java.io.File;
+
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+public interface UpdateCheckManager {
 
-/**
- * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>
- * @version $Id$
- */
-public class ExclusionSetFilter
-    implements ArtifactFilter
-{
-    private Set<String> excludes;
+	String ROLE = UpdateCheckManager.class.getName();
 
-    public ExclusionSetFilter( String[] excludes )
-    {
-        this.excludes = new HashSet<String>( Arrays.asList( excludes ) );
-    }
+	boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository );
 
-    public ExclusionSetFilter( Set<String> excludes )
-    {
-        this.excludes = excludes;
-    }
+	void touch( Artifact artifact, ArtifactRepository repository );
 
-    public boolean include( Artifact artifact )
-    {
-        return !excludes.contains(artifact.getArtifactId());
-    }
+    boolean isUpdateRequired( RepositoryMetadata metadata, ArtifactRepository repository, File file );
+
+	void touch( RepositoryMetadata metadata, ArtifactRepository repository, File file );
+
 }

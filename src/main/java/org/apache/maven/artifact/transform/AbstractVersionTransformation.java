@@ -53,7 +53,7 @@ public abstract class AbstractVersionTransformation
 
     protected String resolveVersion( Artifact artifact,
                                      ArtifactRepository localRepository,
-                                     List remoteRepositories )
+                                     List<ArtifactRepository> remoteRepositories )
         throws RepositoryMetadataResolutionException
     {
         RepositoryMetadata metadata;

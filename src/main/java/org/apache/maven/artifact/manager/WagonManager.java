@@ -77,7 +77,17 @@ public interface WagonManager
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void getArtifact( Artifact artifact,
+                      List remoteRepositories,
+                      boolean forceUpdateCheck )
+    	throws TransferFailedException, ResourceDoesNotExistException;
+
+    void getArtifact( Artifact artifact,
                       ArtifactRepository repository )
+        throws TransferFailedException, ResourceDoesNotExistException;
+
+    void getArtifact( Artifact artifact,
+                      ArtifactRepository repository,
+                      boolean forceUpdateCheck )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void putArtifact( File source,
@@ -94,6 +104,10 @@ public interface WagonManager
                               ArtifactRepository remoteRepository,
                               File destination,
                               String checksumPolicy )
+        throws TransferFailedException, ResourceDoesNotExistException;
+
+    void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository remoteRepository,
+                                                      File file, String checksumPolicyWarn )
         throws TransferFailedException, ResourceDoesNotExistException;
 
     void setOnline( boolean online );
@@ -154,4 +168,6 @@ public interface WagonManager
     void findAndRegisterWagons( PlexusContainer container );
 
     void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
+
+    ArtifactRepository getMirrorRepository( ArtifactRepository repository );
 }

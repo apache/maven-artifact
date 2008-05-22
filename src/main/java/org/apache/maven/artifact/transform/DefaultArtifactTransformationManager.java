@@ -41,17 +41,14 @@ public class DefaultArtifactTransformationManager
      *    role="org.apache.maven.artifact.transform.ArtifactTransformation"
      *    role-hints="release,latest,snapshot"
      */
-    private List artifactTransformations;
+    private List<ArtifactTransformation> artifactTransformations;
 
     public void transformForResolve( Artifact artifact,
-                                     List remoteRepositories,
+                                     List<ArtifactRepository> remoteRepositories,
                                      ArtifactRepository localRepository )
         throws ArtifactResolutionException, ArtifactNotFoundException
     {
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-        {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
-
+        for (ArtifactTransformation transform : artifactTransformations) {
             transform.transformForResolve( artifact, remoteRepositories, localRepository );
         }
     }
@@ -60,9 +57,7 @@ public class DefaultArtifactTransformationManager
                                      ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-        {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
+        for (ArtifactTransformation transform : artifactTransformations) {
             transform.transformForInstall( artifact, localRepository );
         }
     }
@@ -72,9 +67,7 @@ public class DefaultArtifactTransformationManager
                                         ArtifactRepository localRepository )
         throws ArtifactDeploymentException
     {
-        for ( Iterator i = artifactTransformations.iterator(); i.hasNext(); )
-        {
-            ArtifactTransformation transform = (ArtifactTransformation) i.next();
+        for (ArtifactTransformation transform : artifactTransformations) {
             transform.transformForDeployment( artifact, remoteRepository, localRepository );
         }
     }

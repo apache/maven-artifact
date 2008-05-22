@@ -131,7 +131,7 @@ public class ArtifactRepositoryPolicy
         else if ( updatePolicy.startsWith( UPDATE_POLICY_INTERVAL ) )
         {
             String s = updatePolicy.substring( UPDATE_POLICY_INTERVAL.length() + 1 );
-            int minutes = Integer.valueOf( s ).intValue();
+            int minutes = Integer.valueOf(s);
             Calendar cal = Calendar.getInstance();
             cal.add( Calendar.MINUTE, -minutes );
             if ( cal.getTime().after( lastModified ) )

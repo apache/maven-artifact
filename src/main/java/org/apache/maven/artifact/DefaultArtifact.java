@@ -48,10 +48,6 @@ public class DefaultArtifact
 
     private String artifactId;
 
-    private String type;
-
-    private File file;
-
     /**
      * The resolved version for the artifact after conflict resolution, that has not been transformed.
      *
@@ -59,11 +55,15 @@ public class DefaultArtifact
      */
     private String baseVersion;
 
+    private String type;
+
+    private File file;
+
     private String version;
 
     private VersionRange versionRange;
 
-    private Map metadataMap;
+    private Map<Object,ArtifactMetadata> metadataMap;
 
     // This is Maven specific. jvz/
     private String classifier;
@@ -302,10 +302,10 @@ public class DefaultArtifact
     {
         if ( metadataMap == null )
         {
-            metadataMap = new HashMap();
+            metadataMap = new HashMap<Object,ArtifactMetadata>();
         }
 
-        ArtifactMetadata m = (ArtifactMetadata) metadataMap.get( metadata.getKey() );
+        ArtifactMetadata m = metadataMap.get( metadata.getKey() );
         if ( m != null )
         {
             m.merge( metadata );
@@ -316,9 +316,13 @@ public class DefaultArtifact
         }
     }
 
-    public Collection getMetadataList()
+    public Collection<ArtifactMetadata> getMetadataList()
     {
-        return metadataMap == null ? Collections.EMPTY_LIST : metadataMap.values();
+        if (metadataMap == null) {
+            return Collections.emptyList();
+        }
+
+        return metadataMap.values();
     }
 
     // ----------------------------------------------------------------------
@@ -515,12 +519,12 @@ public class DefaultArtifact
         dependencyFilter = artifactFilter;
     }
 
-    public List getDependencyTrail()
+    public List<String> getDependencyTrail()
     {
         return dependencyTrail;
     }
 
-    public void setDependencyTrail( List dependencyTrail )
+    public void setDependencyTrail( List<String> dependencyTrail )
     {
         this.dependencyTrail = dependencyTrail;
     }

@@ -1,5 +1,14 @@
 package org.apache.maven.artifact.repository.metadata;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.Collections;
+import java.util.Date;
+
+import junit.framework.TestCase;
+
+import org.apache.maven.artifact.manager.DefaultUpdateCheckManager;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -11,14 +20,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.easymock.MockControl;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.Collections;
-import java.util.Date;
-
-import junit.framework.TestCase;
 
 public class DefaultRepositoryMetadataManagerTest
     extends TestCase
@@ -34,6 +35,8 @@ public class DefaultRepositoryMetadataManagerTest
 
     private WagonManager wagonManager;
 
+	private DefaultUpdateCheckManager updateCheckManager;
+
     @Override
     public void setUp()
         throws Exception
@@ -44,6 +47,8 @@ public class DefaultRepositoryMetadataManagerTest
         mockManager.add( wagonManagerCtl );
 
         wagonManager = (WagonManager) wagonManagerCtl.getMock();
+        
+        updateCheckManager = new DefaultUpdateCheckManager( new ConsoleLogger( Logger.LEVEL_DEBUG, "test" ) );
     }
 
     @Override
@@ -89,7 +94,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         try
         {
-            wagonManager.getArtifactMetadata( null, null, null, null );
+            wagonManager.getArtifactMetadataFromDeploymentRepository( null, null, null, null );
             wagonManagerCtl.setMatcher( MockControl.ALWAYS_MATCHER );
             wagonManagerCtl.setThrowable( new ResourceDoesNotExistException( "Test error" ) );
         }
@@ -124,17 +129,16 @@ public class DefaultRepositoryMetadataManagerTest
 
         Logger logger = new ConsoleLogger( Logger.LEVEL_DEBUG, "test" );
 
-        new DefaultRepositoryMetadataManager( wagonManager, logger ).resolveAlways( metadata,
-                                                                                    localRepo,
-                                                                                    localRepo );
+        new DefaultRepositoryMetadataManager( wagonManager, updateCheckManager, logger ).resolveAlways( metadata,
+                                                                                                       localRepo,
+                                                                                                       localRepo );
 
         // helps the lastUpdate interval be significantly different.
         Thread.sleep( 1000 );
 
         Date end = new Date();
 
-        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepo );
-        Date checkDate = touchfile.getLastCheckDate( localRepo.getId(), filename, logger );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, localRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
         assertTrue( checkDate.after( start ) );
@@ -180,7 +184,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         try
         {
-            wagonManager.getArtifactMetadata( null, null, null, null );
+            wagonManager.getArtifactMetadataFromDeploymentRepository( null, null, null, null );
             wagonManagerCtl.setMatcher( MockControl.ALWAYS_MATCHER );
             wagonManagerCtl.setThrowable( new TransferFailedException( "Test error" ) );
         }
@@ -215,17 +219,24 @@ public class DefaultRepositoryMetadataManagerTest
 
         Logger logger = new ConsoleLogger( Logger.LEVEL_DEBUG, "test" );
 
-        new DefaultRepositoryMetadataManager( wagonManager, logger ).resolveAlways( metadata,
-                                                                                    localRepo,
-                                                                                    localRepo );
+        try
+        {
+            new DefaultRepositoryMetadataManager( wagonManager, updateCheckManager, logger ).resolveAlways( metadata,
+                                                                                                            localRepo,
+                                                                                                            localRepo );
+            fail( "Should have thrown an exception due to transfer failure" );
+        }
+        catch ( RepositoryMetadataResolutionException e )
+        {
+            assertTrue( true );
+        }
 
         // helps the lastUpdate interval be significantly different.
         Thread.sleep( 1000 );
 
         Date end = new Date();
 
-        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepo );
-        Date checkDate = touchfile.getLastCheckDate( localRepo.getId(), filename, logger );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, localRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
         assertTrue( checkDate.after( start ) );
@@ -268,7 +279,7 @@ public class DefaultRepositoryMetadataManagerTest
 
         try
         {
-            wagonManager.getArtifactMetadata( null, null, null, null );
+            wagonManager.getArtifactMetadataFromDeploymentRepository( null, null, null, null );
             wagonManagerCtl.setMatcher( MockControl.ALWAYS_MATCHER );
             wagonManagerCtl.setVoidCallable();
         }
@@ -303,17 +314,16 @@ public class DefaultRepositoryMetadataManagerTest
 
         Logger logger = new ConsoleLogger( Logger.LEVEL_DEBUG, "test" );
 
-        new DefaultRepositoryMetadataManager( wagonManager, logger ).resolveAlways( metadata,
-                                                                                    localRepo,
-                                                                                    localRepo );
+        new DefaultRepositoryMetadataManager( wagonManager, updateCheckManager, logger ).resolveAlways( metadata,
+                                                                                                        localRepo,
+                                                                                                        localRepo );
 
         // helps the lastUpdate interval be significantly different.
         Thread.sleep( 1000 );
 
         Date end = new Date();
 
-        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepo );
-        Date checkDate = touchfile.getLastCheckDate( localRepo.getId(), filename, logger );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, localRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
         assertTrue( checkDate.after( start ) );
@@ -421,17 +431,16 @@ public class DefaultRepositoryMetadataManagerTest
 
         System.out.println( "Testing re-check proofing..." );
 
-        RepositoryMetadataManager mgr = new DefaultRepositoryMetadataManager( wagonManager, logger );
+        RepositoryMetadataManager mgr = new DefaultRepositoryMetadataManager( wagonManager, updateCheckManager, logger );
         mgr.resolve( metadata, Collections.singletonList( remoteRepo ), localRepo );
 
-        MetadataTouchfile touchfile = new MetadataTouchfile( metadata, localRepo );
-        Date checkDate = touchfile.getLastCheckDate( repoId, filename, logger );
+        Date checkDate = updateCheckManager.readLastUpdated( metadata, remoteRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
 
         mgr.resolve( metadata, Collections.singletonList( remoteRepo ), localRepo );
 
-        checkDate = touchfile.getLastCheckDate( repoId, filename, logger );
+        checkDate = updateCheckManager.readLastUpdated( metadata, remoteRepo, new File( dir, path ) );
 
         assertNotNull( checkDate );
 

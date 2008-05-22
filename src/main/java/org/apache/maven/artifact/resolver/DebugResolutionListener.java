@@ -40,7 +40,7 @@ public class DebugResolutionListener
 
     private String indent = "";
 
-    private static Set ignoredArtifacts = new HashSet();
+    private static Set<Artifact> ignoredArtifacts = new HashSet<Artifact>();
 
     public DebugResolutionListener( Logger logger )
     {

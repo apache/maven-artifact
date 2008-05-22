@@ -4,6 +4,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,18 +31,18 @@ public class ArtifactResolutionRequest
 
     private ArtifactRepository localRepository;
 
-    private List remoteRepostories;
+    private List<ArtifactRepository> remoteRepostories;
 
     private ArtifactFilter filter;
 
-    private List listeners = new ArrayList();
+    private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
 
     // This should really be a component. Different impls can can be composed to account for different forms of metadata.
     private ArtifactMetadataSource metadataSource;
 
     private Map managedVersionMap;
 
-    private List conflictResolvers;
+    private List<ConflictResolver> conflictResolvers;
 
     public Artifact getArtifact()
     {
@@ -140,7 +141,7 @@ public class ArtifactResolutionRequest
         return remoteRepostories;
     }
 
-    public ArtifactResolutionRequest setRemoteRepostories( List remoteRepostories )
+    public ArtifactResolutionRequest setRemoteRepostories( List<ArtifactRepository> remoteRepostories )
     {
         this.remoteRepostories = remoteRepostories;
 
@@ -199,12 +200,12 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public List getConflictResolvers()
+    public List<ConflictResolver> getConflictResolvers()
     {
         return conflictResolvers;
     }
 
-    public ArtifactResolutionRequest setConflictResolvers( List conflictResolvers )
+    public ArtifactResolutionRequest setConflictResolvers( List<ConflictResolver> conflictResolvers )
     {
         this.conflictResolvers = conflictResolvers;
 
@@ -214,9 +215,9 @@ public class ArtifactResolutionRequest
     public String toString()
     {
         StringBuffer sb = new StringBuffer()
-            .append( "groupId = " + getGroupId() )
-            .append( "artifactId = " + getArtifactId() )
-            .append( "version = " + getVersion() );
+                .append("groupId = ").append(getGroupId())
+                .append("artifactId = ").append(getArtifactId())
+                .append("version = ").append(getVersion());
 
         return sb.toString();
     }

@@ -22,6 +22,7 @@ package org.apache.maven.artifact.resolver;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.TransferFailedException;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class ArtifactResolutionException
                                         String version,
                                         String type,
                                         String classifier,
-                                        List remoteRepositories,
+                                        List<ArtifactRepository> remoteRepositories,
                                         List path,
                                         Throwable t )
     {
@@ -66,7 +67,7 @@ public class ArtifactResolutionException
 
     public ArtifactResolutionException( String message,
                                         Artifact artifact,
-                                        List remoteRepositories )
+                                        List<ArtifactRepository> remoteRepositories )
     {
         super( message, artifact, remoteRepositories );
     }
@@ -80,7 +81,7 @@ public class ArtifactResolutionException
 
     protected ArtifactResolutionException( String message,
                                            Artifact artifact,
-                                           List remoteRepositories,
+                                           List<ArtifactRepository> remoteRepositories,
                                            ArtifactMetadataRetrievalException cause )
     {
         super( message, artifact, remoteRepositories, cause );
@@ -88,7 +89,7 @@ public class ArtifactResolutionException
 
     protected ArtifactResolutionException( String message,
                                            Artifact artifact,
-                                           List remoteRepositories,
+                                           List<ArtifactRepository> remoteRepositories,
                                            TransferFailedException cause )
     {
         super( message, artifact, remoteRepositories, cause );
@@ -96,7 +97,7 @@ public class ArtifactResolutionException
 
     protected ArtifactResolutionException( String message,
                                            Artifact artifact,
-                                           List remoteRepositories,
+                                           List<ArtifactRepository> remoteRepositories,
                                            IOException cause )
     {
         super( message, artifact, remoteRepositories, cause );
