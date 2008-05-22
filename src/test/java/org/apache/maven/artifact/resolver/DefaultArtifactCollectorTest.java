@@ -1,22 +1,18 @@
 package org.apache.maven.artifact.resolver;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.util.ArrayList;
@@ -44,10 +40,11 @@ import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
 
-/**
+/*
  * Test the default artifact collector.
- *
+ * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * 
  * @version $Id$
  */
 public class DefaultArtifactCollectorTest
@@ -120,12 +117,11 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec d = b.addDependency( "d", "4.0" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact, d.artifact} ),
-                      res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact, d.artifact } ), res.getArtifacts() );
 
-        ArtifactFilter filter = new ExclusionSetFilter( new String[]{"b"} );
+        ArtifactFilter filter = new ExclusionSetFilter( new String[] { "b" } );
         res = collect( a, filter );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, c.artifact} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, c.artifact } ), res.getArtifacts() );
     }
 
     public void testResolveCorrectDependenciesWhenDifferentDependenciesOnNearest()
@@ -140,10 +136,8 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec c1 = e.addDependency( "c", "1.0" );
         ArtifactSpec f = c1.addDependency( "f", "1.0" );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, e.artifact} ) );
-        assertEquals( "Check artifact list",
-                      createSet( new Object[]{a.artifact, b.artifact, e.artifact, c1.artifact, f.artifact} ),
-                      res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, e.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, e.artifact, c1.artifact, f.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "1.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
@@ -160,10 +154,8 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec c1 = e.addDependency( "c", "1.0" );
         c1.addDependency( "f", "1.0" );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, e.artifact} ) );
-        assertEquals( "Check artifact list",
-                      createSet( new Object[]{a.artifact, b.artifact, e.artifact, c2.artifact, d.artifact} ),
-                      res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, e.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, e.artifact, c2.artifact, d.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
@@ -181,8 +173,8 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec e = b2.addDependency( "e", "1.0" );
         ArtifactSpec g = d1.addDependency( "g", "1.0" );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact} ) );
-        Object[] artifacts = new Object[]{a.artifact, c.artifact, d1.artifact, b2.artifact, e.artifact, g.artifact};
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact } ) );
+        Object[] artifacts = new Object[] { a.artifact, c.artifact, d1.artifact, b2.artifact, e.artifact, g.artifact };
         assertEquals( "Check artifact list", createSet( artifacts ), res.getArtifacts() );
         assertEquals( "Check version", "1.0", getArtifact( "d", res.getArtifacts() ).getVersion() );
         assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
@@ -198,8 +190,7 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "2.0" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
-                      res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "3.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
@@ -213,8 +204,7 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "3.0" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
-                      res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
@@ -225,8 +215,8 @@ public class DefaultArtifactCollectorTest
         a.addDependency( "b", "2.0" );
         ArtifactSpec b = createArtifactSpec( "b", "3.0" );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "3.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
     }
 
@@ -237,8 +227,8 @@ public class DefaultArtifactCollectorTest
         a.addDependency( "b", "3.0" );
         ArtifactSpec b = createArtifactSpec( "b", "2.0" );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "2.0", getArtifact( "b", res.getArtifacts() ).getVersion() );
     }
 
@@ -249,8 +239,8 @@ public class DefaultArtifactCollectorTest
         a.addDependency( "junit", "3.7" );
         ArtifactSpec b = createArtifactSpec( "junit", "3.8.1", Artifact.SCOPE_TEST );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
         assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
     }
@@ -262,8 +252,8 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec a = createArtifactSpec( "commons-logging", "1.0" );
         a.addDependency( "junit", "3.7" );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "3.8.1", getArtifact( "junit", res.getArtifacts() ).getVersion() );
         assertEquals( "Check artifactScope", Artifact.SCOPE_TEST, getArtifact( "junit", res.getArtifacts() ).getScope() );
     }
@@ -278,8 +268,7 @@ public class DefaultArtifactCollectorTest
         b.addDependency( "c", "[1.0,3.0]" );
 
         ArtifactResolutionResult res = collect( a );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ),
-                      res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts() );
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
 
@@ -298,7 +287,7 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( a );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact, c.artifact} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact } ), res.getArtifacts() );
 
         assertEquals( "Check version", "2.5", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
@@ -350,7 +339,7 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( a );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, c.artifact} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, c.artifact } ), res.getArtifacts() );
 
         assertEquals( "Check version", "2.0", getArtifact( "c", res.getArtifacts() ).getVersion() );
     }
@@ -382,7 +371,7 @@ public class DefaultArtifactCollectorTest
 
         ArtifactResolutionResult res = collect( a, managedVersion );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedB} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedB } ), res.getArtifacts() );
     }
 
     public void testCollectChangesVersionOfOriginatingArtifactIfInDependencyManagementHasDifferentVersion()
@@ -414,9 +403,9 @@ public class DefaultArtifactCollectorTest
 
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
 
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
 
@@ -434,9 +423,9 @@ public class DefaultArtifactCollectorTest
 
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_RUNTIME ).artifact;
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
 
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
 
@@ -456,10 +445,9 @@ public class DefaultArtifactCollectorTest
 
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{root.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { root.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, root.artifact, modifiedC} ),
-                      res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, root.artifact, modifiedC } ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
 
         assertEquals( "Check artifactScope", Artifact.SCOPE_COMPILE, artifact.getScope() );
@@ -476,9 +464,9 @@ public class DefaultArtifactCollectorTest
 
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_COMPILE ).artifact;
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
 
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
 
@@ -496,9 +484,9 @@ public class DefaultArtifactCollectorTest
 
         Artifact modifiedC = createArtifactSpec( "c", "3.0", Artifact.SCOPE_RUNTIME ).artifact;
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, c.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, c.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, modifiedC} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, modifiedC } ), res.getArtifacts() );
 
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
 
@@ -514,9 +502,9 @@ public class DefaultArtifactCollectorTest
 
         b.addDependency( "c", "3.0", Artifact.SCOPE_PROVIDED );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
     public void testOptionalNotTransitive()
@@ -528,9 +516,9 @@ public class DefaultArtifactCollectorTest
 
         b.addDependency( "c", "3.0", true );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
     public void testOptionalIncludedAtRoot()
@@ -540,12 +528,12 @@ public class DefaultArtifactCollectorTest
 
         ArtifactSpec b = createArtifactSpec( "b", "1.0", true );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
 
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
-    public void testScopeUpdate()
+    public void testScopeUpdateWithCompileScopeBeingFarthest()
         throws InvalidVersionSpecificationException, ArtifactResolutionException
     {
         /* farthest = compile */
@@ -554,28 +542,44 @@ public class DefaultArtifactCollectorTest
         checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_COMPILE, Artifact.SCOPE_TEST, Artifact.SCOPE_COMPILE );
+    }
 
+    public void testScopeUpdateWithProvidedScopeBeingFarthest()
+        throws InvalidVersionSpecificationException, ArtifactResolutionException
+    {
         /* farthest = provided */
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
         checkScopeUpdate( Artifact.SCOPE_PROVIDED, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
+    }
 
+    public void testScopeUpdateWithRuntimeScopeBeingFarthest()
+        throws InvalidVersionSpecificationException, ArtifactResolutionException
+    {
         /* farthest = runtime */
         checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_RUNTIME );
         checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
         checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
         checkScopeUpdate( Artifact.SCOPE_RUNTIME, Artifact.SCOPE_TEST, Artifact.SCOPE_RUNTIME );
+    }
 
+    public void testScopeUpdateWithSystemScopeBeingFarthest()
+        throws InvalidVersionSpecificationException, ArtifactResolutionException
+    {
         /* farthest = system */
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_RUNTIME, Artifact.SCOPE_RUNTIME );
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM, Artifact.SCOPE_SYSTEM );
         checkScopeUpdate( Artifact.SCOPE_SYSTEM, Artifact.SCOPE_TEST, Artifact.SCOPE_TEST );
+    }
 
+    public void testScopeUpdateWithTestScopeBeingFarthest()
+        throws InvalidVersionSpecificationException, ArtifactResolutionException
+    {
         /* farthest = test */
         checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_COMPILE, Artifact.SCOPE_COMPILE );
         checkScopeUpdate( Artifact.SCOPE_TEST, Artifact.SCOPE_PROVIDED, Artifact.SCOPE_PROVIDED );
@@ -632,6 +636,7 @@ public class DefaultArtifactCollectorTest
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
         ScopeArtifactFilter filter;
+
         if ( Artifact.SCOPE_PROVIDED.equals( expectedScope ) )
         {
             filter = new ScopeArtifactFilter( Artifact.SCOPE_COMPILE );
@@ -645,7 +650,7 @@ public class DefaultArtifactCollectorTest
             filter = new ScopeArtifactFilter( expectedScope );
         }
 
-        Set artifactSet = createSet( new Object[]{a.artifact, b.artifact} );
+        Set artifactSet = createSet( new Object[] { a.artifact, b.artifact } );
 
         System.out.println( "filter = " + filter );
 
@@ -663,7 +668,7 @@ public class DefaultArtifactCollectorTest
 
         ArtifactSpec d = createArtifactSpec( "d", "1.0" );
 
-        artifactSet = createSet( new Object[]{a.artifact, b.artifact, d.artifact} );
+        artifactSet = createSet( new Object[] { a.artifact, b.artifact, d.artifact } );
 
         System.out.println( "artifactSet = " + artifactSet );
 
@@ -686,10 +691,8 @@ public class DefaultArtifactCollectorTest
 
         ArtifactSpec c = createArtifactSpec( "c", "3.0" );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
-        assertEquals( "Check artifact list",
-                      createSet( new Object[]{a.artifact, b.artifact, c.artifact, d.artifact, e.artifact} ),
-                      res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact, c.artifact, d.artifact, e.artifact } ), res.getArtifacts() );
         Artifact artifact = getArtifact( "c", res.getArtifacts() );
         assertEquals( "Check version", "3.0", artifact.getVersion() );
     }
@@ -701,8 +704,8 @@ public class DefaultArtifactCollectorTest
         ArtifactSpec b = createArtifactSpec( "b", "1.0" );
         b.addDependency( "c", "3.0", Artifact.SCOPE_TEST );
 
-        ArtifactResolutionResult res = collect( createSet( new Object[]{a.artifact, b.artifact} ) );
-        assertEquals( "Check artifact list", createSet( new Object[]{a.artifact, b.artifact} ), res.getArtifacts() );
+        ArtifactResolutionResult res = collect( createSet( new Object[] { a.artifact, b.artifact } ) );
+        assertEquals( "Check artifact list", createSet( new Object[] { a.artifact, b.artifact } ), res.getArtifacts() );
     }
 
     public void testSnapshotNotIncluded()
@@ -742,30 +745,26 @@ public class DefaultArtifactCollectorTest
     private ArtifactResolutionResult collect( Set artifacts, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
-        return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, source, filter,
-                                          Collections.EMPTY_LIST );
+        return artifactCollector.collect( artifacts, projectArtifact.artifact, null, null, source, filter, Collections.EMPTY_LIST );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a )
         throws ArtifactResolutionException
     {
-        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, null, Collections.EMPTY_LIST );
+        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null, source, null, Collections.EMPTY_LIST );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, ArtifactFilter filter )
         throws ArtifactResolutionException
     {
-        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null,
-                                          source, filter, Collections.EMPTY_LIST );
+        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, null, null, source, filter, Collections.EMPTY_LIST );
     }
 
     private ArtifactResolutionResult collect( ArtifactSpec a, Artifact managedVersion )
         throws ArtifactResolutionException
     {
         Map managedVersions = Collections.singletonMap( managedVersion.getDependencyConflictId(), managedVersion );
-        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact,
-                                          managedVersions, null, null, source, null, Collections.EMPTY_LIST );
+        return artifactCollector.collect( Collections.singleton( a.artifact ), projectArtifact.artifact, managedVersions, null, null, source, null, Collections.EMPTY_LIST );
     }
 
     private ArtifactSpec createArtifactSpec( String id, String version )
@@ -841,7 +840,7 @@ public class DefaultArtifactCollectorTest
         {
             // inherited scope is this artifacts scope
             // dependency scope is as stated here
-                                                                // provided compile
+            // provided compile
             ArtifactSpec dep = createArtifactSpec( id, version, scope, this.artifact.getScope(), optional );
 
             return addDependency( dep );
@@ -861,8 +860,7 @@ public class DefaultArtifactCollectorTest
 
         private Map versions = new HashMap();
 
-        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                         List remoteRepositories )
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             String key = getKey( artifact );
@@ -905,14 +903,14 @@ public class DefaultArtifactCollectorTest
                     versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                 }
 
-                Artifact  artifact;
+                Artifact artifact;
 
                 if ( d.getScope().equals( Artifact.SCOPE_TEST ) || d.getScope().equals( Artifact.SCOPE_PROVIDED ) )
                 {
                     // don't call createDependencyArtifact as it'll ignore test and provided scopes
                     // jvz!!
                     //artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(),
-                      //  d.getClassifier(), false, d.getScope(), inheritedScope );
+                    //  d.getClassifier(), false, d.getScope(), inheritedScope );
 
                     artifact = null;
 
@@ -924,8 +922,7 @@ public class DefaultArtifactCollectorTest
                 }
                 else
                 {
-                    artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
-                        d.getClassifier(), d.isOptional(), d.getScope(), inheritedScope );
+                    artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), d.isOptional(), d.getScope(), inheritedScope );
                 }
 
                 if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
@@ -939,8 +936,7 @@ public class DefaultArtifactCollectorTest
             return projectArtifacts;
         }
 
-        public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                               List remoteRepositories )
+        public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             List artifactVersions = (List) versions.get( artifact.getDependencyConflictId() );
