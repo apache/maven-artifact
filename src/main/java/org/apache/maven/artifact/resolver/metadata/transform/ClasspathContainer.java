@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.transform;
+package org.apache.maven.artifact.resolver.metadata.transform;
 
 import java.util.ArrayList;
 import java.util.Iterator;

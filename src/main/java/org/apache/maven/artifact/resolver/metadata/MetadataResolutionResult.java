@@ -1,10 +1,10 @@
 package org.apache.maven.artifact.resolver.metadata;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.artifact.resolver.conflict.GraphConflictResolutionException;
-import org.apache.maven.artifact.resolver.conflict.GraphConflictResolver;
-import org.apache.maven.artifact.transform.ClasspathContainer;
-import org.apache.maven.artifact.transform.ClasspathTransformation;
+import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionException;
+import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.transform.ClasspathContainer;
+import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
 import org.apache.maven.artifact.transform.MetadataGraphTransformationException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;

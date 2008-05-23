@@ -12,18 +12,16 @@ import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.artifact.resolver.conflict.GraphConflictResolver;
-import org.apache.maven.artifact.transform.ClasspathTransformation;
+import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-
-/**
+/*
  * default implementation of the metadata resolver
  * 
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
- *
+ * 
  * @plexus.component
- *
  */
 public class DefaultMetadataResolver
     extends AbstractLogEnabled
@@ -53,11 +51,7 @@ public class DefaultMetadataResolver
 
             MetadataResolutionResult res = new MetadataResolutionResult();
 
-            MetadataTreeNode tree = resolveMetadataTree( req.getQuery()
-            											, null
-            											, req.getLocalRepository()
-            											, req.getRemoteRepositories()
-            											);
+            MetadataTreeNode tree = resolveMetadataTree( req.getQuery(), null, req.getLocalRepository(), req.getRemoteRepositories() );
 
             res.setTree( tree );
             return res;
@@ -73,23 +67,15 @@ public class DefaultMetadataResolver
     }
 
     //------------------------------------------------------------------------
-    private MetadataTreeNode resolveMetadataTree( ArtifactMetadata query
-    											, MetadataTreeNode parent
-    											, ArtifactRepository localRepository
-    											, List<ArtifactRepository> remoteRepositories
-    											)
+    private MetadataTreeNode resolveMetadataTree( ArtifactMetadata query, MetadataTreeNode parent, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
         throws MetadataResolutionException
     {
         try
         {
-            Artifact pomArtifact = new DefaultArtifact( query.getGroupId(), query.getArtifactId(), query.getVersion(),
-                query.getType() == null ? "jar" : query.getType(), null, false, query.getScope(), null );
+            Artifact pomArtifact = new DefaultArtifact( query.getGroupId(), query.getArtifactId(), query.getVersion(), query.getType() == null ? "jar" : query.getType(), null, false,
+                                                        query.getScope(), null );
 
-            getLogger().debug( "resolveMetadata request:"
-                + "\n> artifact   : " + pomArtifact.toString()
-                + "\n> remoteRepos: " + remoteRepositories
-                + "\n> localRepo  : " + localRepository
-            );
+            getLogger().debug( "resolveMetadata request:" + "\n> artifact   : " + pomArtifact.toString() + "\n> remoteRepos: " + remoteRepositories + "\n> localRepo  : " + localRepository );
 
             String error = null;
 
@@ -100,16 +86,14 @@ public class DefaultMetadataResolver
                 arr.setLocalRepository( localRepository );
                 arr.setRemoteRepostories( remoteRepositories );
 
-                artifactResolver.resolve( pomArtifact, remoteRepositories , localRepository );
-//System.out.println("Resolved "+query+" : "+pomArtifact.isResolved() );
+                artifactResolver.resolve( pomArtifact, remoteRepositories, localRepository );
+                //System.out.println("Resolved "+query+" : "+pomArtifact.isResolved() );
 
                 if ( !pomArtifact.isResolved() )
                 {
-                    getLogger().info( "*************> Did not resolve " + pomArtifact.toString()
-                        + "\nURL: " + pomArtifact.getDownloadUrl()
-                        + "\nRepos: " + remoteRepositories
-                        + "\nLocal: " + localRepository
-                    );
+                    getLogger().info(
+                                      "*************> Did not resolve " + pomArtifact.toString() + "\nURL: " + pomArtifact.getDownloadUrl() + "\nRepos: " + remoteRepositories + "\nLocal: "
+                                          + localRepository );
                 }
             }
             catch ( ArtifactResolutionException are )
@@ -123,94 +107,75 @@ public class DefaultMetadataResolver
                 error = anfe.getMessage();
             }
 
-            if( error != null )
+            if ( error != null )
             {
-                getLogger().info( "*************> Did not resolve " + pomArtifact.toString()
-                    + "\nRepos: " + remoteRepositories
-                    + "\nLocal: " + localRepository
-                    + "\nerror: " + error
-                );
+                getLogger().info( "*************> Did not resolve " + pomArtifact.toString() + "\nRepos: " + remoteRepositories + "\nLocal: " + localRepository + "\nerror: " + error );
             }
 
-            if( pomArtifact.isResolved() )
+            if ( pomArtifact.isResolved() )
             {
-                MetadataResolution metadataResolution = metadataSource.retrieve( 
-                																query
-                																, localRepository
-                																, remoteRepositories
-                																);
+                MetadataResolution metadataResolution = metadataSource.retrieve( query, localRepository, remoteRepositories );
                 ArtifactMetadata found = metadataResolution.getArtifactMetadata();
-                
-                if( pomArtifact.getFile() != null && pomArtifact.getFile().toURI() != null )
-                	found.setArtifactUri( pomArtifact.getFile().toURI().toString() );
 
-                MetadataTreeNode node = new MetadataTreeNode( found
-                											, parent
-                											, true
-                											, found.getScopeAsEnum()
-                											);
-                Collection<ArtifactMetadata> dependencies 
-                		= metadataResolution.getArtifactMetadata().getDependencies();
+                if ( pomArtifact.getFile() != null && pomArtifact.getFile().toURI() != null )
+                    found.setArtifactUri( pomArtifact.getFile().toURI().toString() );
 
-                if( dependencies != null && dependencies.size() > 0 )
+                MetadataTreeNode node = new MetadataTreeNode( found, parent, true, found.getScopeAsEnum() );
+                Collection<ArtifactMetadata> dependencies = metadataResolution.getArtifactMetadata().getDependencies();
+
+                if ( dependencies != null && dependencies.size() > 0 )
                 {
-                	int nKids = dependencies.size();
-                	node.setNChildren(nKids);
-                	int kidNo = 0;
+                    int nKids = dependencies.size();
+                    node.setNChildren( nKids );
+                    int kidNo = 0;
                     for ( ArtifactMetadata a : dependencies )
                     {
-                        MetadataTreeNode kidNode = resolveMetadataTree( a
-                        											, node
-                        											, localRepository
-                        											, remoteRepositories
-                        											);
+                        MetadataTreeNode kidNode = resolveMetadataTree( a, node, localRepository, remoteRepositories );
                         node.addChild( kidNo++, kidNode );
                     }
                 }
                 return node;
-            } else {
+            }
+            else
+            {
                 return new MetadataTreeNode( pomArtifact, parent, false, query.getArtifactScope() );
             }
         }
-        catch( Exception anyEx )
+        catch ( Exception anyEx )
         {
             throw new MetadataResolutionException( anyEx );
         }
     }
-    //------------------------------------------------------------------------
-	public List<Artifact> resolveArtifact(
-								List<ArtifactMetadata> mdCollection
-								, ArtifactRepository localRepository
-							    , List<ArtifactRepository> remoteRepositories
-												)
-	throws ArtifactResolutionException
-	{
-		if( mdCollection == null || mdCollection.isEmpty() )
-			return null;
-		
-		ArrayList<Artifact> res = new ArrayList<Artifact>( mdCollection.size() );
-		Artifact artifact = null;
-        try {
-        	// TODO: optimize retrieval by zipping returns from repo managers (nexus)
-        	for( ArtifactMetadata md : mdCollection )
-			{
 
-                artifact = new DefaultArtifact( md.getGroupId(), md.getArtifactId(), md.getVersion(),
-                    md.getType() == null ? "jar" : md.getType(), null, false, md.getScope(), null );
+    //------------------------------------------------------------------------
+    public List<Artifact> resolveArtifact( List<ArtifactMetadata> mdCollection, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
+        throws ArtifactResolutionException
+    {
+        if ( mdCollection == null || mdCollection.isEmpty() )
+            return null;
+
+        ArrayList<Artifact> res = new ArrayList<Artifact>( mdCollection.size() );
+        Artifact artifact = null;
+        try
+        {
+            // TODO: optimize retrieval by zipping returns from repo managers (nexus)
+            for ( ArtifactMetadata md : mdCollection )
+            {
+
+                artifact = new DefaultArtifact( md.getGroupId(), md.getArtifactId(), md.getVersion(), md.getType() == null ? "jar" : md.getType(), null, false, md.getScope(), null );
 
                 artifactResolver.resolve( artifact, remoteRepositories, localRepository );
 
                 res.add( artifact );
             }
-			return res;
-		} catch (ArtifactNotFoundException e) {
-			e.printStackTrace();
-			throw new ArtifactResolutionException( e.getMessage()
-													, artifact
-													, remoteRepositories
-												);
-		}
-	}
+            return res;
+        }
+        catch ( ArtifactNotFoundException e )
+        {
+            e.printStackTrace();
+            throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories );
+        }
+    }
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
 }

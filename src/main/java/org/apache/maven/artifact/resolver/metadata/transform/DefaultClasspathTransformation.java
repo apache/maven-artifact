@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.transform;
+package org.apache.maven.artifact.resolver.metadata.transform;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,12 +6,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.artifact.resolver.conflict.GraphConflictResolutionException;
-import org.apache.maven.artifact.resolver.conflict.GraphConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
+import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionException;
+import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.transform.MetadataGraphTransformationException;
 
 /**
  * default implementation of the metadata classpath transformer

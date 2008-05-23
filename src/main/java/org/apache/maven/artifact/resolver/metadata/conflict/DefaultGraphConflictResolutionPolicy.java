@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.conflict;
+package org.apache.maven.artifact.resolver.metadata.conflict;
 
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.versioning.ArtifactVersion;

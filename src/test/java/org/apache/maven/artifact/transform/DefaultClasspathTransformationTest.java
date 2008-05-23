@@ -11,6 +11,8 @@ import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
+import org.apache.maven.artifact.resolver.metadata.transform.ClasspathContainer;
+import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**
