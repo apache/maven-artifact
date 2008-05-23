@@ -596,6 +596,21 @@ public class DefaultArtifactCollectorTest
         checkScopeUpdateTransitively( farthestScope, nearestScope, expectedScope );
     }
 
+    private void checkScopeUpdateDirect( String farthestScope, String nearestScope, String expectedScope )
+        throws ArtifactResolutionException, InvalidVersionSpecificationException
+    {
+        ArtifactSpec a = createArtifactSpec( "a", "1.0" );
+        ArtifactSpec b = createArtifactSpec( "b", "1.0" );
+        ArtifactSpec c = createArtifactSpec( "c", "1.0" );
+        a.addDependency( c );
+        ArtifactSpec dNearest = createArtifactSpec( "d", "2.0", nearestScope );
+        b.addDependency( dNearest );
+        ArtifactSpec dFarthest = createArtifactSpec( "d", "3.0", farthestScope );
+        c.addDependency( dFarthest );
+
+        checkScopeUpdate( a, b, expectedScope, "2.0" );
+    }
+
     private void checkScopeUpdateTransitively( String farthestScope, String nearestScope, String expectedScope )
         throws ArtifactResolutionException, InvalidVersionSpecificationException
     {
@@ -613,23 +628,6 @@ public class DefaultArtifactCollectorTest
         {
             checkScopeUpdate( a, b, expectedScope, "2.0" );
         }
-    }
-
-    private void checkScopeUpdateDirect( String farthestScope, String nearestScope, String expectedScope )
-        throws ArtifactResolutionException, InvalidVersionSpecificationException
-    {
-        ArtifactSpec a = createArtifactSpec( "a", "1.0" );
-        ArtifactSpec b = createArtifactSpec( "b", "1.0" );
-        ArtifactSpec c = createArtifactSpec( "c", "1.0" );
-        a.addDependency( c );
-        //                                                      provided
-        ArtifactSpec dNearest = createArtifactSpec( "d", "2.0", nearestScope );
-        b.addDependency( dNearest );
-        //                                                       compile
-        ArtifactSpec dFarthest = createArtifactSpec( "d", "3.0", farthestScope );
-        c.addDependency( dFarthest );
-
-        checkScopeUpdate( a, b, expectedScope, "2.0" );
     }
 
     private void checkScopeUpdate( ArtifactSpec a, ArtifactSpec b, String expectedScope, String expectedVersion )
@@ -651,27 +649,16 @@ public class DefaultArtifactCollectorTest
         }
 
         Set artifactSet = createSet( new Object[] { a.artifact, b.artifact } );
-
-        System.out.println( "filter = " + filter );
-
         ArtifactResolutionResult res = collect( artifactSet, filter );
-
         Artifact artifact = getArtifact( "d", res.getArtifacts() );
 
         assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
-
         assertEquals( "Check artifactScope", expectedScope, artifact.getScope() );
-
-        // compile / provided / compile
-        System.out.println( "d = " + artifact );
         assertEquals( "Check version with expect scope[" + expectedScope + "]", expectedVersion, artifact.getVersion() );
 
         ArtifactSpec d = createArtifactSpec( "d", "1.0" );
 
         artifactSet = createSet( new Object[] { a.artifact, b.artifact, d.artifact } );
-
-        System.out.println( "artifactSet = " + artifactSet );
-
         res = collect( artifactSet, filter );
         artifact = getArtifact( "d", res.getArtifacts() );
         assertNotNull( "MNG-1895 Dependency was not added to resolution", artifact );
@@ -889,7 +876,6 @@ public class DefaultArtifactCollectorTest
 
             for ( Iterator i = dependencies.iterator(); i.hasNext(); )
             {
-
                 Artifact d = (Artifact) i.next();
 
                 VersionRange versionRange;
@@ -903,31 +889,19 @@ public class DefaultArtifactCollectorTest
                     versionRange = VersionRange.createFromVersionSpec( d.getVersion() );
                 }
 
-                Artifact artifact;
+                Artifact artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), d.isOptional(), d.getScope(), inheritedScope );
 
-                if ( d.getScope().equals( Artifact.SCOPE_TEST ) || d.getScope().equals( Artifact.SCOPE_PROVIDED ) )
-                {
-                    // don't call createDependencyArtifact as it'll ignore test and provided scopes
-                    // jvz!!
-                    //artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), d.getVersion(), d.getType(),
-                    //  d.getClassifier(), false, d.getScope(), inheritedScope );
-
-                    artifact = null;
-
-                    /*
-                    artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(),
-                        d.getClassifier(), d.isOptional(), d.getScope(), inheritedScope );
-                        */
-
-                }
-                else
-                {
-                    artifact = new DefaultArtifact( d.getGroupId(), d.getArtifactId(), versionRange, d.getType(), d.getClassifier(), d.isOptional(), d.getScope(), inheritedScope );
-                }
-
-                if ( artifact != null && ( dependencyFilter == null || dependencyFilter.include( artifact ) ) )
+                if ( dependencyFilter == null || dependencyFilter.include( artifact ) )
                 {
                     artifact.setDependencyFilter( dependencyFilter );
+                                        
+                    if ( artifact.getScope().equals( Artifact.SCOPE_PROVIDED ) || artifact.getScope().equals( Artifact.SCOPE_TEST ) )
+                    {
+                        if ( inheritedScope == null )
+                        {
+                            continue;
+                        }
+                    }
 
                     projectArtifacts.add( artifact );
                 }

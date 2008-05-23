@@ -1,22 +1,18 @@
 package org.apache.maven.artifact;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
@@ -36,9 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-/**
+/*
  * @author Jason van Zyl
+ * 
  * @version $Id$
+ * 
  * @todo this should possibly be replaced by type handler
  */
 public class DefaultArtifact
@@ -63,30 +61,34 @@ public class DefaultArtifact
 
     private VersionRange versionRange;
 
-    private Map<Object,ArtifactMetadata> metadataMap;
+    private Map<Object, ArtifactMetadata> metadataMap;
 
     // This is Maven specific. jvz/
     private String classifier;
+
     private String scope;
+
     private boolean optional;
-    private List<ArtifactVersion> availableVersions; 
+
+    private List<ArtifactVersion> availableVersions;
+
     private boolean release;
+
     private boolean resolved;
+
     private ArtifactFilter dependencyFilter;
+
     private List dependencyTrail;
+
     // Why is this here? What repository is determined at runtime and is therefore a
     // runtime charactistic. This needs to go. jvz.
     private ArtifactRepository repository;
+
     private String downloadUrl;
 
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            String version,
-                            String type,
-                            String classifier,
-                            boolean optional,
-                            String scope,
-                            String inheritedScope )
+    private String inheritedScope;
+    
+    public DefaultArtifact( String groupId, String artifactId, String version, String type, String classifier, boolean optional, String scope, String inheritedScope )
     {
         if ( version == null )
         {
@@ -98,78 +100,67 @@ public class DefaultArtifact
         initialize( groupId, artifactId, versionRange, type, classifier, optional, scope, inheritedScope );
     }
 
-    public DefaultArtifact( String groupId,
-                            String artifactId,
-                            VersionRange versionRange,
-                            String type,
-                            String classifier,
-                            boolean optional,
-                            String scope,
-                            String inheritedScope )
+    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, boolean optional, String scope, String inheritedScope )
     {
         initialize( groupId, artifactId, versionRange, type, classifier, optional, scope, inheritedScope );
     }
 
-    private void initialize( String groupId,
-                             String artifactId,
-                             VersionRange versionRange,
-                             String type,
-                             String classifier,
-                             boolean optional,
-                             String scope,
-                             String inheritedScope )
+    public String getInheritedScope()
     {
+        return inheritedScope;
+    }
+    
+    private void initialize( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, boolean optional, String scope, String inheritedScope )
+    {
+        this.inheritedScope = inheritedScope;
         this.groupId = groupId;
-
         this.artifactId = artifactId;
-
         this.versionRange = versionRange;
-
         selectVersionFromNewRangeIfAvailable();
-
-        this.scope = scope;
-
+        //this.scope = scope;
         this.type = type;
-
         this.classifier = classifier;
-
-        // We were relying on the artifact handler to get the classifier here. 
-
         this.optional = optional;
 
-        // Scope information
+        String desiredScope = Artifact.SCOPE_RUNTIME;
 
-        //this.scope = Artifact.SCOPE_RUNTIME;
+        boolean calc = true;
 
         if ( inheritedScope == null )
         {
-            this.scope = scope;
+            desiredScope = scope;
         }
-        else if( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_PROVIDED.equals( scope ) )
+        else if ( Artifact.SCOPE_TEST.equals( scope ) || Artifact.SCOPE_PROVIDED.equals( scope ) )
         {
-            // do nothing
+            desiredScope = scope;
+            //calc = false;
         }
         else if ( Artifact.SCOPE_COMPILE.equals( scope ) && Artifact.SCOPE_COMPILE.equals( inheritedScope ) )
         {
             // added to retain compile artifactScope. Remove if you want compile inherited as runtime
-            this.scope = Artifact.SCOPE_COMPILE;
+            desiredScope = Artifact.SCOPE_COMPILE;
         }
 
-        if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
+        if ( calc )
         {
-            this.scope = Artifact.SCOPE_TEST;
-        }
+            if ( Artifact.SCOPE_TEST.equals( inheritedScope ) )
+            {
+                desiredScope = Artifact.SCOPE_TEST;
+            }
 
-        if ( Artifact.SCOPE_PROVIDED.equals( inheritedScope ) )
-        {
-            this.scope = Artifact.SCOPE_PROVIDED;
-        }
+            if ( Artifact.SCOPE_PROVIDED.equals( inheritedScope ) )
+            {
+                desiredScope = Artifact.SCOPE_PROVIDED;
+            }
 
-        if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
-        {
-            // system scopes come through unchanged...
-            this.scope = Artifact.SCOPE_SYSTEM;
+            if ( Artifact.SCOPE_SYSTEM.equals( scope ) )
+            {
+                // system scopes come through unchanged...
+                desiredScope = Artifact.SCOPE_SYSTEM;
+            }
         }
+        
+        this.scope = desiredScope;
 
         validateIdentity();
     }
@@ -178,26 +169,22 @@ public class DefaultArtifact
     {
         if ( empty( groupId ) )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The groupId cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The groupId cannot be empty." );
         }
 
         if ( artifactId == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The artifactId cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The artifactId cannot be empty." );
         }
 
         if ( type == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The type cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The type cannot be empty." );
         }
 
         if ( ( version == null ) && ( versionRange == null ) )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type,
-                "The version cannot be empty." );
+            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The version cannot be empty." );
         }
     }
 
@@ -302,7 +289,7 @@ public class DefaultArtifact
     {
         if ( metadataMap == null )
         {
-            metadataMap = new HashMap<Object,ArtifactMetadata>();
+            metadataMap = new HashMap<Object, ArtifactMetadata>();
         }
 
         ArtifactMetadata m = metadataMap.get( metadata.getKey() );
@@ -318,7 +305,8 @@ public class DefaultArtifact
 
     public Collection<ArtifactMetadata> getMetadataList()
     {
-        if (metadataMap == null) {
+        if ( metadataMap == null )
+        {
             return Collections.emptyList();
         }
 
@@ -492,8 +480,7 @@ public class DefaultArtifact
         return result;
     }
 
-    public void updateVersion( String version,
-                               ArtifactRepository localRepository )
+    public void updateVersion( String version, ArtifactRepository localRepository )
     {
         setResolvedVersion( version );
         setFile( new File( localRepository.getBasedir(), localRepository.pathOf( this ) ) );
@@ -577,7 +564,7 @@ public class DefaultArtifact
 
     public boolean isSnapshot()
     {
-        return getBaseVersion() != null && (getBaseVersion().endsWith(SNAPSHOT_VERSION) || getBaseVersion().equals(LATEST_VERSION));
+        return getBaseVersion() != null && ( getBaseVersion().endsWith( SNAPSHOT_VERSION ) || getBaseVersion().equals( LATEST_VERSION ) );
     }
 
     public void setResolved( boolean resolved )
