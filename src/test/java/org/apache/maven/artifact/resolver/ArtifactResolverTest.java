@@ -25,6 +25,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.resolver.metadata.Artifact;
 import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionResult;
 
 import java.util.ArrayList;
 import java.util.Collections;

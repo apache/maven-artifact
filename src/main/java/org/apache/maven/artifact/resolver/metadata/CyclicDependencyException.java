@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver;
+package org.apache.maven.artifact.resolver.metadata;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,7 +19,7 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionException;
 
 /**
  * Indiciates a cycle in the dependency graph.
@@ -35,7 +35,7 @@ public class CyclicDependencyException
     public CyclicDependencyException( String message,
                                       Artifact artifact )
     {
-        super( message, artifact );
+        //super( message, artifact );
         this.artifact = artifact;
     }
 

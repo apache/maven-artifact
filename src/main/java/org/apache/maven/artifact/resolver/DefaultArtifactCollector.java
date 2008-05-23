@@ -27,6 +27,8 @@ import org.apache.maven.artifact.resolver.filter.AndArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.metadata.Artifact;
 import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.metadata.CyclicDependencyException;
 import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
 import org.apache.maven.artifact.resolver.metadata.version.ManagedVersionMap;
 import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;

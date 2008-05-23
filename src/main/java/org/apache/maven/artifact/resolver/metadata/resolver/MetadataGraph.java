@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 
+
 /**
  * maven dependency metadata graph
  * 

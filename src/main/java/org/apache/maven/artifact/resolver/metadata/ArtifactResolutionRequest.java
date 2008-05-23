@@ -1,12 +1,8 @@
-package org.apache.maven.artifact.resolver;
+package org.apache.maven.artifact.resolver.metadata;
 
-import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.resolver.metadata.Artifact;
-import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
-import org.apache.maven.artifact.resolver.conflict.ConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataSource;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,16 +29,12 @@ public class ArtifactResolutionRequest
 
     private List<ArtifactRepository> remoteRepostories;
 
-    private ArtifactFilter filter;
-
-    private List<ResolutionListener> listeners = new ArrayList<ResolutionListener>();
-
     // This should really be a component. Different impls can can be composed to account for different forms of metadata.
-    private ArtifactMetadataSource metadataSource;
+    private MetadataSource metadataSource;
 
     private Map managedVersionMap;
 
-    private List<ConflictResolver> conflictResolvers;
+    private List<GraphConflictResolver> conflictResolvers;
 
     public Artifact getArtifact()
     {
@@ -148,40 +140,16 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public ArtifactFilter getFilter()
-    {
-        return filter;
-    }
-
-    public ArtifactResolutionRequest setFilter( ArtifactFilter filter )
-    {
-        this.filter = filter;
-
-        return this;
-    }
-
-    public List<ResolutionListener> getListeners()
-    {
-        return listeners;
-    }
-
-    public ArtifactResolutionRequest addListener( ResolutionListener listener )
-    {
-        listeners.add( listener );
-
-        return this;
-    }
-
     // ------------------------------------------------------------------------
     //
     // ------------------------------------------------------------------------
 
-    public ArtifactMetadataSource getMetadataSource()
+    public MetadataSource getMetadataSource()
     {
         return metadataSource;
     }
 
-    public ArtifactResolutionRequest setMetadataSource( ArtifactMetadataSource metadataSource )
+    public ArtifactResolutionRequest setMetadataSource( MetadataSource metadataSource )
     {
         this.metadataSource = metadataSource;
 
@@ -200,12 +168,12 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public List<ConflictResolver> getConflictResolvers()
+    public List<GraphConflictResolver> getConflictResolvers()
     {
         return conflictResolvers;
     }
 
-    public ArtifactResolutionRequest setConflictResolvers( List<ConflictResolver> conflictResolvers )
+    public ArtifactResolutionRequest setConflictResolvers( List<GraphConflictResolver> conflictResolvers )
     {
         this.conflictResolvers = conflictResolvers;
 

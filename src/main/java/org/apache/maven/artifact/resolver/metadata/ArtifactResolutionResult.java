@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver;
+package org.apache.maven.artifact.resolver.metadata;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,8 +19,7 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.resolver.metadata.Artifact;
-import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
 
 import java.util.ArrayList;
@@ -63,8 +62,6 @@ public class ArtifactResolutionResult
 
     private List<ArtifactRepository> repositories;
 
-    private Set<ResolutionNode> resolutionNodes;
-
     private Set<Artifact> artifacts;
 
     public Artifact getOriginatingArtifact()
@@ -84,32 +81,9 @@ public class ArtifactResolutionResult
         if ( artifacts == null )
         {
             artifacts = new LinkedHashSet<Artifact>();
-
-            for (ResolutionNode node : resolutionNodes) {
-                artifacts.add(node.getArtifact());
-            }
         }
 
         return artifacts;
-    }
-
-    public Set<ResolutionNode> getArtifactResolutionNodes()
-    {
-        if (resolutionNodes == null) {
-            return Collections.emptySet();
-        }
-
-        return resolutionNodes;
-    }
-
-    public ArtifactResolutionResult setArtifactResolutionNodes( final Set<ResolutionNode> resolutionNodes )
-    {
-        this.resolutionNodes = resolutionNodes;
-
-        // clear the cache
-        this.artifacts = null;
-
-        return this;
     }
 
     public List getMissingArtifacts()

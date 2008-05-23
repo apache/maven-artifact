@@ -34,6 +34,8 @@ import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.artifact.resolver.metadata.Artifact;
 import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionResult;
+import org.apache.maven.artifact.resolver.metadata.CyclicDependencyException;
 import org.apache.maven.artifact.resolver.metadata.DefaultArtifact;
 import org.apache.maven.artifact.resolver.metadata.version.DefaultArtifactVersion;
 import org.apache.maven.artifact.resolver.metadata.version.InvalidVersionSpecificationException;
