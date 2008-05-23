@@ -1,4 +1,4 @@
-package org.apache.maven.artifact;
+package org.apache.maven.artifact.resolver.metadata;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

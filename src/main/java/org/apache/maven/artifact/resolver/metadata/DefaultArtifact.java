@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import org.apache.maven.artifact.InvalidArtifactRTException;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
 import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
 import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
@@ -71,8 +69,6 @@ public class DefaultArtifact
     private boolean release;
 
     private boolean resolved;
-
-    private ArtifactFilter dependencyFilter;
 
     private List dependencyTrail;
 
@@ -462,16 +458,6 @@ public class DefaultArtifact
     public void setDownloadUrl( String downloadUrl )
     {
         this.downloadUrl = downloadUrl;
-    }
-
-    public ArtifactFilter getDependencyFilter()
-    {
-        return dependencyFilter;
-    }
-
-    public void setDependencyFilter( ArtifactFilter artifactFilter )
-    {
-        dependencyFilter = artifactFilter;
     }
 
     public List<String> getDependencyTrail()
