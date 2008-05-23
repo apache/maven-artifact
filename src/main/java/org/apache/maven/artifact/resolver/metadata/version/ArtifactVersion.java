@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.versioning;
+package org.apache.maven.artifact.resolver.metadata.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,35 +19,25 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Iterator;
-
-public class ManagedVersionMap
-    extends HashMap
+/**
+ * Describes an artifact version in terms of its components, converts it to/from a string and
+ * compares two versions.
+ *
+ * @author <a href="mailto:brett@apache.org">Brett Porter</a>
+ * @version $Id$
+ */
+public interface ArtifactVersion
+    extends Comparable
 {
-    public ManagedVersionMap( Map map )
-    {
-        super();
-        if ( map != null )
-        {
-            putAll( map );
-        }
-    }
+    int getMajorVersion();
 
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer( "ManagedVersionMap (" + size() + " entries)\n" );
-        Iterator iter = keySet().iterator();
-        while ( iter.hasNext() )
-        {
-            String key = (String) iter.next();
-            buffer.append( key ).append( "=" ).append( get( key ) );
-            if ( iter.hasNext() )
-            {
-                buffer.append( "\n" );
-            }
-        }
-        return buffer.toString();
-    }
+    int getMinorVersion();
+
+    int getIncrementalVersion();
+
+    int getBuildNumber();
+
+    String getQualifier();
+
+    void parseVersion( String version );
 }

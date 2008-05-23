@@ -19,9 +19,10 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 import org.apache.maven.wagon.repository.Repository;
 
 /**

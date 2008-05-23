@@ -19,8 +19,10 @@ package org.apache.maven.artifact;
  * under the License.
  */
 
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.DefaultArtifact;
+import org.apache.maven.artifact.resolver.metadata.version.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
 
 import java.util.ArrayList;
 import java.util.Collection;

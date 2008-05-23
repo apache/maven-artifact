@@ -19,9 +19,9 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
 import java.util.List;
+
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 
 /**
  * Provides some metadata operations, like querying the remote repository for a list of versions available for an

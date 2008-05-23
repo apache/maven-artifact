@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.artifact.ArtifactScopeEnum;
+import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;

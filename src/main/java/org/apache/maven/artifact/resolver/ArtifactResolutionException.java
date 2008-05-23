@@ -19,10 +19,10 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 import org.apache.maven.wagon.TransferFailedException;
 
 import java.io.IOException;

@@ -20,8 +20,8 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import junit.framework.TestCase;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 import org.apache.maven.artifact.testutils.MockManager;
 import org.apache.maven.artifact.testutils.TestFileManager;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;

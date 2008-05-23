@@ -1,6 +1,6 @@
 package org.apache.maven.artifact.resolver.metadata.transform;
 
-import org.apache.maven.artifact.ArtifactScopeEnum;
+import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
 import org.apache.maven.artifact.transform.MetadataGraphTransformationException;
 

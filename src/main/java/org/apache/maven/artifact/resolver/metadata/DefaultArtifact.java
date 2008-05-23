@@ -1,4 +1,4 @@
-package org.apache.maven.artifact;
+package org.apache.maven.artifact.resolver.metadata;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
@@ -15,15 +15,6 @@ package org.apache.maven.artifact;
  * the License.
  */
 
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
-import org.apache.maven.artifact.versioning.VersionRange;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.codehaus.plexus.util.StringUtils;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
+
+import org.apache.maven.artifact.InvalidArtifactRTException;
+import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
+import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
+import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
+import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
+import org.codehaus.plexus.util.StringUtils;
 
 /*
  * @author Jason van Zyl

@@ -19,6 +19,8 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
+import org.apache.maven.artifact.resolver.metadata.version.DefaultArtifactVersion;
+
 import junit.framework.TestCase;
 
 /**

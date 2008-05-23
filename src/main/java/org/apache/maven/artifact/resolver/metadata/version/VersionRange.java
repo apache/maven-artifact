@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.versioning;
+package org.apache.maven.artifact.resolver.metadata.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,7 +24,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+
 
 /**
  * Construct a version range from a specification.

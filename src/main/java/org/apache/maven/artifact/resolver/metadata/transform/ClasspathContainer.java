@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.maven.artifact.ArtifactScopeEnum;
+import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataResolutionException;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataTreeNode;

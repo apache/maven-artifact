@@ -1,8 +1,8 @@
 package org.apache.maven.artifact.resolver.metadata.conflict;
 
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
+import org.apache.maven.artifact.resolver.metadata.version.DefaultArtifactVersion;
 
 /**
  *

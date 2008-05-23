@@ -22,8 +22,8 @@ package org.apache.maven.artifact.resolver;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 
 /**
  * Exception caused when one or more artifacts can not be resolved because they are not found in the

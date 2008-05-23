@@ -2,8 +2,8 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
 
 import java.util.Collection;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.ArtifactScopeEnum;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 
 /**
  * Artifact Metadata that is resolved independent of Artifact itself.

@@ -20,7 +20,7 @@ package org.apache.maven.artifact.repository.metadata;
  */
 
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 
 import java.util.List;
 

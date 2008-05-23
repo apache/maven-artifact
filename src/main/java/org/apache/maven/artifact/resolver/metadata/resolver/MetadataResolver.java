@@ -1,11 +1,10 @@
 package org.apache.maven.artifact.resolver.metadata.resolver;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 
 /**
  * entry point into metadata resolution component

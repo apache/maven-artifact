@@ -15,12 +15,12 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
  * the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 
 /*
  * Base class for artifact resolution exceptions.

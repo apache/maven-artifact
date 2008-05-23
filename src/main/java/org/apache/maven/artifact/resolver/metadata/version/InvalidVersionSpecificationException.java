@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.versioning;
+package org.apache.maven.artifact.resolver.metadata.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,32 +19,17 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-
-import java.util.List;
-
 /**
- * Occurs when ranges exclude each other and no valid value remains.
+ * Occurs when a version is invalid.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public class OverConstrainedVersionException
-    extends ArtifactResolutionException
+public class InvalidVersionSpecificationException
+    extends Exception
 {
-    public OverConstrainedVersionException( String msg,
-                                            Artifact artifact )
+    public InvalidVersionSpecificationException( String message )
     {
-        super( msg, artifact );
+        super( message );
     }
-
-    public OverConstrainedVersionException( String msg,
-                                            Artifact artifact,
-                                            List<ArtifactRepository> remoteRepositories )
-    {
-        super( msg, artifact, remoteRepositories );
-    }
-
 }

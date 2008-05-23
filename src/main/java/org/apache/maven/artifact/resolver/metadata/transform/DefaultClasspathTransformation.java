@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.apache.maven.artifact.ArtifactScopeEnum;
+import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionException;
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;

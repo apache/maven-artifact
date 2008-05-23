@@ -1,11 +1,11 @@
 package org.apache.maven.artifact.deployer;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.version.DefaultArtifactVersion;
 
 import java.util.ArrayList;
 import java.util.List;

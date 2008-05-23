@@ -20,8 +20,8 @@ package org.apache.maven.artifact.resolver.conflict;
  */
 
 import org.apache.maven.artifact.resolver.ResolutionNode;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
+import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
+import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
 
 /**
  * Resolves conflicting artifacts by always selecting the <em>oldest</em> declaration. Oldest is defined as the

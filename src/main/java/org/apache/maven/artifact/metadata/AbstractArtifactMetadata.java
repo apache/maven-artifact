@@ -19,7 +19,7 @@ package org.apache.maven.artifact.metadata;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
 
 /**
  * Common elements of artifact metadata.

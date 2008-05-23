@@ -19,7 +19,7 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
 
 /** Artifact Filter which filters on artifact type */
 public class TypeArtifactFilter

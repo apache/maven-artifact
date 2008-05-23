@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.versioning;
+package org.apache.maven.artifact.resolver.metadata.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,25 +19,32 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
+import java.util.List;
+
+import org.apache.maven.artifact.resolver.ArtifactResolutionException;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
+
 /**
- * Describes an artifact version in terms of its components, converts it to/from a string and
- * compares two versions.
+ * Occurs when ranges exclude each other and no valid value remains.
  *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @version $Id$
  */
-public interface ArtifactVersion
-    extends Comparable
+public class OverConstrainedVersionException
+    extends ArtifactResolutionException
 {
-    int getMajorVersion();
+    public OverConstrainedVersionException( String msg,
+                                            Artifact artifact )
+    {
+        super( msg, artifact );
+    }
 
-    int getMinorVersion();
+    public OverConstrainedVersionException( String msg,
+                                            Artifact artifact,
+                                            List<ArtifactRepository> remoteRepositories )
+    {
+        super( msg, artifact, remoteRepositories );
+    }
 
-    int getIncrementalVersion();
-
-    int getBuildNumber();
-
-    String getQualifier();
-
-    void parseVersion( String version );
 }

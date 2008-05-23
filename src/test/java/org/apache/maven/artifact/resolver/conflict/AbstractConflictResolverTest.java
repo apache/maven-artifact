@@ -19,11 +19,11 @@ package org.apache.maven.artifact.resolver.conflict;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.resolver.ResolutionNode;
-import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
-import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.DefaultArtifact;
+import org.apache.maven.artifact.resolver.metadata.version.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**

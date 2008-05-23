@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.versioning;
+package org.apache.maven.artifact.resolver.metadata.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Properties;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.Stack;
 
 /**

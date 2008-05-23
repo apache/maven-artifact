@@ -19,16 +19,16 @@ package org.apache.maven.artifact.resolver.metadata.conflict;
  * under the License.
  */
 
-import org.apache.maven.artifact.ArtifactScopeEnum;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
+import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphVertex;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataResolutionException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
 
 /**
  * Default conflict resolver.Implements closer newer first policy 

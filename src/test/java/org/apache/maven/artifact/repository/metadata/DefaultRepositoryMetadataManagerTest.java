@@ -10,8 +10,8 @@ import junit.framework.TestCase;
 
 import org.apache.maven.artifact.manager.DefaultUpdateCheckManager;
 import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 import org.apache.maven.artifact.testutils.MockManager;
 import org.apache.maven.artifact.testutils.TestFileManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;

@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.repository;
+package org.apache.maven.artifact.resolver.metadata;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,8 +19,8 @@ package org.apache.maven.artifact.repository;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 
 /**

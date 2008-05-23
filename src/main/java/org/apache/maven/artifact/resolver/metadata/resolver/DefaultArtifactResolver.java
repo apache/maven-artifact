@@ -19,11 +19,6 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
  * under the License.
  */
 
-import java.util.List;
-
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /**

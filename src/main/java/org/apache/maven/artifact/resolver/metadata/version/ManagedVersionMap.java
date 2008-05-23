@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.versioning;
+package org.apache.maven.artifact.resolver.metadata.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,17 +19,35 @@ package org.apache.maven.artifact.versioning;
  * under the License.
  */
 
-/**
- * Occurs when a version is invalid.
- *
- * @author <a href="mailto:brett@apache.org">Brett Porter</a>
- * @version $Id$
- */
-public class InvalidVersionSpecificationException
-    extends Exception
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+public class ManagedVersionMap
+    extends HashMap
 {
-    public InvalidVersionSpecificationException( String message )
+    public ManagedVersionMap( Map map )
     {
-        super( message );
+        super();
+        if ( map != null )
+        {
+            putAll( map );
+        }
+    }
+
+    public String toString()
+    {
+        StringBuffer buffer = new StringBuffer( "ManagedVersionMap (" + size() + " entries)\n" );
+        Iterator iter = keySet().iterator();
+        while ( iter.hasNext() )
+        {
+            String key = (String) iter.next();
+            buffer.append( key ).append( "=" ).append( get( key ) );
+            if ( iter.hasNext() )
+            {
+                buffer.append( "\n" );
+            }
+        }
+        return buffer.toString();
     }
 }

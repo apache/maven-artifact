@@ -19,8 +19,8 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
 
 /**
  * Listens to the resolution process and handles events.

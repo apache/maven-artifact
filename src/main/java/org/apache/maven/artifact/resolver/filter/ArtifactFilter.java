@@ -19,7 +19,7 @@ package org.apache.maven.artifact.resolver.filter;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

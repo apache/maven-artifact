@@ -20,7 +20,7 @@ package org.apache.maven.artifact.installer;
  */
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
 
 import java.io.File;
 

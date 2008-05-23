@@ -1,6 +1,6 @@
 package org.apache.maven.artifact.resolver.metadata.resolver;
 
-import org.apache.maven.artifact.ArtifactScopeEnum;
+import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 
 
 /**

@@ -19,10 +19,10 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-
 import java.util.List;
+
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl</a>

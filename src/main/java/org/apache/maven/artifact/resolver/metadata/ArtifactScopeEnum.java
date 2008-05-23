@@ -1,4 +1,4 @@
-package org.apache.maven.artifact;
+package org.apache.maven.artifact.resolver.metadata;
 
 /**
  * Type safe reincarnation of Artifact scope. Also supplies the <code>DEFAULT_SCOPE<code> as well

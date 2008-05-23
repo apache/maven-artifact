@@ -19,13 +19,13 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
-import org.apache.maven.wagon.TransferFailedException;
-
 import java.io.IOException;
 import java.util.List;
+
+import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+import org.apache.maven.wagon.TransferFailedException;
 
 /**
  * @author Jason van Zyl

@@ -1,5 +1,7 @@
 package org.apache.maven.artifact;
 
+import org.apache.maven.artifact.resolver.metadata.Artifact;
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file

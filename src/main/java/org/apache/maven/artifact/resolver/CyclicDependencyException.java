@@ -19,7 +19,7 @@ package org.apache.maven.artifact.resolver;
  * under the License.
  */
 
-import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.resolver.metadata.Artifact;
 
 /**
  * Indiciates a cycle in the dependency graph.

@@ -22,6 +22,7 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.UnknownRepositoryLayoutException;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 
 import java.io.File;
 
