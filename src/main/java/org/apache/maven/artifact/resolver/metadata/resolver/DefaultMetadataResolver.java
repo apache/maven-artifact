@@ -1,28 +1,20 @@
 package org.apache.maven.artifact.resolver.metadata.resolver;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.maven.artifact.resolver.metadata.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.metadata.Artifact;
 import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 import org.apache.maven.artifact.resolver.metadata.DefaultArtifact;
-import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolver;
-import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 
 /*
  * default implementation of the metadata resolver
  * 
- * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
+ * @author Oleg Gusakov
  * 
  * @plexus.component
  */
 public class DefaultMetadataResolver
-    extends AbstractLogEnabled
     implements MetadataResolver
 {
     //------------------------------------------------------------------------
@@ -33,35 +25,17 @@ public class DefaultMetadataResolver
     /** @plexus.requirement */
     MetadataSource metadataSource;
 
-    /** @plexus.requirement */
-    ConflictResolver conflictResolver;
-
-    /** @plexus.requirement */
-    ClasspathTransformation classpathTransformation;
-
     //------------------------------------------------------------------------
-    public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest req )
+    public MetadataResolutionResult resolveMetadata( MetadataResolutionRequest request )
         throws MetadataResolutionException
     {
-        try
-        {
-            getLogger().debug( "Received request for: " + req.getQuery() );
+        MetadataResolutionResult result = new MetadataResolutionResult();
 
-            MetadataResolutionResult res = new MetadataResolutionResult();
+        MetadataTreeNode tree = resolveMetadataTree( request.getQuery(), null, request.getLocalRepository(), request.getRemoteRepositories() );
 
-            MetadataTreeNode tree = resolveMetadataTree( req.getQuery(), null, req.getLocalRepository(), req.getRemoteRepositories() );
+        result.setTree( tree );
 
-            res.setTree( tree );
-            return res;
-        }
-        catch ( MetadataResolutionException mrEx )
-        {
-            throw mrEx;
-        }
-        catch ( Exception anyEx )
-        {
-            throw new MetadataResolutionException( anyEx );
-        }
+        return result;
     }
 
     //------------------------------------------------------------------------
@@ -73,15 +47,6 @@ public class DefaultMetadataResolver
             Artifact pomArtifact = new DefaultArtifact( query.getGroupId(), query.getArtifactId(), query.getVersion(), query.getType() == null ? "jar" : query.getType(), null, false,
                                                         query.getScope(), null );
 
-            getLogger().debug( "resolveMetadata request:" + "\n> artifact   : " + pomArtifact.toString() + "\n> remoteRepos: " + remoteRepositories + "\n> localRepo  : " + localRepository );
-
-            String error = null;
-
-            ArtifactResolutionRequest arr = new ArtifactResolutionRequest();
-            arr.setArtifact( pomArtifact );
-            arr.setLocalRepository( localRepository );
-            arr.setRemoteRepostories( remoteRepositories );
-
             ResolutionRequest request = new ResolutionRequest().setArtifact( pomArtifact ).setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories );
 
             ResolutionResult result = artifactResolver.resolve( request );
@@ -92,25 +57,15 @@ public class DefaultMetadataResolver
                 pomArtifact.setResolved( false );
             }
 
-            if ( !pomArtifact.isResolved() )
-            {
-                getLogger().info(
-                                  "*************> Did not resolve " + pomArtifact.toString() + "\nURL: " + pomArtifact.getDownloadUrl() + "\nRepos: " + remoteRepositories + "\nLocal: "
-                                      + localRepository );
-            }
-
-            if ( error != null )
-            {
-                getLogger().info( "*************> Did not resolve " + pomArtifact.toString() + "\nRepos: " + remoteRepositories + "\nLocal: " + localRepository + "\nerror: " + error );
-            }
-
             if ( pomArtifact.isResolved() )
             {
                 MetadataResolution metadataResolution = metadataSource.retrieve( query, localRepository, remoteRepositories );
                 ArtifactMetadata found = metadataResolution.getArtifactMetadata();
 
                 if ( pomArtifact.getFile() != null && pomArtifact.getFile().toURI() != null )
+                {
                     found.setArtifactUri( pomArtifact.getFile().toURI().toString() );
+                }
 
                 MetadataTreeNode node = new MetadataTreeNode( found, parent, true, found.getScopeAsEnum() );
                 Collection<ArtifactMetadata> dependencies = metadataResolution.getArtifactMetadata().getDependencies();
@@ -138,29 +93,4 @@ public class DefaultMetadataResolver
             throw new MetadataResolutionException( anyEx );
         }
     }
-
-    //------------------------------------------------------------------------
-    public List<Artifact> resolveArtifact( List<ArtifactMetadata> mdCollection, ArtifactRepository localRepository, List<ArtifactRepository> remoteRepositories )
-        throws ArtifactResolutionException
-    {
-        if ( mdCollection == null || mdCollection.isEmpty() )
-            return null;
-
-        ArrayList<Artifact> res = new ArrayList<Artifact>( mdCollection.size() );
-        Artifact artifact = null;
-
-        // TODO: optimize retrieval by zipping returns from repo managers (nexus)
-        for ( ArtifactMetadata md : mdCollection )
-        {
-            artifact = new DefaultArtifact( md.getGroupId(), md.getArtifactId(), md.getVersion(), md.getType() == null ? "jar" : md.getType(), null, false, md.getScope(), null );
-
-            ResolutionRequest request = new ResolutionRequest().setArtifact( artifact ).setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories );
-
-            ResolutionResult result = artifactResolver.resolve( request );
-
-            res.add( artifact );
-        }
-        return res;
-    }
 }
-

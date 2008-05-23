@@ -1,22 +1,18 @@
 package org.apache.maven.artifact.resolver.metadata.version;
 
 /*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 import java.util.ArrayList;
@@ -28,11 +24,13 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Stack;
 
-/**
+/*
  * Generic implementation of version comparison.
- *
+ * 
  * @author <a href="mailto:kenney@apache.org">Kenney Westerhof</a>
+ * 
  * @author <a href="mailto:hboutemy@apache.org">Herve Boutemy</a>
+ * 
  * @version $Id$
  */
 public class ComparableVersion
@@ -47,7 +45,9 @@ public class ComparableVersion
     private interface Item
     {
         public static final int INTEGER_ITEM = 0;
+
         public static final int STRING_ITEM = 1;
+
         public static final int LIST_ITEM = 2;
 
         public int compareTo( Item item );
@@ -77,7 +77,7 @@ public class ComparableVersion
 
         public boolean isNull()
         {
-            return (value == 0 );
+            return ( value == 0 );
         }
 
         public int compareTo( Item item )
@@ -120,11 +120,13 @@ public class ComparableVersion
         private final static List _QUALIFIERS = Arrays.asList( QUALIFIERS );
 
         private final static Properties ALIASES = new Properties();
-        static {
+        static
+        {
             ALIASES.put( "ga", "" );
             ALIASES.put( "final", "" );
             ALIASES.put( "cr", "rc" );
         }
+
         /**
          * A comparable for the empty-string qualifier. This one is used to determine if a given qualifier makes the
          * version older than one without a qualifier, or more recent.
@@ -151,7 +153,7 @@ public class ComparableVersion
                         break;
                 }
             }
-            this.value = ALIASES.getProperty( value , value );
+            this.value = ALIASES.getProperty( value, value );
         }
 
         public int getType()
@@ -233,7 +235,7 @@ public class ComparableVersion
 
         void normalize()
         {
-            for( ListIterator iterator = listIterator( size() ); iterator.hasPrevious(); )
+            for ( ListIterator iterator = listIterator( size() ); iterator.hasPrevious(); )
             {
                 Item item = (Item) iterator.previous();
                 if ( item.isNull() )
@@ -255,7 +257,7 @@ public class ComparableVersion
                 {
                     return 0; // 1-0 = 1- (normalize) = 1
                 }
-                Item first = (Item) get(0);
+                Item first = (Item) get( 0 );
                 return first.compareTo( null );
             }
             switch ( item.getType() )
@@ -269,21 +271,21 @@ public class ComparableVersion
                 case LIST_ITEM:
                     Iterator left = iterator();
                     Iterator right = ( (ListItem) item ).iterator();
-    
+
                     while ( left.hasNext() || right.hasNext() )
                     {
                         Item l = left.hasNext() ? (Item) left.next() : null;
                         Item r = right.hasNext() ? (Item) right.next() : null;
-    
+
                         // if this is shorter, then invert the compare and mul with -1
                         int result = l == null ? -1 * r.compareTo( l ) : l.compareTo( r );
-    
+
                         if ( result != 0 )
                         {
                             return result;
                         }
                     }
-    
+
                     return 0;
 
                 default:
@@ -294,7 +296,7 @@ public class ComparableVersion
         public String toString()
         {
             StringBuffer buffer = new StringBuffer( "(" );
-            for( Iterator iter = iterator(); iter.hasNext(); )
+            for ( Iterator iter = iterator(); iter.hasNext(); )
             {
                 buffer.append( iter.next() );
                 if ( iter.hasNext() )
@@ -360,7 +362,7 @@ public class ComparableVersion
                 if ( isDigit )
                 {
                     list.normalize(); // 1.0-* = 1-*
-                    
+
                     if ( ( i + 1 < version.length() ) && Character.isDigit( version.charAt( i + 1 ) ) )
                     {
                         // new ListItem only if previous were digits and new char is a digit,
@@ -424,7 +426,7 @@ public class ComparableVersion
 
     public boolean equals( Object o )
     {
-        return ( o instanceof ComparableVersion ) && canonical.equals( ( ( ComparableVersion )o ).canonical );
+        return ( o instanceof ComparableVersion ) && canonical.equals( ( (ComparableVersion) o ).canonical );
     }
 
     public int hashCode()

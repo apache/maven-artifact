@@ -64,8 +64,6 @@ public class DefaultArtifact
 
     private boolean optional;
 
-    private List<ArtifactVersion> availableVersions;
-
     private boolean release;
 
     private boolean resolved;
@@ -547,31 +545,9 @@ public class DefaultArtifact
         return release;
     }
 
-    public List<ArtifactVersion> getAvailableVersions()
-    {
-        return availableVersions;
-    }
-
-    public void setAvailableVersions( List<ArtifactVersion> availableVersions )
-    {
-        this.availableVersions = availableVersions;
-    }
-
     public boolean isOptional()
     {
         return optional;
-    }
-
-    public ArtifactVersion getSelectedVersion()
-        throws OverConstrainedVersionException
-    {
-        return versionRange.getSelectedVersion( this );
-    }
-
-    public boolean isSelectedVersionKnown()
-        throws OverConstrainedVersionException
-    {
-        return versionRange.isSelectedVersionKnown( this );
     }
 
     public void setOptional( boolean optional )
