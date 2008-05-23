@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.metadata;
+package org.apache.maven.artifact.resolver.metadata.resolver;
 
 public enum MetadataResolutionRequestTypeEnum
 {

@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.metadata;
+package org.apache.maven.artifact.resolver.metadata.resolver;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;

@@ -20,7 +20,7 @@ package org.apache.maven.artifact.resolver.metadata.conflict;
  */
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
 
 /**
  * Resolves conflicts in the supplied dependency graph. 

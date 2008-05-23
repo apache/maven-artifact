@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.metadata;
+package org.apache.maven.artifact.resolver.metadata.resolver;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,23 +19,25 @@ package org.apache.maven.artifact.resolver.metadata;
  * under the License.
  */
 
-import org.apache.maven.artifact.repository.ArtifactRepository;
-
 import java.util.List;
 
-/**
- * Provides some metadata operations, like querying the remote repository for a list of versions available for an
- * artifact.
- *
- * @author Jason van Zyl
- * @version $Id$
- */
-public interface MetadataSource
-{
-    String ROLE = MetadataSource.class.getName();
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 
-    MetadataResolution retrieve( ArtifactMetadata artifact,
-                                 ArtifactRepository localRepository,
-                                 List<ArtifactRepository> remoteRepositories )
-        throws MetadataRetrievalException;
+/**
+ * @author Jason van Zyl
+ * @plexus.component
+ */
+public class DefaultArtifactResolver
+    extends AbstractLogEnabled
+    implements ArtifactResolver
+{
+    public ResolutionResult resolve( ResolutionRequest request )
+    {
+        ResolutionResult result = new ResolutionResult();
+        
+        return result;
+    }
 }

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphVertex;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.logging.Logger;
 

@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.resolver.conflict;
 
-import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionPolicy;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
 import org.codehaus.plexus.PlexusTestCase;
 
 /**

@@ -1,6 +1,6 @@
 package org.apache.maven.artifact.resolver.metadata.conflict;
 
-import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
 
 /**
  *  MetadataGraph edge selection policy. Complements 

@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.resolver.metadata;
+package org.apache.maven.artifact.resolver.metadata.resolver;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,18 +19,23 @@ package org.apache.maven.artifact.resolver.metadata;
  * under the License.
  */
 
+import org.apache.maven.artifact.repository.ArtifactRepository;
+
+import java.util.List;
+
 /**
- * I want to use it for hidding the fact that sometime artifact must be
- * downloaded. I am just asking LocalRepository for given artifact and I don't
- * care if it is alredy there or how it will get there.
+ * Provides some metadata operations, like querying the remote repository for a list of versions available for an
+ * artifact.
  *
  * @author Jason van Zyl
  * @version $Id$
  */
-public interface ArtifactResolver
+public interface MetadataSource
 {
-    String ROLE = ArtifactResolver.class.getName();
+    String ROLE = MetadataSource.class.getName();
 
-    /** @since 3.0 */
-    ResolutionResult resolve( ResolutionRequest request );
+    MetadataResolution retrieve( ArtifactMetadata artifact,
+                                 ArtifactRepository localRepository,
+                                 List<ArtifactRepository> remoteRepositories )
+        throws MetadataRetrievalException;
 }

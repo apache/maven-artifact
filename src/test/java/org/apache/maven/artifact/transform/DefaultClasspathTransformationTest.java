@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.apache.maven.artifact.ArtifactScopeEnum;
-import org.apache.maven.artifact.resolver.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraph;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraphEdge;
-import org.apache.maven.artifact.resolver.metadata.MetadataGraphVertex;
+import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
+import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphVertex;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathContainer;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
 import org.codehaus.plexus.PlexusTestCase;
