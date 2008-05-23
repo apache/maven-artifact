@@ -20,12 +20,7 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
  */
 
 /**
- * I want to use it for hidding the fact that sometime artifact must be
- * downloaded. I am just asking LocalRepository for given artifact and I don't
- * care if it is alredy there or how it will get there.
- *
  * @author Jason van Zyl
- * @version $Id$
  */
 public interface ArtifactResolver
 {

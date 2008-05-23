@@ -21,7 +21,7 @@ public class ArtifactMetadata
 
     protected String version;
 
-    protected String type;
+    protected String type = "jar";
 
     protected ArtifactScopeEnum artifactScope;
 
@@ -51,63 +51,31 @@ public class ArtifactMetadata
     /** error message  */
     private String error;
 
-    //------------------------------------------------------------------
-    /**
-     * 
-     */
-    public ArtifactMetadata( String name )
-    {
-        if ( name == null )
-            return;
-        int ind1 = name.indexOf( ':' );
-        int ind2 = name.lastIndexOf( ':' );
-
-        if ( ind1 == -1 || ind2 == -1 )
-            return;
-
-        this.groupId = name.substring( 0, ind1 );
-        if ( ind1 == ind2 )
-        {
-            this.artifactId = name.substring( ind1 + 1 );
-        }
-        else
-        {
-            this.artifactId = name.substring( ind1 + 1, ind2 );
-            this.version = name.substring( ind2 + 1 );
-        }
-    }
-
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version )
     {
         this( groupId, name, version, null );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type )
     {
         this( groupId, name, version, type, null );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope )
     {
         this( groupId, name, version, type, artifactScope, null );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope, String classifier )
     {
         this( groupId, name, version, type, artifactScope, classifier, null );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope, String classifier, String artifactUri )
     {
         this( groupId, name, version, type, artifactScope, classifier, artifactUri, null, true, null );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type, ArtifactScopeEnum artifactScope, String classifier, String artifactUri, String why, boolean resolved,
                              String error )
     {
@@ -123,31 +91,26 @@ public class ArtifactMetadata
         this.error = error;
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( String groupId, String name, String version, String type, String scopeString, String classifier, String artifactUri, String why, boolean resolved, String error )
     {
         this( groupId, name, version, type, scopeString == null ? ArtifactScopeEnum.DEFAULT_SCOPE : ArtifactScopeEnum.valueOf( scopeString ), classifier, artifactUri, why, resolved, error );
     }
 
-    //------------------------------------------------------------------
     public ArtifactMetadata( Artifact af )
     {
     }
 
-    //------------------------------------------------------------------
     @Override
     public String toString()
     {
         return groupId + ":" + artifactId + ":" + version;
     }
 
-    //------------------------------------------------------------------
     public String toDomainString()
     {
         return groupId + ":" + artifactId;
     }
 
-    //------------------------------------------------------------------
     public String getGroupId()
     {
         return groupId;
@@ -288,7 +251,6 @@ public class ArtifactMetadata
         this.why = why;
     }
 
-    //-------------------------------------------------------------------
     public String getError()
     {
         return error;
@@ -304,11 +266,8 @@ public class ArtifactMetadata
         return error == null;
     }
 
-    //------------------------------------------------------------------
     public String getDependencyConflictId()
     {
         return groupId + ":" + artifactId;
     }
-    //------------------------------------------------------------------
-    //------------------------------------------------------------------
 }

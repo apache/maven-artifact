@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
-import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionException;
+import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolutionException;
 import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
@@ -58,7 +58,7 @@ public class DefaultClasspathTransformation
 
             return cpc;
         }
-        catch ( GraphConflictResolutionException e )
+        catch ( ConflictResolutionException e )
         {
             throw new MetadataGraphTransformationException( e );
         }

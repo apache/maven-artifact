@@ -7,26 +7,26 @@ package org.apache.maven.artifact.resolver.metadata.conflict;
  * @version $Id$
  */
 
-public class GraphConflictResolutionException
+public class ConflictResolutionException
 extends Exception
 {
 	private static final long serialVersionUID = 2677613140287940255L;
 
-	public GraphConflictResolutionException()
+	public ConflictResolutionException()
 	{
 	}
 
-	public GraphConflictResolutionException(String message)
+	public ConflictResolutionException(String message)
 	{
 		super(message);
 	}
 
-	public GraphConflictResolutionException(Throwable cause)
+	public ConflictResolutionException(Throwable cause)
 	{
 		super(cause);
 	}
 
-	public GraphConflictResolutionException(String message, Throwable cause)
+	public ConflictResolutionException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}

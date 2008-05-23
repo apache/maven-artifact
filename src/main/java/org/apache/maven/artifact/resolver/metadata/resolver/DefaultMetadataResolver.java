@@ -44,8 +44,7 @@ public class DefaultMetadataResolver
     {
         try
         {
-            Artifact pomArtifact = new DefaultArtifact( query.getGroupId(), query.getArtifactId(), query.getVersion(), query.getType() == null ? "jar" : query.getType(), null, false,
-                                                        query.getScope(), null );
+            Artifact pomArtifact = new DefaultArtifact( query.getGroupId(), query.getArtifactId(), query.getVersion(), query.getType(), null, false, query.getScope(), null );
 
             ResolutionRequest request = new ResolutionRequest().setArtifact( pomArtifact ).setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories );
 

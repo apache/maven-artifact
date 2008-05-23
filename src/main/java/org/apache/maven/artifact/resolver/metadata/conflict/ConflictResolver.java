@@ -43,5 +43,5 @@ public interface ConflictResolver
      * @since 3.0
      */
     MetadataGraph resolveConflicts( MetadataGraph graph, ArtifactScopeEnum scope )
-        throws GraphConflictResolutionException;
+        throws ConflictResolutionException;
 }

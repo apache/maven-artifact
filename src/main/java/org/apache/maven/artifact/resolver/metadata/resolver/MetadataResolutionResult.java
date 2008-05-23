@@ -1,7 +1,7 @@
 package org.apache.maven.artifact.resolver.metadata.resolver;
 
 import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
-import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionException;
+import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolutionException;
 import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathContainer;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
@@ -60,7 +60,7 @@ public class MetadataResolutionResult
     }
     //----------------------------------------------------------------------------
     public MetadataGraph getGraph( ArtifactScopeEnum scope )
-    throws MetadataResolutionException, GraphConflictResolutionException
+    throws MetadataResolutionException, ConflictResolutionException
     {
     	if( treeRoot == null )
     		return null;
@@ -72,7 +72,7 @@ public class MetadataResolutionResult
     }
     //----------------------------------------------------------------------------
     public MetadataGraph getGraph( MetadataResolutionRequestTypeEnum requestType )
-    throws MetadataResolutionException, GraphConflictResolutionException
+    throws MetadataResolutionException, ConflictResolutionException
     {
     	if( requestType == null )
     		return null;
