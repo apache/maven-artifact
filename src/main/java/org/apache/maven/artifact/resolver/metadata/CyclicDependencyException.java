@@ -31,14 +31,13 @@ public class CyclicDependencyException
     extends ArtifactResolutionException
 {
     private Artifact artifact;
-
-    public CyclicDependencyException( String message,
-                                      Artifact artifact )
+       
+    public CyclicDependencyException( String message, Throwable cause )
     {
-        //super( message, artifact );
+        super( message, cause );
         this.artifact = artifact;
     }
-
+    
     public Artifact getArtifact()
     {
         return artifact;

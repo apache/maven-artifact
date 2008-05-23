@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionException;
-import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
@@ -25,7 +25,7 @@ public class DefaultClasspathTransformation
 implements ClasspathTransformation
 {
     /** @plexus.requirement */
-    GraphConflictResolver conflictResolver;
+    ConflictResolver conflictResolver;
     //----------------------------------------------------------------------------------------------------
 	public ClasspathContainer transform(
 						  MetadataGraph dirtyGraph

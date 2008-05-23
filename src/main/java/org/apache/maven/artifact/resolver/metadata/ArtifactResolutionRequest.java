@@ -1,6 +1,6 @@
 package org.apache.maven.artifact.resolver.metadata;
 
-import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataSource;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class ArtifactResolutionRequest
 
     private Map managedVersionMap;
 
-    private List<GraphConflictResolver> conflictResolvers;
+    private List<ConflictResolver> conflictResolvers;
 
     public Artifact getArtifact()
     {
@@ -168,12 +168,12 @@ public class ArtifactResolutionRequest
         return this;
     }
 
-    public List<GraphConflictResolver> getConflictResolvers()
+    public List<ConflictResolver> getConflictResolvers()
     {
         return conflictResolvers;
     }
 
-    public ArtifactResolutionRequest setConflictResolvers( List<GraphConflictResolver> conflictResolvers )
+    public ArtifactResolutionRequest setConflictResolvers( List<ConflictResolver> conflictResolvers )
     {
         this.conflictResolvers = conflictResolvers;
 

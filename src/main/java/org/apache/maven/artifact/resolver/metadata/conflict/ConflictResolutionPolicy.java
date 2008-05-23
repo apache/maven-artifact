@@ -11,9 +11,9 @@ import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
  * @version $Id$
  */
 
-public interface GraphConflictResolutionPolicy
+public interface ConflictResolutionPolicy
 {
-    static String ROLE = GraphConflictResolutionPolicy.class.getName();
+    static String ROLE = ConflictResolutionPolicy.class.getName();
 
     public MetadataGraphEdge apply( 
 			  MetadataGraphEdge e1

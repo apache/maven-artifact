@@ -41,15 +41,15 @@ import org.apache.maven.artifact.resolver.metadata.resolver.MetadataResolutionEx
  * @version $Id$
  */
 
-public class DefaultGraphConflictResolver
-implements GraphConflictResolver
+public class DefaultConflictResolver
+implements ConflictResolver
 {
 	/**
      * artifact, closer to the entry point, is selected
      * 
      * @plexus.requirement role="org.apache.maven.artifact.resolver.conflict.GraphConflictResolutionPolicy"
      */
-	protected GraphConflictResolutionPolicy policy;
+	protected ConflictResolutionPolicy policy;
 	//-------------------------------------------------------------------------------------
 	//-------------------------------------------------------------------------------------
 	public MetadataGraph resolveConflicts( MetadataGraph graph, ArtifactScopeEnum scope )

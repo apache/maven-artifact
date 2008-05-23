@@ -12,8 +12,8 @@ import org.apache.maven.artifact.resolver.metadata.version.DefaultArtifactVersio
  * 
  * @version $Id$
  */
-public class DefaultGraphConflictResolutionPolicy
-implements GraphConflictResolutionPolicy
+public class DefaultConflictResolutionPolicy
+implements ConflictResolutionPolicy
 {
 	
 	/**

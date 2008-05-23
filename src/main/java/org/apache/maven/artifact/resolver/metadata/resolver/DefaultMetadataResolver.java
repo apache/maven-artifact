@@ -10,7 +10,7 @@ import org.apache.maven.artifact.resolver.metadata.ArtifactResolutionRequest;
 import org.apache.maven.artifact.resolver.metadata.Artifact;
 import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 import org.apache.maven.artifact.resolver.metadata.DefaultArtifact;
-import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 
@@ -34,7 +34,7 @@ public class DefaultMetadataResolver
     MetadataSource metadataSource;
 
     /** @plexus.requirement */
-    GraphConflictResolver conflictResolver;
+    ConflictResolver conflictResolver;
 
     /** @plexus.requirement */
     ClasspathTransformation classpathTransformation;
@@ -77,32 +77,26 @@ public class DefaultMetadataResolver
 
             String error = null;
 
-            try
-            {
-                ArtifactResolutionRequest arr = new ArtifactResolutionRequest();
-                arr.setArtifact( pomArtifact );
-                arr.setLocalRepository( localRepository );
-                arr.setRemoteRepostories( remoteRepositories );
+            ArtifactResolutionRequest arr = new ArtifactResolutionRequest();
+            arr.setArtifact( pomArtifact );
+            arr.setLocalRepository( localRepository );
+            arr.setRemoteRepostories( remoteRepositories );
 
-                artifactResolver.resolve( pomArtifact, remoteRepositories, localRepository );
-                //System.out.println("Resolved "+query+" : "+pomArtifact.isResolved() );
+            ResolutionRequest request = new ResolutionRequest().setArtifact( pomArtifact ).setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories );
 
-                if ( !pomArtifact.isResolved() )
-                {
-                    getLogger().info(
-                                      "*************> Did not resolve " + pomArtifact.toString() + "\nURL: " + pomArtifact.getDownloadUrl() + "\nRepos: " + remoteRepositories + "\nLocal: "
-                                          + localRepository );
-                }
-            }
-            catch ( ArtifactResolutionException are )
+            ResolutionResult result = artifactResolver.resolve( request );
+
+            // Here we just need to deal with basic retrieval problems.
+            if ( result.hasMetadataResolutionExceptions() )
             {
                 pomArtifact.setResolved( false );
-                error = are.getMessage();
             }
-            catch ( ArtifactNotFoundException anfe )
+
+            if ( !pomArtifact.isResolved() )
             {
-                pomArtifact.setResolved( false );
-                error = anfe.getMessage();
+                getLogger().info(
+                                  "*************> Did not resolve " + pomArtifact.toString() + "\nURL: " + pomArtifact.getDownloadUrl() + "\nRepos: " + remoteRepositories + "\nLocal: "
+                                      + localRepository );
             }
 
             if ( error != null )
@@ -154,26 +148,19 @@ public class DefaultMetadataResolver
 
         ArrayList<Artifact> res = new ArrayList<Artifact>( mdCollection.size() );
         Artifact artifact = null;
-        try
+
+        // TODO: optimize retrieval by zipping returns from repo managers (nexus)
+        for ( ArtifactMetadata md : mdCollection )
         {
-            // TODO: optimize retrieval by zipping returns from repo managers (nexus)
-            for ( ArtifactMetadata md : mdCollection )
-            {
+            artifact = new DefaultArtifact( md.getGroupId(), md.getArtifactId(), md.getVersion(), md.getType() == null ? "jar" : md.getType(), null, false, md.getScope(), null );
 
-                artifact = new DefaultArtifact( md.getGroupId(), md.getArtifactId(), md.getVersion(), md.getType() == null ? "jar" : md.getType(), null, false, md.getScope(), null );
+            ResolutionRequest request = new ResolutionRequest().setArtifact( artifact ).setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories );
 
-                artifactResolver.resolve( artifact, remoteRepositories, localRepository );
+            ResolutionResult result = artifactResolver.resolve( request );
 
-                res.add( artifact );
-            }
-            return res;
+            res.add( artifact );
         }
-        catch ( ArtifactNotFoundException e )
-        {
-            e.printStackTrace();
-            throw new ArtifactResolutionException( e.getMessage(), artifact, remoteRepositories );
-        }
+        return res;
     }
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
 }
+

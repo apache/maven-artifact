@@ -2,7 +2,7 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
 
 import org.apache.maven.artifact.resolver.metadata.ArtifactScopeEnum;
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolutionException;
-import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
+import org.apache.maven.artifact.resolver.metadata.conflict.ConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathContainer;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
 import org.apache.maven.artifact.resolver.metadata.transform.MetadataGraphTransformationException;
@@ -24,7 +24,7 @@ public class MetadataResolutionResult
      * explicit call of the initTreeProcessing() 
      */ 
     ClasspathTransformation classpathTransformation;
-    GraphConflictResolver conflictResolver;
+    ConflictResolver conflictResolver;
 
     //----------------------------------------------------------------------------
     public MetadataResolutionResult( )
@@ -50,7 +50,7 @@ public class MetadataResolutionResult
     throws ComponentLookupException
     {
         classpathTransformation = (ClasspathTransformation)plexus.lookup(ClasspathTransformation.class);
-        conflictResolver = (GraphConflictResolver)plexus.lookup(GraphConflictResolver.class);
+        conflictResolver = (ConflictResolver)plexus.lookup(ConflictResolver.class);
     }
     //----------------------------------------------------------------------------
     public MetadataGraph getGraph()
