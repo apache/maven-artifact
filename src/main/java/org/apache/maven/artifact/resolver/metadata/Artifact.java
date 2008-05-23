@@ -20,12 +20,9 @@ package org.apache.maven.artifact.resolver.metadata;
  */
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
 import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
 import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
@@ -97,10 +94,6 @@ public interface Artifact extends Comparable
 
     String getDependencyConflictId();
 
-    void addMetadata( ArtifactMetadata metadata );
-
-    Collection<ArtifactMetadata> getMetadataList();
-
     void setRepository( ArtifactRepository remoteRepository );
 
     ArtifactRepository getRepository();
@@ -111,10 +104,6 @@ public interface Artifact extends Comparable
     String getDownloadUrl();
 
     void setDownloadUrl( String downloadUrl );
-
-    ArtifactFilter getDependencyFilter();
-
-    void setDependencyFilter( ArtifactFilter artifactFilter );
 
     List<String> getDependencyTrail();
 
