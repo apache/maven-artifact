@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import org.apache.maven.artifact.InvalidArtifactRTException;
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
 import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
@@ -59,8 +58,6 @@ public class DefaultArtifact
     private String version;
 
     private VersionRange versionRange;
-
-    private Map<Object, ArtifactMetadata> metadataMap;
 
     // This is Maven specific. jvz/
     private String classifier;
@@ -282,34 +279,6 @@ public class DefaultArtifact
             sb.append( ":" );
             sb.append( getClassifier() );
         }
-    }
-
-    public void addMetadata( ArtifactMetadata metadata )
-    {
-        if ( metadataMap == null )
-        {
-            metadataMap = new HashMap<Object, ArtifactMetadata>();
-        }
-
-        ArtifactMetadata m = metadataMap.get( metadata.getKey() );
-        if ( m != null )
-        {
-            m.merge( metadata );
-        }
-        else
-        {
-            metadataMap.put( metadata.getKey(), metadata );
-        }
-    }
-
-    public Collection<ArtifactMetadata> getMetadataList()
-    {
-        if ( metadataMap == null )
-        {
-            return Collections.emptyList();
-        }
-
-        return metadataMap.values();
     }
 
     // ----------------------------------------------------------------------

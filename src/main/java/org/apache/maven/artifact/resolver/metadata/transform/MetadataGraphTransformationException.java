@@ -27,5 +27,4 @@ public class MetadataGraphTransformationException
 	{
 		super(message, cause);
 	}
-
 }
