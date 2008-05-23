@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.transform;
+package org.apache.maven.artifact.resolver.metadata.transform;
 
 /**
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>

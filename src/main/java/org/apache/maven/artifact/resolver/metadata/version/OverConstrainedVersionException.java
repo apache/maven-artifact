@@ -21,9 +21,9 @@ package org.apache.maven.artifact.resolver.metadata.version;
 
 import java.util.List;
 
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
 import org.apache.maven.artifact.resolver.metadata.Artifact;
 import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
+import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactResolutionException;
 
 /**
  * Occurs when ranges exclude each other and no valid value remains.

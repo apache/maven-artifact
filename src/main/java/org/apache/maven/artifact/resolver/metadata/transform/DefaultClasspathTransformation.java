@@ -12,7 +12,6 @@ import org.apache.maven.artifact.resolver.metadata.resolver.ArtifactMetadata;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraph;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphEdge;
 import org.apache.maven.artifact.resolver.metadata.resolver.MetadataGraphVertex;
-import org.apache.maven.artifact.transform.MetadataGraphTransformationException;
 
 /**
  * default implementation of the metadata classpath transformer

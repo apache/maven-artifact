@@ -19,10 +19,6 @@ package org.apache.maven.artifact.resolver.metadata;
  * under the License.
  */
 
-import org.apache.maven.artifact.metadata.ArtifactMetadata;
-import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
-import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-
 /**
  * Specifies the repository used for artifact handling.
  *
@@ -33,11 +29,6 @@ public interface ArtifactRepository
 {
     String pathOf( Artifact artifact );
 
-    String pathOfRemoteRepositoryMetadata( ArtifactMetadata artifactMetadata );
-
-    String pathOfLocalRepositoryMetadata( ArtifactMetadata metadata,
-                                          ArtifactRepository repository );
-
     String getUrl();
 
     String getBasedir();
@@ -45,12 +36,6 @@ public interface ArtifactRepository
     String getProtocol();
 
     String getId();
-
-    ArtifactRepositoryPolicy getSnapshots();
-
-    ArtifactRepositoryPolicy getReleases();
-
-    ArtifactRepositoryLayout getLayout();
 
     String getKey();
 

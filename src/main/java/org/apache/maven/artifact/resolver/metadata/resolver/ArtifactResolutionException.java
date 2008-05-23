@@ -22,8 +22,6 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
-import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
 import org.apache.maven.artifact.resolver.metadata.Artifact;
 import org.apache.maven.wagon.TransferFailedException;
 
@@ -71,21 +69,6 @@ public class ArtifactResolutionException
         super( message, artifact, remoteRepositories );
     }
 
-    public ArtifactResolutionException( String message,
-                                        Artifact artifact,
-                                        ArtifactMetadataRetrievalException cause )
-    {
-        super( message, artifact, null, cause );
-    }
-
-    protected ArtifactResolutionException( String message,
-                                           Artifact artifact,
-                                           List remoteRepositories,
-                                           ArtifactMetadataRetrievalException cause )
-    {
-        super( message, artifact, remoteRepositories, cause );
-    }
-
     protected ArtifactResolutionException( String message,
                                            Artifact artifact,
                                            List remoteRepositories,
@@ -100,12 +83,5 @@ public class ArtifactResolutionException
                                            IOException cause )
     {
         super( message, artifact, remoteRepositories, cause );
-    }
-
-    public ArtifactResolutionException( String message,
-                                        Artifact artifact,
-                                        RepositoryMetadataResolutionException cause )
-    {
-        super( message, artifact, null, cause );
     }
 }

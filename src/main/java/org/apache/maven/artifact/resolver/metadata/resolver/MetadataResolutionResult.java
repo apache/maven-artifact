@@ -5,7 +5,7 @@ import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolut
 import org.apache.maven.artifact.resolver.metadata.conflict.GraphConflictResolver;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathContainer;
 import org.apache.maven.artifact.resolver.metadata.transform.ClasspathTransformation;
-import org.apache.maven.artifact.transform.MetadataGraphTransformationException;
+import org.apache.maven.artifact.resolver.metadata.transform.MetadataGraphTransformationException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
