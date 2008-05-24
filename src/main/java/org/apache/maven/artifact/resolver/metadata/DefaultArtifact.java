@@ -16,16 +16,9 @@ package org.apache.maven.artifact.resolver.metadata;
  */
 
 import java.io.File;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 
-import org.apache.maven.artifact.resolver.metadata.version.ArtifactVersion;
-import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
-import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
 import org.codehaus.plexus.util.StringUtils;
 
 /*
@@ -55,8 +48,6 @@ public class DefaultArtifact
 
     private String version;
 
-    private VersionRange versionRange;
-
     // This is Maven specific. jvz/
     private String classifier;
 
@@ -82,17 +73,10 @@ public class DefaultArtifact
     {
         if ( version == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, version, type, "Version cannot be null." );
+            throw new IllegalArgumentException( "Version cannot be null." );
         }
 
-        VersionRange versionRange = VersionRange.createFromVersion( version );
-
-        initialize( groupId, artifactId, versionRange, type, classifier, optional, scope, inheritedScope );
-    }
-
-    public DefaultArtifact( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, boolean optional, String scope, String inheritedScope )
-    {
-        initialize( groupId, artifactId, versionRange, type, classifier, optional, scope, inheritedScope );
+        initialize( groupId, artifactId, version, type, classifier, optional, scope, inheritedScope );
     }
 
     public String getInheritedScope()
@@ -100,13 +84,11 @@ public class DefaultArtifact
         return inheritedScope;
     }
     
-    private void initialize( String groupId, String artifactId, VersionRange versionRange, String type, String classifier, boolean optional, String scope, String inheritedScope )
+    private void initialize( String groupId, String artifactId, String version, String type, String classifier, boolean optional, String scope, String inheritedScope )
     {
         this.inheritedScope = inheritedScope;
         this.groupId = groupId;
         this.artifactId = artifactId;
-        this.versionRange = versionRange;
-        selectVersionFromNewRangeIfAvailable();
         //this.scope = scope;
         this.type = type;
         this.classifier = classifier;
@@ -159,22 +141,22 @@ public class DefaultArtifact
     {
         if ( empty( groupId ) )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The groupId cannot be empty." );
+            throw new IllegalArgumentException( "The groupId cannot be empty." );
         }
 
         if ( artifactId == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The artifactId cannot be empty." );
+            throw new IllegalArgumentException( "The artifactId cannot be empty." );
         }
 
         if ( type == null )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The type cannot be empty." );
+            throw new IllegalArgumentException( "The type cannot be empty." );
         }
 
-        if ( ( version == null ) && ( versionRange == null ) )
+        if ( ( version == null ) )
         {
-            throw new InvalidArtifactRTException( groupId, artifactId, getVersion(), type, "The version cannot be empty." );
+            throw new IllegalArgumentException( "The version cannot be empty." );
         }
     }
 
@@ -216,8 +198,6 @@ public class DefaultArtifact
     public void setVersion( String version )
     {
         this.version = version;
-        setBaseVersionInternal( version );
-        versionRange = null;
     }
 
     public String getType()
@@ -289,14 +269,12 @@ public class DefaultArtifact
         }
         appendArtifactTypeClassifierString( sb );
         sb.append( ":" );
-        if ( getBaseVersionInternal() != null )
+        
+        if ( getVersion() != null )
         {
             sb.append( getBaseVersionInternal() );
         }
-        else
-        {
-            sb.append( versionRange.toString() );
-        }
+        
         if ( scope != null )
         {
             sb.append( ":" );
@@ -471,31 +449,6 @@ public class DefaultArtifact
     public void setScope( String scope )
     {
         this.scope = scope;
-    }
-
-    public VersionRange getVersionRange()
-    {
-        return versionRange;
-    }
-
-    public void setVersionRange( VersionRange versionRange )
-    {
-        this.versionRange = versionRange;
-
-        selectVersionFromNewRangeIfAvailable();
-    }
-
-    private void selectVersionFromNewRangeIfAvailable()
-    {
-        if ( ( versionRange != null ) && ( versionRange.getRecommendedVersion() != null ) )
-        {
-            selectVersion( versionRange.getRecommendedVersion().toString() );
-        }
-        else
-        {
-            version = null;
-            baseVersion = null;
-        }
     }
 
     public void selectVersion( String version )

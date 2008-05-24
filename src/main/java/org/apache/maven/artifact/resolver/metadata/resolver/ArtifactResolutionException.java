@@ -23,65 +23,12 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.maven.artifact.resolver.metadata.Artifact;
-import org.apache.maven.wagon.TransferFailedException;
 
 /**
  * @author Jason van Zyl
  * @version $Id$
  */
 public class ArtifactResolutionException
-    extends AbstractArtifactResolutionException
+    extends Exception
 {
-    public ArtifactResolutionException( String message,
-                                        String groupId,
-                                        String artifactId,
-                                        String version,
-                                        String type,
-                                        String classifier,
-                                        List remoteRepositories,
-                                        List path,
-                                        Throwable t )
-    {
-        super( message, groupId, artifactId, version, type, classifier, remoteRepositories, path, t );
-    }
-
-    public ArtifactResolutionException( String message,
-                                        String groupId,
-                                        String artifactId,
-                                        String version,
-                                        String type,
-                                        String classifier,
-                                        Throwable t )
-    {
-        super( message, groupId, artifactId, version, type, classifier, null, null, t );
-    }
-
-    public ArtifactResolutionException( String message,
-                                        Artifact artifact )
-    {
-        super( message, artifact );
-    }
-
-    public ArtifactResolutionException( String message,
-                                        Artifact artifact,
-                                        List remoteRepositories )
-    {
-        super( message, artifact, remoteRepositories );
-    }
-
-    protected ArtifactResolutionException( String message,
-                                           Artifact artifact,
-                                           List remoteRepositories,
-                                           TransferFailedException cause )
-    {
-        super( message, artifact, remoteRepositories, cause );
-    }
-
-    protected ArtifactResolutionException( String message,
-                                           Artifact artifact,
-                                           List remoteRepositories,
-                                           IOException cause )
-    {
-        super( message, artifact, remoteRepositories, cause );
-    }
 }

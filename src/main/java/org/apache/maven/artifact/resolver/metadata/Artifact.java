@@ -19,8 +19,6 @@ import java.io.File;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.maven.artifact.resolver.metadata.version.VersionRange;
-
 /*
  * Description of an artifact.
  * 
@@ -80,11 +78,6 @@ public interface Artifact
 
     void setFile( File destination );
 
-    String getBaseVersion();
-
-    /** @todo would like to get rid of this - or at least only have one. Base version should be immutable. */
-    void setBaseVersion( String baseVersion );
-
     // ----------------------------------------------------------------------
 
     String getId();
@@ -106,10 +99,6 @@ public interface Artifact
     void setDependencyTrail( List<String> dependencyTrail );
 
     void setScope( String scope );
-
-    VersionRange getVersionRange();
-
-    void setVersionRange( VersionRange newRange );
 
     void selectVersion( String version );
 

@@ -19,19 +19,43 @@ package org.apache.maven.artifact.resolver.metadata.resolver;
  * under the License.
  */
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.apache.maven.mercury.client.MercuryException;
+import org.apache.maven.mercury.client.retrieve.DefaultRetrievalRequest;
+import org.apache.maven.mercury.client.retrieve.DefaultRetriever;
+import org.apache.maven.mercury.client.retrieve.RetrievalRequest;
+import org.apache.maven.mercury.client.retrieve.Retriever;
 
 /**
  * @author Jason van Zyl
  * @plexus.component
  */
 public class DefaultArtifactResolver
-    extends AbstractLogEnabled
     implements ArtifactResolver
 {
     public ResolutionResult resolve( ResolutionRequest request )
     {
         ResolutionResult result = new ResolutionResult();
+
+        // Setup the HTTP client
+        
+        Retriever retriever;
+                
+        try
+        {
+            retriever = new DefaultRetriever();
+        }
+        catch ( MercuryException e )
+        {
+            result.addException( e );
+            
+            return result;
+        }
+
+        // Create the retrieval request
+        
+        RetrievalRequest rr = new DefaultRetrievalRequest();                
+        
+        retriever.retrieve( rr );        
         
         return result;
     }

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.artifact.resolver.metadata.Artifact;
-import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersionException;
+import org.apache.maven.artifact.resolver.metadata.ArtifactRepository;
 
 /**
  * Specific problems during resolution that we want to account for:
@@ -45,175 +45,54 @@ import org.apache.maven.artifact.resolver.metadata.version.OverConstrainedVersio
  */
 public class ResolutionResult
 {
-    private Artifact originatingArtifact;
+    private Artifact artifact;
 
-    private List versionRangeViolations;
+    private List<ArtifactRepository> repositories;
 
-    private List metadataResolutionExceptions;
+    private List<Exception> exceptions;
 
-    private List missingArtifacts;
-
-    private List errorArtifactExceptions;
-
-    // file system errors
-
-    private List repositories;
-
-    private Set artifacts;
-
-    //
-
-    public Artifact getOriginatingArtifact()
+    public Artifact getArtifact()
     {
-        return originatingArtifact;
+        return artifact;
     }
 
-    public ResolutionResult ListOriginatingArtifact( Artifact originatingArtifact )
+    public void setArtifact( Artifact artifact )
     {
-        this.originatingArtifact = originatingArtifact;
-
-        return this;
+        this.artifact = artifact;
     }
 
-    /**
-     * 
-     * @return set of Artifact instances
-     */
-    
-    public Set getArtifacts()
+    public List<ArtifactRepository> getRepositories()
     {
-        return artifacts;
+        return repositories;
     }
 
-    public List getMissingArtifacts()
-    {
-        return missingArtifacts == null ? Collections.EMPTY_LIST : missingArtifacts;
-    }
-
-    public ResolutionResult addMissingArtifact( Artifact artifact )
-    {
-        missingArtifacts = initList( missingArtifacts );
-
-        missingArtifacts.add( artifact );
-
-        return this;
-    }
-
-    public ResolutionResult setUnresolvedArtifacts( List unresolvedArtifacts )
-    {
-        this.missingArtifacts = unresolvedArtifacts;
-
-        return this;
-    }
-
-    // ------------------------------------------------------------------------
-    // Version Range Violations
-    // ------------------------------------------------------------------------
-
-    public boolean hasVersionRangeViolations()
-    {
-        return versionRangeViolations != null;
-    }
-
-    /**
-     * @TODO this needs to accept a {@link OverConstrainedVersionException} as returned by
-     * {@link #getVersionRangeViolation(int)} but it's not used like that in
-     * {@link DefaultArtifactCollector}
-     */
-    public ResolutionResult addVersionRangeViolation( Exception e )
-    {
-        versionRangeViolations = initList( versionRangeViolations );
-
-        versionRangeViolations.add( e );
-
-        return this;
-    }
-
-    public OverConstrainedVersionException getVersionRangeViolation( int i )
-    {
-        return (OverConstrainedVersionException) versionRangeViolations.get( i );
-    }
-
-    public List getVersionRangeViolations()
-    {
-        return versionRangeViolations == null ? Collections.EMPTY_LIST : versionRangeViolations;
-    }
-
-    // ------------------------------------------------------------------------
-    // Metadata Resolution Exceptions: ArtifactResolutionExceptions
-    // ------------------------------------------------------------------------
-
-    public boolean hasMetadataResolutionExceptions()
-    {
-        return metadataResolutionExceptions != null;
-    }
-
-    public ResolutionResult addMetadataResolutionException( ArtifactResolutionException e )
-    {
-        metadataResolutionExceptions = initList( metadataResolutionExceptions );
-
-        metadataResolutionExceptions.add( e );
-
-        return this;
-    }
-
-    public ArtifactResolutionException getMetadataResolutionException( int i )
-    {
-        return (ArtifactResolutionException) metadataResolutionExceptions.get( i );
-    }
-
-    public List getMetadataResolutionExceptions()
-    {
-        return metadataResolutionExceptions == null ? Collections.EMPTY_LIST : metadataResolutionExceptions;
-    }
-
-    // ------------------------------------------------------------------------
-    // ErrorArtifactExceptions: ArtifactResolutionExceptions
-    // ------------------------------------------------------------------------
-
-    public boolean hasErrorArtifactExceptions()
-    {
-        return errorArtifactExceptions != null;
-    }
-
-    public ResolutionResult addErrorArtifactException( ArtifactResolutionException e )
-    {
-        errorArtifactExceptions = initList( errorArtifactExceptions );
-
-        errorArtifactExceptions.add( e );
-
-        return this;
-    }
-
-    public List getErrorArtifactExceptions()
-    {
-        return errorArtifactExceptions == null ? Collections.EMPTY_LIST : errorArtifactExceptions;
-    }
-
-    // ------------------------------------------------------------------------
-    //
-    // ------------------------------------------------------------------------
-
-    // Repositories
-
-    public List getRepositories()
-    {
-        return repositories == null ? Collections.EMPTY_LIST : repositories;
-    }
-
-    public ResolutionResult setRepositories( List repositories )
+    public void setRepositories( List<ArtifactRepository> repositories )
     {
         this.repositories = repositories;
-
-        return this;
     }
 
-    private List initList( List l )
+    public List<Exception> getExceptions()
     {
-        if ( l == null )
+        return exceptions;
+    }
+
+    public void addException( Exception e )
+    {
+        if ( exceptions == null )
         {
-            return new ArrayList();
+            exceptions = new ArrayList();
         }
-        return l;
+        
+        exceptions.add( e );
+    }
+    
+    public void setExceptions( List<Exception> exceptions )
+    {
+        this.exceptions = exceptions;
+    }
+
+    public boolean hasExceptions()
+    {
+        return exceptions != null;
     }
 }

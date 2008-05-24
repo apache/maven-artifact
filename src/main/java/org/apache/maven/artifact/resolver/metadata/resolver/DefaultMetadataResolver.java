@@ -51,7 +51,7 @@ public class DefaultMetadataResolver
             ResolutionResult result = artifactResolver.resolve( request );
 
             // Here we just need to deal with basic retrieval problems.
-            if ( result.hasMetadataResolutionExceptions() )
+            if ( result.hasExceptions() )
             {
                 pomArtifact.setResolved( false );
             }
@@ -71,8 +71,8 @@ public class DefaultMetadataResolver
 
                 if ( dependencies != null && dependencies.size() > 0 )
                 {
-                    int nKids = dependencies.size();
-                    node.setNChildren( nKids );
+                    int numberOfChildren = dependencies.size();
+                    node.setNChildren( numberOfChildren );
                     int kidNo = 0;
                     for ( ArtifactMetadata a : dependencies )
                     {
