@@ -81,3 +81,23 @@ These are all attributes of the target system
 
  inheritedScope goes away entirely from the model when a graph is used because the scope selected will be a function of
  how the graph is processed.
+ 
+ 24 May 2008
+ 
+ 1. Retrieval & Storage 
+    
+    There is the task of retrieving a set of resources from a data source atomically. Simple, and safe retrieval. Period. This has nothing to do with 
+    dependency management per se, but is the basis of any safe and reliable dependency management system. We need to deal with repository corruption
+    and recovery as well. The method employed by GIT with hierarchical checksums provides an efficient means to detect where in a repository corruption
+    has occured to make sure the problem can be correct, shunted around, or simply bring it to the users attention.
+ 
+ 2. Representation Processing 
+ 
+    There is the task of processing the representation of an artifact. In the case of Maven an artifact's representation is encapsulated in
+    a POM. If the representation refers to other representations i.e. dependencies then these have to be taken into account as well. The system
+    may allow transitive processing and this is where the real power of a dependency management system comes into play. The representations are
+    gathered into a tree structure where the flavour of the system imparts special processing on this tree to yield a graph. 
+    
+ Once the representation has been processed and we have a graph, we fall back to the retrieval mechanism to place the desired artifacts in
+ the storage system. Ultimately from this graph, according to the desired purpose we have set of artifacts that we can do something with.
+ 
