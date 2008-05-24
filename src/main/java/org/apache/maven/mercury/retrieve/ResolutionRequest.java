@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.resolver;
+package org.apache.maven.mercury.retrieve;
 
 import java.util.ArrayList;
 import java.util.List;

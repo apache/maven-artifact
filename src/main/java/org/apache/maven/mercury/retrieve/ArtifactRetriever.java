@@ -1,4 +1,5 @@
-package org.apache.maven.mercury.resolver;
+package org.apache.maven.mercury.retrieve;
+
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -20,12 +21,14 @@ package org.apache.maven.mercury.resolver;
  */
 
 /**
+ * Responsible for retrieving a set of artifacts.
+ * 
  * @author Jason van Zyl
  */
-public interface ArtifactResolver
+public interface ArtifactRetriever
 {
-    String ROLE = ArtifactResolver.class.getName();
+    String ROLE = ArtifactRetriever.class.getName();
 
     /** @since 3.0 */
-    ResolutionResult resolve( ResolutionRequest request );
+    ResolutionResult retrieve( ResolutionRequest request );
 }

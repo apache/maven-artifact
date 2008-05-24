@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.resolver;
+package org.apache.maven.mercury.retrieve;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -36,12 +36,12 @@ import org.apache.maven.mercury.client.retrieve.Retriever;
  * @author Jason van Zyl
  * @plexus.component
  */
-public class DefaultArtifactResolver
-    implements ArtifactResolver
+public class DefaultArtifactRetriever
+    implements ArtifactRetriever
 {
     ArtifactRepositoryLayout layout = new DefaultRepositoryLayout();
 
-    public ResolutionResult resolve( ResolutionRequest request )
+    public ResolutionResult retrieve( ResolutionRequest request )
     {
         ResolutionResult result = new ResolutionResult();
 

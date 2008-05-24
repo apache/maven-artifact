@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.resolver;
+package org.apache.maven.mercury.retrieve;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -27,21 +27,8 @@ import java.util.Set;
 import org.apache.maven.mercury.Artifact;
 import org.apache.maven.mercury.ArtifactRepository;
 
-/**
- * Specific problems during resolution that we want to account for:
- * <p/>
- * - missing metadata
- * - version range violations
- * - version circular dependencies
- * - missing artifacts
- * - network/transfer errors
- * - file system errors: permissions
- *
+/*
  * @author Jason van Zyl
- * @version $Id$
- * @TODO carlos: all these possible has*Exceptions and get*Exceptions methods make the clients too
- * complex requiring a long list of checks, need to create a parent/interfact/encapsulation
- * for the types of exceptions
  */
 public class ResolutionResult
 {

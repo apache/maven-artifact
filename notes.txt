@@ -101,3 +101,7 @@ These are all attributes of the target system
  Once the representation has been processed and we have a graph, we fall back to the retrieval mechanism to place the desired artifacts in
  the storage system. Ultimately from this graph, according to the desired purpose we have set of artifacts that we can do something with.
  
+Processing
+
+I have come to the conclusion that providing the necessary support for version ranges cannot be done without a SAT solver, as we are 
+approaching an NP complete problem and we're going to end up with an approximation and all the heavy lifting is being done already by SAT4J.

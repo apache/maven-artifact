@@ -6,6 +6,9 @@ import java.util.List;
 import org.apache.maven.mercury.Artifact;
 import org.apache.maven.mercury.ArtifactRepository;
 import org.apache.maven.mercury.DefaultArtifact;
+import org.apache.maven.mercury.retrieve.ArtifactRetriever;
+import org.apache.maven.mercury.retrieve.ResolutionRequest;
+import org.apache.maven.mercury.retrieve.ResolutionResult;
 
 /*
  * default implementation of the metadata resolver
@@ -20,7 +23,7 @@ public class DefaultMetadataResolver
     //------------------------------------------------------------------------
 
     /** @plexus.requirement */
-    ArtifactResolver artifactResolver;
+    ArtifactRetriever artifactResolver;
 
     /** @plexus.requirement */
     MetadataSource metadataSource;
@@ -48,7 +51,7 @@ public class DefaultMetadataResolver
 
             ResolutionRequest request = new ResolutionRequest().setArtifact( pomArtifact ).setLocalRepository( localRepository ).setRemoteRepostories( remoteRepositories );
 
-            ResolutionResult result = artifactResolver.resolve( request );
+            ResolutionResult result = artifactResolver.retrieve( request );
 
             // Here we just need to deal with basic retrieval problems.
             if ( result.hasExceptions() )

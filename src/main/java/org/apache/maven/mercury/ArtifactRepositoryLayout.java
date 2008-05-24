@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.resolver;
+package org.apache.maven.mercury;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,16 +19,10 @@ package org.apache.maven.mercury.resolver;
  * under the License.
  */
 
-import java.io.IOException;
-import java.util.List;
-
-import org.apache.maven.mercury.Artifact;
-
-/**
- * @author Jason van Zyl
- * @version $Id$
- */
-public class ArtifactResolutionException
-    extends Exception
+/** @author jdcasey */
+public interface ArtifactRepositoryLayout
 {
+    String ROLE = ArtifactRepositoryLayout.class.getName();
+
+    String pathOf( Artifact artifact );
 }
