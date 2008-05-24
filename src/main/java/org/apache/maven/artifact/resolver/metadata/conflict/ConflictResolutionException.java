@@ -10,8 +10,6 @@ package org.apache.maven.artifact.resolver.metadata.conflict;
 public class ConflictResolutionException
 extends Exception
 {
-	private static final long serialVersionUID = 2677613140287940255L;
-
 	public ConflictResolutionException()
 	{
 	}
