@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.transform;
+package org.apache.maven.mercury.representation.transform;
 
 import org.apache.maven.mercury.ArtifactScopeEnum;
 import org.apache.maven.mercury.representation.MetadataGraph;

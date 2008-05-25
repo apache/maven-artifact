@@ -1,8 +1,8 @@
-package org.apache.maven.mercury.conflict;
+package org.apache.maven.mercury.representation.conflict;
 
 import org.apache.maven.mercury.representation.MetadataGraphEdge;
-import org.apache.maven.mercury.version.ArtifactVersion;
-import org.apache.maven.mercury.version.DefaultArtifactVersion;
+import org.apache.maven.mercury.representation.version.ArtifactVersion;
+import org.apache.maven.mercury.representation.version.DefaultArtifactVersion;
 
 /*
  * 

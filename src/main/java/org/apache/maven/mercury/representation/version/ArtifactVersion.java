@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.version;
+package org.apache.maven.mercury.representation.version;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

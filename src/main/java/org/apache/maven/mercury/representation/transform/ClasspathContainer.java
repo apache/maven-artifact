@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.transform;
+package org.apache.maven.mercury.representation.transform;
 
 import java.util.ArrayList;
 import java.util.Iterator;

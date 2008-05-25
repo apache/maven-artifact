@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.transform;
+package org.apache.maven.mercury.representation.transform;
 
 /*
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>

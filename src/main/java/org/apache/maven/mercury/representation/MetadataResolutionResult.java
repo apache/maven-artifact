@@ -1,11 +1,11 @@
 package org.apache.maven.mercury.representation;
 
 import org.apache.maven.mercury.ArtifactScopeEnum;
-import org.apache.maven.mercury.conflict.ConflictResolutionException;
-import org.apache.maven.mercury.conflict.ConflictResolver;
-import org.apache.maven.mercury.transform.ClasspathContainer;
-import org.apache.maven.mercury.transform.ClasspathTransformation;
-import org.apache.maven.mercury.transform.MetadataGraphTransformationException;
+import org.apache.maven.mercury.representation.conflict.ConflictResolutionException;
+import org.apache.maven.mercury.representation.conflict.ConflictResolver;
+import org.apache.maven.mercury.representation.transform.ClasspathContainer;
+import org.apache.maven.mercury.representation.transform.ClasspathTransformation;
+import org.apache.maven.mercury.representation.transform.MetadataGraphTransformationException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 

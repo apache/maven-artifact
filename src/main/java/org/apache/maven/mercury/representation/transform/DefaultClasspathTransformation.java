@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.transform;
+package org.apache.maven.mercury.representation.transform;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,12 +6,12 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.apache.maven.mercury.ArtifactScopeEnum;
-import org.apache.maven.mercury.conflict.ConflictResolutionException;
-import org.apache.maven.mercury.conflict.ConflictResolver;
 import org.apache.maven.mercury.representation.ArtifactMetadata;
 import org.apache.maven.mercury.representation.MetadataGraph;
 import org.apache.maven.mercury.representation.MetadataGraphEdge;
 import org.apache.maven.mercury.representation.MetadataGraphVertex;
+import org.apache.maven.mercury.representation.conflict.ConflictResolutionException;
+import org.apache.maven.mercury.representation.conflict.ConflictResolver;
 
 /*
  * default implementation of the metadata classpath transformer

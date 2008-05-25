@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.conflict;
+package org.apache.maven.mercury.representation.conflict;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
