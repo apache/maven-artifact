@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.mercury.ArtifactScopeEnum;
-import org.apache.maven.mercury.resolver.ArtifactMetadata;
-import org.apache.maven.mercury.resolver.MetadataResolutionException;
-import org.apache.maven.mercury.resolver.MetadataTreeNode;
+import org.apache.maven.mercury.representation.ArtifactMetadata;
+import org.apache.maven.mercury.representation.MetadataResolutionException;
+import org.apache.maven.mercury.representation.MetadataTreeNode;
 
 /*
  * classpath container that is aware of the classpath scope

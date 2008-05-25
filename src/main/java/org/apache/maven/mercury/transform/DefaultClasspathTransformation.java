@@ -8,10 +8,10 @@ import java.util.List;
 import org.apache.maven.mercury.ArtifactScopeEnum;
 import org.apache.maven.mercury.conflict.ConflictResolutionException;
 import org.apache.maven.mercury.conflict.ConflictResolver;
-import org.apache.maven.mercury.resolver.ArtifactMetadata;
-import org.apache.maven.mercury.resolver.MetadataGraph;
-import org.apache.maven.mercury.resolver.MetadataGraphEdge;
-import org.apache.maven.mercury.resolver.MetadataGraphVertex;
+import org.apache.maven.mercury.representation.ArtifactMetadata;
+import org.apache.maven.mercury.representation.MetadataGraph;
+import org.apache.maven.mercury.representation.MetadataGraphEdge;
+import org.apache.maven.mercury.representation.MetadataGraphVertex;
 
 /*
  * default implementation of the metadata classpath transformer

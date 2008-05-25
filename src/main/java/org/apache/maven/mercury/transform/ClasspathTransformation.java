@@ -1,7 +1,7 @@
 package org.apache.maven.mercury.transform;
 
 import org.apache.maven.mercury.ArtifactScopeEnum;
-import org.apache.maven.mercury.resolver.MetadataGraph;
+import org.apache.maven.mercury.representation.MetadataGraph;
 
 /*
  * Helper class to conver an Md Graph into some form of a classpath

@@ -16,7 +16,7 @@ package org.apache.maven.mercury.conflict;
  */
 
 import org.apache.maven.mercury.ArtifactScopeEnum;
-import org.apache.maven.mercury.resolver.MetadataGraph;
+import org.apache.maven.mercury.representation.MetadataGraph;
 
 /*
  * Resolves conflicts in the supplied dependency graph. Different implementations will implement

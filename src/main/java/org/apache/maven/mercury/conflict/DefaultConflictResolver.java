@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.TreeSet;
 
 import org.apache.maven.mercury.ArtifactScopeEnum;
-import org.apache.maven.mercury.resolver.ArtifactMetadata;
-import org.apache.maven.mercury.resolver.MetadataGraph;
-import org.apache.maven.mercury.resolver.MetadataGraphEdge;
-import org.apache.maven.mercury.resolver.MetadataGraphVertex;
-import org.apache.maven.mercury.resolver.MetadataResolutionException;
+import org.apache.maven.mercury.representation.ArtifactMetadata;
+import org.apache.maven.mercury.representation.MetadataGraph;
+import org.apache.maven.mercury.representation.MetadataGraphEdge;
+import org.apache.maven.mercury.representation.MetadataGraphVertex;
+import org.apache.maven.mercury.representation.MetadataResolutionException;
 
 /*
  * Default conflict resolver.Implements closer newer first policy by default, but could be

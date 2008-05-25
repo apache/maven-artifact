@@ -1,6 +1,6 @@
 package org.apache.maven.mercury.conflict;
 
-import org.apache.maven.mercury.resolver.MetadataGraphEdge;
+import org.apache.maven.mercury.representation.MetadataGraphEdge;
 
 /*
  * MetadataGraph edge selection policy. Complements GraphConflictResolver by being injected into it
