@@ -120,6 +120,8 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "1.2.3-10000000000", "1.2.3-10000000001" );
         assertVersionOlder( "1.2.3-1", "1.2.3-10000000001" );
         assertVersionOlder( "2.3.0-v200706262000", "2.3.0-v200706262130" ); // org.eclipse:emf:2.3.0-v200706262000
+        // org.eclipse.wst.common_core.feature_2.0.0.v200706041905-7C78EK9E_EkMNfNOd2d8qq
+        assertVersionOlder( "2.0.0.v200706041905-7C78EK9E_EkMNfNOd2d8qq", "2.0.0.v200706041906-7C78EK9E_EkMNfNOd2d8qq" );
     }
 
     public void testVersionSnapshotComparing()
