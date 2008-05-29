@@ -76,6 +76,10 @@ public class DefaultArtifactVersionTest
         checkVersionParsing( "1.7.3.0-1" , 0, 0, 0, 0, "1.7.3.0-1" );
         checkVersionParsing( "PATCH-1193602" , 0, 0, 0, 0, "PATCH-1193602" );
         checkVersionParsing( "5.0.0alpha-2006020117" , 0, 0, 0, 0, "5.0.0alpha-2006020117" );
+
+        checkVersionParsing( "1.2.3.200705301630" , 0, 0, 0, 0, "1.2.3.200705301630" );
+        checkVersionParsing( "1.2.3-200705301630" , 1, 2, 3, 0, "200705301630" );
+
     }
 
     public void testVersionComparing()
@@ -112,6 +116,9 @@ public class DefaultArtifactVersionTest
 
         assertVersionOlder( "2.0.1", "2.0.1-123" );
         assertVersionOlder( "2.0.1-xyz", "2.0.1-123" );
+
+        assertVersionOlder( "1.2.3-10000000000", "1.2.3-10000000001" );
+        assertVersionOlder( "1.2.3-1", "1.2.3-10000000001" );
     }
 
     public void testVersionSnapshotComparing()
