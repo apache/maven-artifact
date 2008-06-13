@@ -50,8 +50,7 @@ public class ResolutionNode
 
     private List<Artifact> trail;
 
-    public ResolutionNode( Artifact artifact,
-                           List<ArtifactRepository> remoteRepositories )
+    public ResolutionNode( Artifact artifact, List<ArtifactRepository> remoteRepositories )
     {
         this.artifact = artifact;
         this.remoteRepositories = remoteRepositories;
@@ -60,9 +59,7 @@ public class ResolutionNode
         parent = null;
     }
 
-    public ResolutionNode( Artifact artifact,
-                           List<ArtifactRepository> remoteRepositories,
-                           ResolutionNode parent )
+    public ResolutionNode( Artifact artifact, List<ArtifactRepository> remoteRepositories, ResolutionNode parent )
     {
         this.artifact = artifact;
         this.remoteRepositories = remoteRepositories;
@@ -83,8 +80,7 @@ public class ResolutionNode
         return artifact.getDependencyConflictId();
     }
 
-    public void addDependencies( Set<Artifact> artifacts,
-                                 List<ArtifactRepository> remoteRepositories,
+    public void addDependencies( Set<Artifact> artifacts, List<ArtifactRepository> remoteRepositories,
                                  ArtifactFilter filter )
         throws CyclicDependencyException, OverConstrainedVersionException
     {
@@ -92,14 +88,16 @@ public class ResolutionNode
         {
             children = new ArrayList<ResolutionNode>( artifacts.size() );
 
-            for (Artifact a : artifacts) {
-                if (parents.contains(a.getDependencyConflictId())) {
-                    a.setDependencyTrail(getDependencyTrail());
+            for ( Artifact a : artifacts )
+            {
+                if ( parents.contains( a.getDependencyConflictId() ) )
+                {
+                    a.setDependencyTrail( getDependencyTrail() );
 
-                    throw new CyclicDependencyException("A dependency has introduced a cycle", a);
+                    throw new CyclicDependencyException( "A dependency has introduced a cycle", a );
                 }
 
-                children.add(new ResolutionNode(a, remoteRepositories, this));
+                children.add( new ResolutionNode( a, remoteRepositories, this ) );
             }
         }
         else
@@ -119,9 +117,10 @@ public class ResolutionNode
         List<Artifact> trial = getTrail();
 
         List<String> ret = new ArrayList<String>( trial.size() );
-        
-        for (Artifact artifact : trial) {
-            ret.add(artifact.getId());
+
+        for ( Artifact artifact : trial )
+        {
+            ret.add( artifact.getId() );
         }
 
         return ret;
@@ -141,15 +140,16 @@ public class ResolutionNode
                 {
                     // set the recommended version
                     ArtifactVersion selected = artifact.getSelectedVersion();
-                    //MNG-2123: null is a valid response to getSelectedVersion, don't
-                    //assume it won't ever be.
-                    if (selected != null)
+                    // MNG-2123: null is a valid response to getSelectedVersion, don't
+                    // assume it won't ever be.
+                    if ( selected != null )
                     {
                         artifact.selectVersion( selected.toString() );
                     }
                     else
                     {
-                        throw new OverConstrainedVersionException("Unable to get a selected Version for "+ artifact.getArtifactId(),artifact);
+                        throw new OverConstrainedVersionException( "Unable to get a selected Version for "
+                            + artifact.getArtifactId(), artifact );
                     }
                 }
 
@@ -174,7 +174,7 @@ public class ResolutionNode
         return parent != null && parent.parent == null;
     }
 
-    public Iterator getChildrenIterator()
+    public Iterator<ResolutionNode> getChildrenIterator()
     {
         return children.iterator();
     }
@@ -201,7 +201,8 @@ public class ResolutionNode
         // TODO: if it was null, we really need to go find them now... or is this taken care of by the ordering?
         if ( children != null )
         {
-            for (ResolutionNode node : children) {
+            for ( ResolutionNode node : children )
+            {
                 node.enable();
             }
         }
@@ -212,7 +213,8 @@ public class ResolutionNode
         active = false;
         if ( children != null )
         {
-            for (ResolutionNode node : children) {
+            for ( ResolutionNode node : children )
+            {
                 node.disable();
             }
         }

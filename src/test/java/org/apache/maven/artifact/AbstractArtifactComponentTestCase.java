@@ -35,8 +35,7 @@ import java.util.List;
 
 /**
  * @author <a href="mailto:jason@maven.org">Jason van Zyl </a>
- * @version $Id: AbstractArtifactComponentTestCase.java,v 1.5 2004/10/23 13:33:59
- *          jvanzyl Exp $
+ * @version $Id$
  */
 public abstract class AbstractArtifactComponentTestCase
     extends PlexusTestCase
@@ -45,7 +44,7 @@ public abstract class AbstractArtifactComponentTestCase
 
     /**
      * Return an existing file, not a directory - causes creation to fail.
-     *
+     * 
      * @throws Exception
      */
     protected ArtifactRepository badLocalRepository()
@@ -57,8 +56,8 @@ public abstract class AbstractArtifactComponentTestCase
 
         f.createNewFile();
 
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
+        ArtifactRepositoryLayout repoLayout =
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
 
         return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
     }
@@ -75,8 +74,8 @@ public abstract class AbstractArtifactComponentTestCase
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
+        ArtifactRepositoryLayout repoLayout =
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
 
         return new DefaultArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
     }
@@ -88,8 +87,8 @@ public abstract class AbstractArtifactComponentTestCase
 
         File f = new File( getBasedir(), path );
 
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
+        ArtifactRepositoryLayout repoLayout =
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
 
         return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
                                               new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
@@ -98,8 +97,8 @@ public abstract class AbstractArtifactComponentTestCase
     protected ArtifactRepository badRemoteRepository()
         throws Exception
     {
-        ArtifactRepositoryLayout repoLayout = (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE,
-                                                                                 "legacy" );
+        ArtifactRepositoryLayout repoLayout =
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
 
         return new DefaultArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
     }
@@ -168,10 +167,10 @@ public abstract class AbstractArtifactComponentTestCase
     //
     // ----------------------------------------------------------------------
 
-    protected List remoteRepositories()
+    protected List<ArtifactRepository> remoteRepositories()
         throws Exception
     {
-        List remoteRepositories = new ArrayList();
+        List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
 
         remoteRepositories.add( remoteRepository() );
 
@@ -275,4 +274,3 @@ public abstract class AbstractArtifactComponentTestCase
         }
     }
 }
-

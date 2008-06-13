@@ -31,196 +31,194 @@ import java.util.List;
 import java.util.TreeSet;
 
 /**
- * Default conflict resolver.Implements closer newer first policy 
- * by default, but could be configured via plexus 
+ * Default conflict resolver.Implements closer newer first policy by default, but could be configured via plexus
  * 
  * @plexus.component
- * 
  * @author <a href="mailto:oleg@codehaus.org">Oleg Gusakov</a>
- * 
  * @version $Id$
  */
 
 public class DefaultGraphConflictResolver
-implements GraphConflictResolver
+    implements GraphConflictResolver
 {
-	/**
+    /**
      * artifact, closer to the entry point, is selected
      * 
      * @plexus.requirement role="org.apache.maven.artifact.resolver.conflict.GraphConflictResolutionPolicy"
      */
-	protected GraphConflictResolutionPolicy policy;
-	//-------------------------------------------------------------------------------------
-	//-------------------------------------------------------------------------------------
-	public MetadataGraph resolveConflicts( MetadataGraph graph, ArtifactScopeEnum scope )
-	throws GraphConflictResolutionException
-	{
-		if( policy == null )
-			throw new GraphConflictResolutionException("no GraphConflictResolutionPolicy injected");
-		
-		if( graph == null )
-			return null;
+    protected GraphConflictResolutionPolicy policy;
 
-		final MetadataGraphVertex entry = graph.getEntry();
-		if( entry == null )
-			return null;
+    // -------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------
+    public MetadataGraph resolveConflicts( MetadataGraph graph, ArtifactScopeEnum scope )
+        throws GraphConflictResolutionException
+    {
+        if ( policy == null )
+            throw new GraphConflictResolutionException( "no GraphConflictResolutionPolicy injected" );
 
-		if( graph.isEmpty() )
-			throw new GraphConflictResolutionException("graph with an entry, but not vertices do not exist");
+        if ( graph == null )
+            return null;
 
-		if( graph.isEmptyEdges() )
-			return null; // no edges - nothing to worry about
-		
-		final TreeSet<MetadataGraphVertex> vertices = graph.getVertices();
-		
-		try {
-			// edge case - single vertex graph
-			if( vertices.size() == 1 )
-					return new MetadataGraph( entry );
-	
-			final ArtifactScopeEnum requestedScope = ArtifactScopeEnum.checkScope(scope);
-			
-			MetadataGraph res = new MetadataGraph( vertices.size() );
-			res.setVersionedVertices( false );
-			res.setScopedVertices( false );
-			
-			MetadataGraphVertex resEntry = res.addVertex( entry.getMd() );
-			res.setEntry( resEntry );
-			
-			res.setScope( requestedScope );
-	
-			for( MetadataGraphVertex v : vertices ) {
-				final List<MetadataGraphEdge> ins = graph.getIncidentEdges(v);
-				final MetadataGraphEdge edge = cleanEdges( v, ins, requestedScope );
-				
-				if( edge == null ) { // no edges - don't need this vertex any more
-					if( entry.equals(v) ) { // unless it's an entry point. 
-						// currently processing the entry point - it should not have any entry incident edges
-						res.getEntry().getMd().setWhy("This is a graph entry point. No links.");
-					} 
-					else
-					{
-//System.out.println("--->"+v.getMd().toDomainString()
-//+" has been terminated on this entry set\n-------------------\n"
-//+ins 
-//+"\n-------------------\n"
-//);
-					}
-				}
-				else
-				{
-//System.out.println("+++>"+v.getMd().toDomainString()+" still has "+edge.toString() );
-					// fill in domain md with actual version data
-					ArtifactMetadata md = v.getMd();
-					ArtifactMetadata newMd = new ArtifactMetadata(
-							md.getGroupId()
-							, md.getArtifactId()
-							, edge.getVersion()
-							, md.getType()
-							, md.getScopeAsEnum()
-							, md.getClassifier()
-							, edge.getArtifactUri()
-							, edge.getSource() == null ? ""	:  edge.getSource().getMd().toString()
-							, edge.isResolved()
-							, edge.getTarget() == null ? null : edge.getTarget().getMd().getError()
-									);
-					MetadataGraphVertex newV = res.addVertex( newMd );
-					MetadataGraphVertex sourceV = res.addVertex( edge.getSource().getMd() );
+        final MetadataGraphVertex entry = graph.getEntry();
+        if ( entry == null )
+            return null;
 
-					res.addEdge( sourceV, newV, edge );
-				}
-			}
-			MetadataGraph linkedRes = findLinkedSubgraph( res );
-//System.err.println("Original graph("+graph.getVertices().size()+"):\n"+graph.toString());
-//System.err.println("Cleaned("+requestedScope+") graph("+res.getVertices().size()+"):\n"+res.toString());
-//System.err.println("Linked("+requestedScope+") subgraph("+linkedRes.getVertices().size()+"):\n"+linkedRes.toString());
-			return linkedRes;
-		} catch (MetadataResolutionException e) {
-			throw new GraphConflictResolutionException(e);
-		}
-	}
-	//-------------------------------------------------------------------------------------
-	private final MetadataGraph findLinkedSubgraph( MetadataGraph g )
-	{
-		if( g.getVertices().size() == 1 )
-			return g;
-		
-		List<MetadataGraphVertex> visited = new ArrayList<MetadataGraphVertex>( g.getVertices().size() );
-		visit( g.getEntry(), visited, g );
-		
-		List<MetadataGraphVertex> dropList = new ArrayList<MetadataGraphVertex>( g.getVertices().size() );
+        if ( graph.isEmpty() )
+            throw new GraphConflictResolutionException( "graph with an entry, but not vertices do not exist" );
 
-		// collect drop list
-		for( MetadataGraphVertex v : g.getVertices() )
-		{
-			if( !visited.contains(v) )
-				dropList.add( v );
-		}
-		
-		if( dropList.size() < 1 )
-			return g;
-		
-		// now - drop vertices
-		TreeSet<MetadataGraphVertex> vertices = g.getVertices();
-		for( MetadataGraphVertex v : dropList ) 
-		{
-			vertices.remove(v);
-		}
-		
-		return g;
-	}
-	//-------------------------------------------------------------------------------------
-	private final void visit( MetadataGraphVertex from
-							, List<MetadataGraphVertex> visited
-							, MetadataGraph graph
-							)
-	{
-		if( visited.contains( from ) )
-			return;
-		
-		visited.add(from);
-		
-		List<MetadataGraphEdge> exitList =  graph.getExcidentEdges(from);
-//String s = "|---> "+from.getMd().toString()+" - "+(exitList == null ? -1 : exitList.size()) + " exit links";
-		if( exitList != null && exitList.size() > 0 ) {
-			for( MetadataGraphEdge e : graph.getExcidentEdges(from) ) 
-			{
-				visit( e.getTarget(), visited, graph );
-			}
-		}
-	}
-	//-------------------------------------------------------------------------------------
-	private final MetadataGraphEdge cleanEdges( MetadataGraphVertex v
-												, List<MetadataGraphEdge> edges
-												, ArtifactScopeEnum scope
-											  )
-	{
-		if( edges == null || edges.isEmpty() )
-			return null;
+        if ( graph.isEmptyEdges() )
+            return null; // no edges - nothing to worry about
 
-		if( edges.size() == 1 ) {
-			MetadataGraphEdge e = edges.get(0);
-			if( scope.encloses( e.getScope() ) )
-				return e;
+        final TreeSet<MetadataGraphVertex> vertices = graph.getVertices();
 
-			return null;
-		}
-		
-		MetadataGraphEdge res = null;
-		
-		for( MetadataGraphEdge e : edges )
-		{
-			if( !scope.encloses( e.getScope()) )
-				continue;
+        try
+        {
+            // edge case - single vertex graph
+            if ( vertices.size() == 1 )
+                return new MetadataGraph( entry );
 
-			if( res == null )
-				res = e;
-			else
-				res = policy.apply( e, res );
-		}
+            final ArtifactScopeEnum requestedScope = ArtifactScopeEnum.checkScope( scope );
 
-		return res;
-	}
-	//-------------------------------------------------------------------------------------
-	//-------------------------------------------------------------------------------------
+            MetadataGraph res = new MetadataGraph( vertices.size() );
+            res.setVersionedVertices( false );
+            res.setScopedVertices( false );
+
+            MetadataGraphVertex resEntry = res.addVertex( entry.getMd() );
+            res.setEntry( resEntry );
+
+            res.setScope( requestedScope );
+
+            for ( MetadataGraphVertex v : vertices )
+            {
+                final List<MetadataGraphEdge> ins = graph.getIncidentEdges( v );
+                final MetadataGraphEdge edge = cleanEdges( v, ins, requestedScope );
+
+                if ( edge == null )
+                { // no edges - don't need this vertex any more
+                    if ( entry.equals( v ) )
+                    { // unless it's an entry point.
+                        // currently processing the entry point - it should not have any entry incident edges
+                        res.getEntry().getMd().setWhy( "This is a graph entry point. No links." );
+                    }
+                    else
+                    {
+                        // System.out.println("--->"+v.getMd().toDomainString()
+                        // +" has been terminated on this entry set\n-------------------\n"
+                        // +ins
+                        // +"\n-------------------\n"
+                        // );
+                    }
+                }
+                else
+                {
+                    // System.out.println("+++>"+v.getMd().toDomainString()+" still has "+edge.toString() );
+                    // fill in domain md with actual version data
+                    ArtifactMetadata md = v.getMd();
+                    ArtifactMetadata newMd =
+                        new ArtifactMetadata( md.getGroupId(), md.getArtifactId(), edge.getVersion(), md.getType(),
+                                              md.getScopeAsEnum(), md.getClassifier(), edge.getArtifactUri(),
+                                              edge.getSource() == null ? "" : edge.getSource().getMd().toString(),
+                                              edge.isResolved(), edge.getTarget() == null ? null
+                                                              : edge.getTarget().getMd().getError() );
+                    MetadataGraphVertex newV = res.addVertex( newMd );
+                    MetadataGraphVertex sourceV = res.addVertex( edge.getSource().getMd() );
+
+                    res.addEdge( sourceV, newV, edge );
+                }
+            }
+            MetadataGraph linkedRes = findLinkedSubgraph( res );
+            // System.err.println("Original graph("+graph.getVertices().size()+"):\n"+graph.toString());
+            // System.err.println("Cleaned("+requestedScope+") graph("+res.getVertices().size()+"):\n"+res.toString());
+            // System.err.println("Linked("+requestedScope+")
+            // subgraph("+linkedRes.getVertices().size()+"):\n"+linkedRes.toString());
+            return linkedRes;
+        }
+        catch ( MetadataResolutionException e )
+        {
+            throw new GraphConflictResolutionException( e );
+        }
+    }
+
+    // -------------------------------------------------------------------------------------
+    private MetadataGraph findLinkedSubgraph( MetadataGraph g )
+    {
+        if ( g.getVertices().size() == 1 )
+            return g;
+
+        List<MetadataGraphVertex> visited = new ArrayList<MetadataGraphVertex>( g.getVertices().size() );
+        visit( g.getEntry(), visited, g );
+
+        List<MetadataGraphVertex> dropList = new ArrayList<MetadataGraphVertex>( g.getVertices().size() );
+
+        // collect drop list
+        for ( MetadataGraphVertex v : g.getVertices() )
+        {
+            if ( !visited.contains( v ) )
+                dropList.add( v );
+        }
+
+        if ( dropList.size() < 1 )
+            return g;
+
+        // now - drop vertices
+        TreeSet<MetadataGraphVertex> vertices = g.getVertices();
+        for ( MetadataGraphVertex v : dropList )
+        {
+            vertices.remove( v );
+        }
+
+        return g;
+    }
+
+    // -------------------------------------------------------------------------------------
+    private void visit( MetadataGraphVertex from, List<MetadataGraphVertex> visited, MetadataGraph graph )
+    {
+        if ( visited.contains( from ) )
+            return;
+
+        visited.add( from );
+
+        List<MetadataGraphEdge> exitList = graph.getExcidentEdges( from );
+        // String s = "|---> "+from.getMd().toString()+" - "+(exitList == null ? -1 : exitList.size()) + " exit links";
+        if ( exitList != null && exitList.size() > 0 )
+        {
+            for ( MetadataGraphEdge e : graph.getExcidentEdges( from ) )
+            {
+                visit( e.getTarget(), visited, graph );
+            }
+        }
+    }
+
+    // -------------------------------------------------------------------------------------
+    private MetadataGraphEdge cleanEdges( MetadataGraphVertex v, List<MetadataGraphEdge> edges, ArtifactScopeEnum scope )
+    {
+        if ( edges == null || edges.isEmpty() )
+            return null;
+
+        if ( edges.size() == 1 )
+        {
+            MetadataGraphEdge e = edges.get( 0 );
+            if ( scope.encloses( e.getScope() ) )
+                return e;
+
+            return null;
+        }
+
+        MetadataGraphEdge res = null;
+
+        for ( MetadataGraphEdge e : edges )
+        {
+            if ( !scope.encloses( e.getScope() ) )
+                continue;
+
+            if ( res == null )
+                res = e;
+            else
+                res = policy.apply( e, res );
+        }
+
+        return res;
+    }
+    // -------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------
 }

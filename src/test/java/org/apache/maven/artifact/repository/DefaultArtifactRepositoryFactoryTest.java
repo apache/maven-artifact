@@ -10,7 +10,6 @@ import org.codehaus.plexus.util.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class DefaultArtifactRepositoryFactoryTest
@@ -18,7 +17,7 @@ public class DefaultArtifactRepositoryFactoryTest
 {
     private ArtifactRepositoryFactory repoFactory;
 
-    private Set toDelete = new HashSet();
+    private Set<File> toDelete = new HashSet<File>();
 
     public void setUp()
         throws Exception
@@ -31,10 +30,8 @@ public class DefaultArtifactRepositoryFactoryTest
     public void tearDown()
         throws Exception
     {
-        for ( Iterator it = toDelete.iterator(); it.hasNext(); )
+        for ( File f : toDelete )
         {
-            File f = (File) it.next();
-
             if ( f.exists() )
             {
                 FileUtils.forceDelete( f );

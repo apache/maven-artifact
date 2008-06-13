@@ -57,7 +57,7 @@ public class TestFileManager
 
     public static final String TEMP_DIR_PATH = System.getProperty( "java.io.tmpdir" );
 
-    private List filesToDelete = new ArrayList();
+    private List<File> filesToDelete = new ArrayList<File>();
 
     private final String baseFilename;
 
@@ -118,6 +118,7 @@ public class TestFileManager
         }
         catch ( InterruptedException e )
         {
+            // ignore
         }
 
         File dir = new File( TEMP_DIR_PATH, baseFilename + System.currentTimeMillis() );
@@ -143,7 +144,7 @@ public class TestFileManager
     {
         for ( Iterator it = filesToDelete.iterator(); it.hasNext(); )
         {
-            File file = ( File ) it.next();
+            File file = (File) it.next();
 
             if ( file.exists() )
             {

@@ -30,7 +30,6 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * @author Jason van Zyl
@@ -48,10 +47,7 @@ public class DefaultArtifactInstaller
 
     /** @deprecated we want to use the artifact method only, and ensure artifact.file is set correctly. */
     @Deprecated
-    public void install( String basedir,
-                         String finalName,
-                         Artifact artifact,
-                         ArtifactRepository localRepository )
+    public void install( String basedir, String finalName, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
         String extension = artifact.getArtifactHandler().getExtension();
@@ -60,9 +56,7 @@ public class DefaultArtifactInstaller
         install( source, artifact, localRepository );
     }
 
-    public void install( File source,
-                         Artifact artifact,
-                         ArtifactRepository localRepository )
+    public void install( File source, Artifact artifact, ArtifactRepository localRepository )
         throws ArtifactInstallationException
     {
         try
@@ -83,14 +77,14 @@ public class DefaultArtifactInstaller
             FileUtils.copyFile( source, destination );
 
             // must be after the artifact is installed
-            for ( Iterator i = artifact.getMetadataList().iterator(); i.hasNext(); )
+            for ( ArtifactMetadata metadata : artifact.getMetadataList() )
             {
-                ArtifactMetadata metadata = (ArtifactMetadata) i.next();
                 repositoryMetadataManager.install( metadata, localRepository );
             }
-            // TODO: would like to flush this, but the plugin metadata is added in advance, not as an install/deploy transformation
+            // TODO: would like to flush this, but the plugin metadata is added in advance, not as an install/deploy
+            // transformation
             // This would avoid the need to merge and clear out the state during deployment
-//            artifact.getMetadataList().clear();
+            // artifact.getMetadataList().clear();
         }
         catch ( IOException e )
         {

@@ -6,6 +6,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,22 +15,17 @@ import java.util.List;
 public class SimpleArtifactMetadataSource
     implements ArtifactMetadataSource
 {
-    public ResolutionGroup retrieve( Artifact artifact,
-                                     ArtifactRepository localRepository,
-                                     List remoteRepositories )
+    public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        ResolutionGroup rg = new ResolutionGroup( null, null, null );
-
-        return rg;
+        return new ResolutionGroup( null, null, null );
     }
 
-    public List retrieveAvailableVersions( Artifact artifact,
-                                           ArtifactRepository localRepository,
-                                           List remoteRepositories )
+    public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                            List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException
     {
-        List versions = new ArrayList();
+        List<ArtifactVersion> versions = new ArrayList<ArtifactVersion>();
 
         versions.add( new DefaultArtifactVersion( "10.1.3" ) );
 

@@ -28,9 +28,9 @@ public class TestTransferListener
     extends AbstractTransferListener
 {
 
-    private final List transfers = new ArrayList();
+    private final List<String> transfers = new ArrayList<String>();
 
-    public List getTransfers()
+    public List<String> getTransfers()
     {
         return transfers;
     }

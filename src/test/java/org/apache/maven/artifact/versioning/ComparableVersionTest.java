@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 /**
  * Test ComparableVersion.
- *
+ * 
  * @author <a href="mailto:hboutemy@apache.org">Herve Boutemy</a>
  * @version $Id$
  */
@@ -37,28 +37,27 @@ public class ComparableVersionTest
         return new ComparableVersion( version );
     }
 
-    private static final String[] VERSIONS_QUALIFIER = {
-        "1-SNAPSHOT", "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-m2", "1-m11", "1-rc",
-        "1-cr2", "1-rc123", "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-1-snapshot", "1-1", "1-2", "1-123"
-    };
+    private static final String[] VERSIONS_QUALIFIER =
+        { "1-SNAPSHOT", "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-m2", "1-m11",
+            "1-rc", "1-cr2", "1-rc123", "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-1-snapshot", "1-1",
+            "1-2", "1-123" };
 
-    private static final String[] VERSIONS_NUMBER = {
-        "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1",
-        "2.2", "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m"
-    };
+    private static final String[] VERSIONS_NUMBER =
+        { "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1",
+            "2.2", "2.123", "11.a2", "11.a11", "11.b2", "11.b11", "11.m2", "11.m11", "11", "11.a", "11b", "11c", "11m" };
 
     private void checkVersionsOrder( String[] versions )
     {
-        Comparable[] c = new Comparable[ versions.length ];
-        for( int i = 0; i < versions.length; i++ )
+        Comparable[] c = new Comparable[versions.length];
+        for ( int i = 0; i < versions.length; i++ )
         {
             c[i] = newComparable( versions[i] );
         }
 
-        for( int i = 1; i < versions.length; i++)
+        for ( int i = 1; i < versions.length; i++ )
         {
             Comparable low = c[i - 1];
-            for( int j = i; j < versions.length; j++ )
+            for ( int j = i; j < versions.length; j++ )
             {
                 Comparable high = c[j];
                 assertTrue( "expected " + low + " < " + high, low.compareTo( high ) < 0 );
@@ -160,9 +159,9 @@ public class ComparableVersionTest
         Locale[] locales = { Locale.ENGLISH, new Locale( "tr" ), Locale.getDefault() };
         try
         {
-            for ( int i = 0; i < locales.length; i++ )
+            for ( Locale locale : locales )
             {
-                Locale.setDefault( locales[i] );
+                Locale.setDefault( locale );
                 checkVersionsEqual( "1-abcdefghijklmnopqrstuvwxyz", "1-ABCDEFGHIJKLMNOPQRSTUVWXYZ" );
             }
         }

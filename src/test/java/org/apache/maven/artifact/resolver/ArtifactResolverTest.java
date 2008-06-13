@@ -136,9 +136,9 @@ public class ArtifactResolverTest
             }
         };
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( g ),
-                                                                                projectArtifact, remoteRepositories(),
-                                                                                localRepository(), mds );
+        ArtifactResolutionResult result =
+            artifactResolver.resolveTransitively( Collections.singleton( g ), projectArtifact, remoteRepositories(),
+                                                  localRepository(), mds );
 
         assertEquals( 2, result.getArtifacts().size() );
 
@@ -192,9 +192,9 @@ public class ArtifactResolverTest
             }
         };
 
-        ArtifactResolutionResult result = artifactResolver.resolveTransitively( Collections.singleton( i ),
-                                                                                projectArtifact, remoteRepositories(),
-                                                                                localRepository(), mds );
+        ArtifactResolutionResult result =
+            artifactResolver.resolveTransitively( Collections.singleton( i ), projectArtifact, remoteRepositories(),
+                                                  localRepository(), mds );
 
         assertEquals( 2, result.getArtifacts().size() );
 
@@ -229,7 +229,7 @@ public class ArtifactResolverTest
         Artifact l = createRemoteArtifact( "l", "1.0-SNAPSHOT" );
         deleteLocalArtifact( l );
 
-        List repositories = new ArrayList();
+        List<ArtifactRepository> repositories = new ArrayList<ArtifactRepository>();
         repositories.add( remoteRepository() );
         repositories.add( badRemoteRepository() );
 
@@ -269,7 +269,8 @@ public class ArtifactResolverTest
         set.add( n );
         set.add( m );
 
-        result = artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
+        result =
+            artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
 
         Iterator i = result.getArtifacts().iterator();
         assertEquals( "n should be first", n, i.next() );
@@ -280,7 +281,8 @@ public class ArtifactResolverTest
         set.add( m );
         set.add( n );
 
-        result = artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
+        result =
+            artifactResolver.resolveTransitively( set, projectArtifact, remoteRepositories(), localRepository(), mds );
 
         i = result.getArtifacts().iterator();
         assertEquals( "m should be first", m, i.next() );
