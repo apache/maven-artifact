@@ -139,7 +139,13 @@ public class DefaultWagonManager
     public Wagon getWagon( String protocol )
         throws UnsupportedProtocolException
     {
-        Wagon wagon = (Wagon) wagons.get( protocol );
+        if ( protocol == null )
+        {
+            throw new UnsupportedProtocolException( "Unspecified protocol" );
+        }
+
+        String hint = protocol.toLowerCase( java.util.Locale.ENGLISH );
+        Wagon wagon = (Wagon) wagons.get( hint );
 
         if ( wagon == null )
         {

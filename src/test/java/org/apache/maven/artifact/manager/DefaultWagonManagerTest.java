@@ -281,6 +281,21 @@ public class DefaultWagonManagerTest
     }
 
     /**
+     * Checks that lookup by protocol/scheme is case-insensitive as suggested by RFC 2396, "3.1. Scheme Component".
+     */
+    public void testGetWagonCaseInsensitive()
+        throws Exception
+    {
+        assertWagon( "a" );
+
+        assertWagon( "A" );
+
+        assertWagonRepository( "a" );
+
+        assertWagonRepository( "A" );
+    }
+
+    /**
      * Check that transfer listeners are properly removed after getArtifact and putArtifact
      */
     public void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact()
