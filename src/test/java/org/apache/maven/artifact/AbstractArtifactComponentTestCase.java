@@ -27,8 +27,9 @@ import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.codehaus.plexus.PlexusTestCase;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,7 +226,7 @@ public abstract class AbstractArtifactComponentTestCase
             artifactFile.getParentFile().mkdirs();
         }
 
-        Writer writer = new FileWriter( artifactFile );
+        Writer writer = new OutputStreamWriter( new FileOutputStream( artifactFile ), "ISO-8859-1" );
 
         writer.write( artifact.getId() );
 

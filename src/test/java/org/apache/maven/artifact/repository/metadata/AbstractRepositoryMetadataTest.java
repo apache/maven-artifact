@@ -65,7 +65,7 @@ public class AbstractRepositoryMetadataTest
         trm.updateRepositoryMetadata( local.repository, remote.repository );
 
         fileManager.assertFileExistence( basedir, path, true );
-        assertTrue( fileManager.getFileContents( new File( basedir, path ) ).indexOf( "<version>"
+        assertTrue( fileManager.getFileContents( new File( basedir, path ), "UTF-8" ).indexOf( "<version>"
             + Artifact.LATEST_VERSION + "</version>" ) < 0 );
 
         mm.verifyAll();
@@ -94,7 +94,7 @@ public class AbstractRepositoryMetadataTest
         trm.updateRepositoryMetadata( local.repository, remote.repository );
 
         fileManager.assertFileExistence( basedir, path, true );
-        assertTrue( fileManager.getFileContents( new File( basedir, path ) ).indexOf( "<version>"
+        assertTrue( fileManager.getFileContents( new File( basedir, path ), "UTF-8" ).indexOf( "<version>"
             + Artifact.RELEASE_VERSION + "</version>" ) < 0 );
 
         mm.verifyAll();

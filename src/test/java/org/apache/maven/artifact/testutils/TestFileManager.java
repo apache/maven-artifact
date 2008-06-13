@@ -40,14 +40,9 @@ package org.apache.maven.artifact.testutils;
 
 import junit.framework.Assert;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -178,77 +173,36 @@ public class TestFileManager
         }
     }
 
-    public void assertFileContents( File dir, String filename, String contentsTest )
+    public void assertFileContents( File dir, String filename, String contentsTest, String encoding )
         throws IOException
     {
         assertFileExistence( dir, filename, true );
 
         File file = new File( dir, filename );
 
-        FileReader reader = null;
-        StringWriter writer = new StringWriter();
+        String contents = FileUtils.fileRead( file, encoding );
 
-        try
-        {
-            reader = new FileReader( file );
-
-            IOUtil.copy( reader, writer );
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        Assert.assertEquals( contentsTest, writer.toString() );
+        Assert.assertEquals( contentsTest, contents );
     }
 
-    public File createFile( File dir, String filename, String contents )
+    public File createFile( File dir, String filename, String contents, String encoding )
         throws IOException
     {
         File file = new File( dir, filename );
 
         file.getParentFile().mkdirs();
 
-        FileWriter writer = null;
-
-        try
-        {
-            writer = new FileWriter( file );
-
-            IOUtil.copy( new StringReader( contents ), writer );
-        }
-        finally
-        {
-            IOUtil.close( writer );
-        }
+        FileUtils.fileWrite( file.getPath(), encoding, contents );
 
         markForDeletion( file );
 
         return file;
     }
 
-    public String getFileContents( File file )
+    public String getFileContents( File file, String encoding )
         throws IOException
     {
-        String result = null;
-
-        FileReader reader = null;
-        try
-        {
-            reader = new FileReader( file );
-
-            StringWriter writer = new StringWriter();
-
-            IOUtil.copy( reader, writer );
-
-            result = writer.toString();
-        }
-        finally
-        {
-            IOUtil.close( reader );
-        }
-
-        return result;
+        return FileUtils.fileRead( file, encoding );
     }
 
     protected void finalize()
@@ -259,11 +213,11 @@ public class TestFileManager
         super.finalize();
     }
 
-    public File createFile( String filename, String content )
+    public File createFile( String filename, String content, String encoding )
         throws IOException
     {
         File dir = createTempDir();
-        return createFile( dir, filename, content );
+        return createFile( dir, filename, content, encoding );
     }
 
 }
