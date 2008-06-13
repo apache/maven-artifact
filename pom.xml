@@ -38,6 +38,9 @@ under the License.
     <contributor>
       <name>Oleg Gusakov</name>      
     </contributor>
+    <contributor>
+      <name>Jason Dillon</name>      
+    </contributor>
   </contributors>
   <dependencies>
     <dependency>
