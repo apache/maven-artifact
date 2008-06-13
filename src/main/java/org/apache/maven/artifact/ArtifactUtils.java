@@ -23,7 +23,7 @@ import org.apache.maven.artifact.versioning.VersionRange;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -93,7 +93,7 @@ public final class ArtifactUtils
 
     public static Map<String,Artifact> artifactMapByVersionlessId( Collection<Artifact> artifacts )
     {
-        Map<String,Artifact> artifactMap = new HashMap<String,Artifact>();
+        Map<String,Artifact> artifactMap = new LinkedHashMap<String,Artifact>();
 
         if ( artifacts != null )
         {
@@ -107,7 +107,7 @@ public final class ArtifactUtils
 
     public static Map<String,Artifact> artifactMapByArtifactId( Collection<Artifact> artifacts )
     {
-        Map<String,Artifact> artifactMap = new HashMap<String,Artifact>();
+        Map<String,Artifact> artifactMap = new LinkedHashMap<String,Artifact>();
 
         if ( artifacts != null )
         {
