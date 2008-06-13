@@ -158,13 +158,20 @@ public class DefaultArtifactVersionTest
         assertVersionOlder( "2.0.1-xyz-SNAPSHOT", "2.0.1-123-SNAPSHOT" );
     }
 
-
     public void testSnapshotVsReleases()
     {
         //assertVersionOlder( "1.0-RC1", "1.0-SNAPSHOT" ); not feasible if "1.0-SNAPSHOT" < "1.0-beta-1" too
         assertVersionOlder( "1.0-SNAPSHOT", "1.0-RC1" );
         assertVersionOlder( "1.0-SNAPSHOT", "1.0-rc1" );
         assertVersionOlder( "1.0-SNAPSHOT", "1.0-rc-1" );
+    }
+
+    public void testHashCode()
+    {
+        ArtifactVersion v1 = newArtifactVersion( "1" );
+        ArtifactVersion v2 = newArtifactVersion( "1.0" );
+        assertEquals( true, v1.equals( v2 ) );
+        assertEquals( v1.hashCode(), v2.hashCode() );
     }
 
     private void assertVersionOlder( String left, String right )
