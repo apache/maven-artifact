@@ -41,6 +41,33 @@ under the License.
     <contributor>
       <name>Jason Dillon</name>      
     </contributor>
+    <contributor>
+      <name>Igor Fedorenko</name>      
+    </contributor>
+    <contributor>
+      <name>James William Dumay</name>      
+    </contributor>
+    <contributor>
+      <name>Abel Muiño</name>      
+    </contributor>
+    <contributor>
+      <name>Bruno Aranda</name>      
+    </contributor>
+    <contributor>
+      <name>Piotr Bzdyl</name>      
+    </contributor>
+    <contributor>
+      <name>Jerome Lacoste</name>      
+    </contributor>
+    <contributor>
+      <name>Lester Ecarma</name>      
+    </contributor>
+    <contributor>
+      <name>Matthew Inger</name>      
+    </contributor>
+    <contributor>
+      <name>Andreas Hoheneder</name>      
+    </contributor>
   </contributors>
   <dependencies>
     <dependency>
