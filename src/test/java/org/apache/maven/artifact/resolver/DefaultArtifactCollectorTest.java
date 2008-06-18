@@ -39,6 +39,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.filter.ArtifactFilter;
 import org.apache.maven.artifact.resolver.filter.ExclusionSetFilter;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.OverConstrainedVersionException;
@@ -841,7 +842,8 @@ public class DefaultArtifactCollectorTest
 
         private Map versions = new HashMap();
 
-        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository, List remoteRepositories )
+        public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
+                                         List<ArtifactRepository> remoteRepositories )
             throws ArtifactMetadataRetrievalException
         {
             String key = getKey( artifact );
@@ -911,18 +913,6 @@ public class DefaultArtifactCollectorTest
             return projectArtifacts;
         }
 
-        public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                               List remoteRepositories )
-            throws ArtifactMetadataRetrievalException
-        {
-            List artifactVersions = (List) versions.get( artifact.getDependencyConflictId() );
-            if ( artifactVersions == null )
-            {
-                artifactVersions = Collections.EMPTY_LIST;
-            }
-            return artifactVersions;
-        }
-
         public void addArtifact( ArtifactSpec spec )
         {
             artifacts.put( getKey( spec.artifact ), spec );
@@ -938,6 +928,32 @@ public class DefaultArtifactCollectorTest
             {
                 artifactVersions.add( new DefaultArtifactVersion( spec.artifact.getVersion() ) );
             }
+        }
+
+        public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
+                                                                List<ArtifactRepository> remoteRepositories )
+            throws ArtifactMetadataRetrievalException
+        {
+            return retrieveAvailableVersions( artifact );
+        }
+
+        public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+                                                                                        Artifact artifact,
+                                                                                        ArtifactRepository localRepository,
+                                                                                        ArtifactRepository remoteRepository )
+            throws ArtifactMetadataRetrievalException
+        {
+            return retrieveAvailableVersions( artifact );
+        }
+
+        private List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact )
+        {
+            List artifactVersions = (List) versions.get( artifact.getDependencyConflictId() );
+            if ( artifactVersions == null )
+            {
+                artifactVersions = Collections.EMPTY_LIST;
+            }
+            return artifactVersions;
         }
     }
 }

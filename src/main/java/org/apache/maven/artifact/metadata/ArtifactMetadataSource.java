@@ -57,4 +57,21 @@ public interface ArtifactMetadataSource
                                     ArtifactRepository localRepository,
                                     List<ArtifactRepository> remoteRepositories )
         throws ArtifactMetadataRetrievalException;
+
+    /**
+     * Get a list of available versions for an artifact in the remote deployment repository. This ignores any update
+     * policy checks and mirrors and always retrieves the latest information from the given repository.
+     * 
+     * @param artifact artifact we are interested in. Only <code>groupid</code> and <code>artifactId</code> are
+     *            needed, for instance the following code will work
+     *            <code>artifactFactory.createProjectArtifact( "org.apache.maven", "maven", "" )</code>
+     * @param localRepository    local repository
+     * @param deploymentRepository remote repository
+     * @return {@link List} $lt; {@link ArtifactVersion} >
+     * @throws ArtifactMetadataRetrievalException
+     *          in case of error while retrieving repository metadata from the repository.
+     */
+    List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository( Artifact artifact,
+                                                                             ArtifactRepository localRepository,
+                                                                             ArtifactRepository remoteRepository ) throws ArtifactMetadataRetrievalException;
 }

@@ -21,6 +21,8 @@ package org.apache.maven.artifact.deployer;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTestCase;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 
@@ -54,10 +56,14 @@ public class ArtifactDeployerTest
         Artifact artifact = createArtifact( "artifact", "1.0" );
 
         File file = new File( artifactBasedir, "artifact-1.0.jar" );
+        assertEquals( "dummy\n", FileUtils.fileRead( file ) );
 
         artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
 
-        assertRemoteArtifactPresent( artifact );
+        ArtifactRepository remoteRepository = remoteRepository();
+        File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
+        assertTrue( deployedFile.exists() );
+        assertEquals( "dummy\n", FileUtils.fileRead( deployedFile ) );
     }
 
     public void testArtifactDeploymentForArtifactThatHasAlreadyBeenDeployed()
@@ -67,15 +73,25 @@ public class ArtifactDeployerTest
 
         Artifact artifact = createArtifact( "artifact", "10.1.3" );
 
-        File file = new File( artifactBasedir, "artifact-10.1.3.jar" );
+        File file = new File( artifactBasedir, "artifact-1.0.jar" );
+        assertEquals( "dummy\n", FileUtils.fileRead( file ) );
 
+        ArtifactRepository remoteRepository = remoteRepository();
+        createRemoteArtifact( artifact );
+
+        File deployedFile = new File( remoteRepository.getBasedir(), remoteRepository.pathOf( artifact ) );
+        assertTrue( deployedFile.exists() );
+        assertEquals( artifact.getId(), FileUtils.fileRead( deployedFile ) );
+        
         try
         {
-            artifactDeployer.deploy( file, artifact, remoteRepository(), localRepository() );
+            artifactDeployer.deploy( file, artifact, remoteRepository, localRepository() );
+            fail( "Should have failed due to previous deployment of artifact." );
         }
         catch( ArtifactDeploymentException e )
         {
-            fail( "Should have failed due to previous deployment of artifact." );
+            assertTrue( deployedFile.exists() );
+            assertEquals( artifact.getId(), FileUtils.fileRead( deployedFile ) );
         }
     }
 }

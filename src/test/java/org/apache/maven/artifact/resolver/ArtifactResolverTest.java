@@ -25,6 +25,7 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,7 +108,7 @@ public class ArtifactResolverTest
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
             public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                             List remoteRepositories )
+                                             List<ArtifactRepository> remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
@@ -129,8 +130,19 @@ public class ArtifactResolverTest
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
             }
 
-            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                   List remoteRepositories )
+            public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact,
+                                                                    ArtifactRepository localRepository,
+                                                                    List<ArtifactRepository> remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            }
+
+            public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+                                                                                            Artifact artifact,
+                                                                                            ArtifactRepository localRepository,
+                                                                                            ArtifactRepository remoteRepository )
+                throws ArtifactMetadataRetrievalException
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
@@ -163,7 +175,7 @@ public class ArtifactResolverTest
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
             public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                             List remoteRepositories )
+                                             List<ArtifactRepository> remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
@@ -185,8 +197,19 @@ public class ArtifactResolverTest
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
             }
 
-            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                   List remoteRepositories )
+            public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact,
+                                                                    ArtifactRepository localRepository,
+                                                                    List<ArtifactRepository> remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            }
+
+            public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+                                                                                            Artifact artifact,
+                                                                                            ArtifactRepository localRepository,
+                                                                                            ArtifactRepository remoteRepository )
+                throws ArtifactMetadataRetrievalException
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
@@ -248,7 +271,7 @@ public class ArtifactResolverTest
         ArtifactMetadataSource mds = new ArtifactMetadataSource()
         {
             public ResolutionGroup retrieve( Artifact artifact, ArtifactRepository localRepository,
-                                             List remoteRepositories )
+                                             List<ArtifactRepository> remoteRepositories )
                 throws ArtifactMetadataRetrievalException
             {
                 Set dependencies = new HashSet();
@@ -256,8 +279,19 @@ public class ArtifactResolverTest
                 return new ResolutionGroup( artifact, dependencies, remoteRepositories );
             }
 
-            public List retrieveAvailableVersions( Artifact artifact, ArtifactRepository localRepository,
-                                                   List remoteRepositories )
+            public List<ArtifactVersion> retrieveAvailableVersions( Artifact artifact,
+                                                                    ArtifactRepository localRepository,
+                                                                    List<ArtifactRepository> remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            }
+
+            public List<ArtifactVersion> retrieveAvailableVersionsFromDeploymentRepository(
+                                                                                            Artifact artifact,
+                                                                                            ArtifactRepository localRepository,
+                                                                                            ArtifactRepository remoteRepository )
+                throws ArtifactMetadataRetrievalException
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }

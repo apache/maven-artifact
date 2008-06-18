@@ -58,14 +58,14 @@ public abstract class AbstractArtifactComponentTestCase
         f.createNewFile();
 
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
         return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout );
     }
 
     protected String getRepositoryLayout()
     {
-        return "legacy";
+        return "default";
     }
 
     protected ArtifactRepository localRepository()
@@ -76,7 +76,7 @@ public abstract class AbstractArtifactComponentTestCase
         File f = new File( getBasedir(), path );
 
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
         return new DefaultArtifactRepository( "local", "file://" + f.getPath(), repoLayout );
     }
@@ -89,7 +89,7 @@ public abstract class AbstractArtifactComponentTestCase
         File f = new File( getBasedir(), path );
 
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
         return new DefaultArtifactRepository( "test", "file://" + f.getPath(), repoLayout,
                                               new ArtifactRepositoryPolicy(), new ArtifactRepositoryPolicy() );
@@ -99,7 +99,7 @@ public abstract class AbstractArtifactComponentTestCase
         throws Exception
     {
         ArtifactRepositoryLayout repoLayout =
-            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "legacy" );
+            (ArtifactRepositoryLayout) lookup( ArtifactRepositoryLayout.ROLE, "default" );
 
         return new DefaultArtifactRepository( "test", "http://foo.bar/repository", repoLayout );
     }

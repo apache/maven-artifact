@@ -28,17 +28,27 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.apache.maven.artifact.repository.metadata.ArtifactRepositoryMetadata;
+import org.apache.maven.artifact.repository.metadata.DefaultRepositoryMetadataManager;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataDeploymentException;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataManager;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataReadException;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataResolutionException;
+import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
 import org.apache.maven.artifact.transform.ArtifactTransformationManager;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -83,7 +93,7 @@ public class DefaultArtifactDeployer
             throw new ArtifactDeploymentException( "System is offline. Cannot deploy artifact: " + artifact + "." );
         }
 
-        if ( !artifactHasBeenDeployed( artifact, deploymentRepository ) )
+        if ( !artifactHasBeenDeployed( artifact, localRepository, deploymentRepository ) )
         {
             try
             {
@@ -117,9 +127,15 @@ public class DefaultArtifactDeployer
                 throw new ArtifactDeploymentException( "Error installing artifact's metadata: " + e.getMessage(), e );
             }
         }
+        else
+        {
+            throw new ArtifactDeploymentException( "The artifact " + artifact + " was already deployed to repository "
+                + deploymentRepository.getId() );
+        }
     }
 
-    private boolean artifactHasBeenDeployed( Artifact artifact, ArtifactRepository remoteRepository )
+    private boolean artifactHasBeenDeployed( Artifact artifact, ArtifactRepository localRepository,
+                                             ArtifactRepository remoteRepository )
         throws ArtifactDeploymentException
     {
         try
@@ -146,25 +162,11 @@ public class DefaultArtifactDeployer
 
             ArtifactVersion artifactVersion = new DefaultArtifactVersion( artifact.getVersion() );
 
-            // We have to fake out the tools underneath as they always expect a local repository.
-            // This makes sure that we are checking for remote deployments not things cached locally
-            // as we don't care about things cached locally. In an embedded environment we have to
-            // deal with multiple deployments, and the same deployment by the same project so we
-            // just need to make sure we have a detached local repository each time as not to
-            // get contaminated results.
-
-            File detachedLocalRepository = File.createTempFile( "maven", "repo" );
-
-            ArtifactRepository localRepository =
-                new DefaultArtifactRepository( "id", "file://" + detachedLocalRepository, defaultLayout );
-
-            List<ArtifactRepository> remoteRepositories = new ArrayList<ArtifactRepository>();
-            remoteRepositories.add( remoteRepository );
-
+            // results in an unfortunate double-retrieval of this metadata file (later for the update)
+            // it would be better to atomically lock, retrieve, check, update, deploy, unlock 
             List<ArtifactVersion> versions =
-                metadataSource.retrieveAvailableVersions( artifact, localRepository, remoteRepositories );
-
-            detachedLocalRepository.delete();
+                metadataSource.retrieveAvailableVersionsFromDeploymentRepository( artifact, localRepository,
+                                                                                  remoteRepository );
 
             for ( ArtifactVersion deployedArtifactVersion : versions )
             {
@@ -178,18 +180,11 @@ public class DefaultArtifactDeployer
                 }
             }
         }
-        catch ( IOException e )
-        {
-            getLogger().warn(
-                              "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
-
-            return false;
-        }
         catch ( ArtifactMetadataRetrievalException e )
         {
             getLogger().warn(
-                              "We cannot retrieve the artifact metadata, or it does not exist. We will assume this artifact needs to be deployed." );
-
+                              "Cannot retrieve the artifact metadata, or it does not exist. Assuming this artifact needs to be deployed." );
+            getLogger().debug( e.getMessage(), e );
             return false;
         }
 

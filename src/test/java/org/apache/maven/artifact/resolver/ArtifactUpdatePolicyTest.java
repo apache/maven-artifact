@@ -40,6 +40,8 @@ public class ArtifactUpdatePolicyTest
     extends AbstractArtifactComponentTestCase
 {
 
+    private static final String PATH = "org/apache/maven/o/0.0.1-SNAPSHOT/o-0.0.1-SNAPSHOT.jar";
+
     private static final long TWO_SECONDS = 2 * 1000L;
 
     private static final long TWO_DAYS = 2 * 86400L * 1000L;
@@ -145,9 +147,8 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
+        assertTransfers( new String[] { "get " + PATH, "getTransfer " + PATH, "get " + PATH + ".sha1",
+            "get " + PATH + ".md5" } );
     }
 
     public void testForceButNoNewUpdates()
@@ -158,7 +159,7 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
+        assertTransfers( new String[] { "getIfNewer " + PATH } );
     }
 
     public void testForceNewUpdate()
@@ -170,9 +171,8 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
+        assertTransfers( new String[] { "getIfNewer " + PATH, "getTransfer " + PATH, "get " + PATH + ".sha1",
+            "get " + PATH + ".md5" } );
     }
 
     public void testForceUpdateMissing()
@@ -200,8 +200,7 @@ public class ArtifactUpdatePolicyTest
             // expected
         }
 
-        assertTransfers( new String[] { "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
+        assertTransfers( new String[] { "get " + PATH, "get " + PATH } );
 
     }
 
@@ -214,9 +213,8 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolve( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
+        assertTransfers( new String[] { "getIfNewer " + PATH, "getTransfer " + PATH, "get " + PATH + ".sha1",
+            "get " + PATH + ".md5" } );
     }
 
     public void testSnapshotNoUpdates()
@@ -230,7 +228,7 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolve( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
+        assertTransfers( new String[] { "getIfNewer " + PATH } );
     }
 
     public void testSnapshotPolicyCheck()
@@ -270,9 +268,8 @@ public class ArtifactUpdatePolicyTest
 
         artifactResolver.resolveAlways( a, remoteRepositories, localRepository );
 
-        assertTransfers( new String[] { "getIfNewer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "getTransfer org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar",
-            "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.sha1", "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar.md5" } );
+        assertTransfers( new String[] { "getIfNewer " + PATH, "getTransfer " + PATH, "get " + PATH + ".sha1",
+            "get " + PATH + ".md5" } );
     }
 
     private void setLastModified( Artifact a, long timestamp, ArtifactRepository repository )
@@ -306,7 +303,7 @@ public class ArtifactUpdatePolicyTest
             // expected
         }
 
-        assertTransfers( new String[] { "get org.apache.maven/jars/o-0.0.1-SNAPSHOT.jar" } );
+        assertTransfers( new String[] { "get org/apache/maven/o/0.0.1-SNAPSHOT/o-0.0.1-SNAPSHOT.jar" } );
     }
 
     public void testResolutionOfArtifactsDeletedFromLocalRepo()
