@@ -61,7 +61,7 @@ public class WagonNoOp
         return true;
     }
 
-    public void openConnection()
+    public void openConnectionInternal()
     {
         // NO-OP
     }

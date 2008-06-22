@@ -29,10 +29,14 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.providers.file.FileWagon;
 import org.apache.maven.wagon.resource.Resource;
 
+/**
+ * Wagon used for test cases that annotates some methods. Note that this is not a thread-safe implementation. 
+ */
 public class TestFileWagon
     extends FileWagon
 {
     private TestTransferListener testTransferListener;
+    private boolean insideGet;
 
     protected void getTransfer( Resource resource, 
                                 File destination, 
@@ -51,7 +55,12 @@ public class TestFileWagon
                AuthorizationException
     {
         addTransfer( "get " + resourceName );
+        
+        insideGet = true;
+        
         super.get( resourceName, destination );
+        
+        insideGet = false;
     }
 
     private void addTransfer( String resourceName )
@@ -67,7 +76,10 @@ public class TestFileWagon
                ResourceDoesNotExistException, 
                AuthorizationException
     {
-        addTransfer( "getIfNewer " + resourceName );
+        if ( !insideGet )
+        {
+            addTransfer( "getIfNewer " + resourceName );
+        }
         return super.getIfNewer( resourceName, destination, timestamp );
     }
 

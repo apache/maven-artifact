@@ -86,7 +86,7 @@ public class WagonString
         return true;
     }
 
-    public void openConnection()
+    public void openConnectionInternal()
     {
         // NO-OP
     }
