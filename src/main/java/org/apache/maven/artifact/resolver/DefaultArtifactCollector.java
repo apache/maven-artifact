@@ -45,7 +45,7 @@ import java.util.Set;
 
 /**
  * Default implementation of the artifact collector.
- * 
+ *
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  * @author Jason van Zyl
  * @version $Id$
@@ -59,7 +59,7 @@ public class DefaultArtifactCollector
 {
     /**
      * The conflict resolver to use when none is specified.
-     * 
+     *
      * @plexus.requirement role-hint="nearest"
      */
     private ConflictResolver defaultConflictResolver;
@@ -187,7 +187,7 @@ public class DefaultArtifactCollector
 
     /**
      * Get the map of managed versions, removing the originating artifact if it is also in managed versions
-     * 
+     *
      * @param originatingArtifact artifact we are processing
      * @param managedVersions original managed versions
      */
@@ -420,6 +420,8 @@ public class DefaultArtifactCollector
                     if ( !child.isResolved() && ( !child.getArtifact().isOptional() || child.isChildOfRootNode() ) )
                     {
                         Artifact artifact = child.getArtifact();
+                        List<ArtifactRepository> childRemoteRepositories = child.getRemoteRepositories();
+
                         try
                         {
                             Object childKey = child.getKey();
@@ -467,7 +469,7 @@ public class DefaultArtifactCollector
                                     {
                                         versions =
                                             source.retrieveAvailableVersions( artifact, localRepository,
-                                                                              remoteRepositories );
+                                                                              childRemoteRepositories );
                                         artifact.setAvailableVersions( versions );
                                     }
 
@@ -487,12 +489,12 @@ public class DefaultArtifactCollector
                                             throw new OverConstrainedVersionException(
                                                                                        "No versions are present in the repository for the artifact with a range "
                                                                                            + versionRange, artifact,
-                                                                                       remoteRepositories );
+                                                                                           childRemoteRepositories );
                                         }
 
                                         throw new OverConstrainedVersionException( "Couldn't find a version in "
                                             + versions + " to match range " + versionRange, artifact,
-                                                                                   remoteRepositories );
+                                            childRemoteRepositories );
                                     }
                                 }
                                 else
@@ -506,7 +508,7 @@ public class DefaultArtifactCollector
 
                             artifact.setDependencyTrail( node.getDependencyTrail() );
 
-                            ResolutionGroup rGroup = source.retrieve( artifact, localRepository, remoteRepositories );
+                            ResolutionGroup rGroup = source.retrieve( artifact, localRepository, childRemoteRepositories );
 
                             // TODO might be better to have source.retrieve() throw a specific exception for this
                             // situation
@@ -526,18 +528,18 @@ public class DefaultArtifactCollector
                             // would like to throw this, but we have crappy stuff in the repo
 
                             fireEvent( ResolutionListener.OMIT_FOR_CYCLE, listeners,
-                                       new ResolutionNode( e.getArtifact(), remoteRepositories, child ) );
+                                       new ResolutionNode( e.getArtifact(), childRemoteRepositories, child ) );
                         }
                         catch ( ArtifactMetadataRetrievalException e )
                         {
                             artifact.setDependencyTrail( node.getDependencyTrail() );
 
                             throw new ArtifactResolutionException( "Unable to get dependency information: "
-                                + e.getMessage(), artifact, remoteRepositories, e );
+                                + e.getMessage(), artifact, childRemoteRepositories, e );
                         }
 
                         recurse( result, child, resolvedArtifacts, managedVersions, localRepository,
-                                 remoteRepositories, source, filter, listeners, conflictResolvers );
+                                 childRemoteRepositories, source, filter, listeners, conflictResolvers );
                     }
                 }
                 catch ( OverConstrainedVersionException e )
@@ -590,7 +592,7 @@ public class DefaultArtifactCollector
     /**
      * Check if the artifactScope needs to be updated. <a
      * href="http://docs.codehaus.org/x/IGU#DependencyMediationandConflictResolution-Scoperesolution">More info</a>.
-     * 
+     *
      * @param farthest farthest resolution node
      * @param nearest nearest resolution node
      * @param listeners
