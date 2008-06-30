@@ -481,13 +481,6 @@ public class DefaultWagonManager
             wagon.addTransferListener( downloadMonitor );
         }
 
-        // TODO: configure on repository
-        int i = 0;
-
-        ChecksumObserver md5ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
-
-        ChecksumObserver sha1ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
-
         File temp = new File( destination + ".tmp" );
 
         temp.deleteOnExit();
@@ -507,81 +500,68 @@ public class DefaultWagonManager
             // only way the retry flag can be set is if ( firstRun == true ).
             while ( firstRun || retry )
             {
-                // reset the retry flag.
-                retry = false;
-
-                // This should take care of creating destination directory now on
-                if ( destination.exists() && !force )
+                ChecksumObserver md5ChecksumObserver = null;
+                ChecksumObserver sha1ChecksumObserver = null;
+                try
                 {
-                    try
-                    {
-                        downloaded = wagon.getIfNewer( remotePath, temp, destination.lastModified() );
+                    // TODO: configure on repository
+                    int i = 0;
 
-                        if ( !downloaded )
-                        {
-                            // prevent additional checks of this artifact until it expires again
-                            destination.setLastModified( System.currentTimeMillis() );
-                        }
-                    }
-                    catch ( UnsupportedOperationException e )
-                    {
-                        // older wagons throw this. Just get() instead
-                        wagon.get( remotePath, temp );
+                    md5ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
+                    sha1ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
 
-                        downloaded = true;
-                    }
-                }
-                else
-                {
-                    wagon.get( remotePath, temp );
-                    downloaded = true;
-                }
+                    // reset the retry flag.
+                    retry = false;
 
-                if ( downloaded )
-                {
-                    // keep the checksum files from showing up on the download monitor...
-                    if ( downloadMonitor != null )
+                    // This should take care of creating destination directory now on
+                    if ( destination.exists() && !force )
                     {
-                        wagon.removeTransferListener( downloadMonitor );
-                    }
-
-                    // try to verify the SHA-1 checksum for this file.
-                    try
-                    {
-                        verifyChecksum( sha1ChecksumObserver, destination, temp, remotePath, ".sha1", wagon );
-                    }
-                    catch ( ChecksumFailedException e )
-                    {
-                        // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the checksum
-                        // doesn't match. This could be a problem with the server (ibiblio HTTP-200 error page), so we'll
-                        // try this up to two times. On the second try, we'll handle it as a bona-fide error, based on the
-                        // repository's checksum checking policy.
-                        if ( firstRun )
-                        {
-                            getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
-                            retry = true;
-                        }
-                        else
-                        {
-                            handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
-                        }
-                    }
-                    catch ( ResourceDoesNotExistException sha1TryException )
-                    {
-                        getLogger().debug( "SHA1 not found, trying MD5", sha1TryException );
-
-                        // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
-                        // file...we'll try again with the MD5 checksum.
                         try
                         {
-                            verifyChecksum( md5ChecksumObserver, destination, temp, remotePath, ".md5", wagon );
+                            downloaded = wagon.getIfNewer( remotePath, temp, destination.lastModified() );
+
+                            if ( !downloaded )
+                            {
+                                // prevent additional checks of this artifact until it expires again
+                                destination.setLastModified( System.currentTimeMillis() );
+                            }
+                        }
+                        catch ( UnsupportedOperationException e )
+                        {
+                            // older wagons throw this. Just get() instead
+                            wagon.get( remotePath, temp );
+
+                            downloaded = true;
+                        }
+                    }
+                    else
+                    {
+                        wagon.get( remotePath, temp );
+                        downloaded = true;
+                    }
+
+                    if ( downloaded )
+                    {
+                        // keep the checksum files from showing up on the download monitor...
+                        if ( downloadMonitor != null )
+                        {
+                            wagon.removeTransferListener( downloadMonitor );
+                        }
+
+                        // try to verify the SHA-1 checksum for this file.
+                        try
+                        {
+                            verifyChecksum( sha1ChecksumObserver, destination, temp, remotePath, ".sha1", wagon );
                         }
                         catch ( ChecksumFailedException e )
                         {
-                            // if we also fail to verify based on the MD5 checksum, and the checksum transfer/read
-                            // succeeded, then we need to determine whether to retry or handle it as a failure.
+                            // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the checksum
+                            // doesn't match. This could be a problem with the server (ibiblio HTTP-200 error page), so we'll
+                            // try this up to two times. On the second try, we'll handle it as a bona-fide error, based on the
+                            // repository's checksum checking policy.
                             if ( firstRun )
                             {
+                                getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
                                 retry = true;
                             }
                             else
@@ -589,23 +569,52 @@ public class DefaultWagonManager
                                 handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
                             }
                         }
-                        catch ( ResourceDoesNotExistException md5TryException )
+                        catch ( ResourceDoesNotExistException sha1TryException )
                         {
-                            // this was a failed transfer, and we don't want to retry.
-                            handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
-                                md5TryException );
+                            getLogger().debug( "SHA1 not found, trying MD5", sha1TryException );
+
+                            // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
+                            // file...we'll try again with the MD5 checksum.
+                            try
+                            {
+                                verifyChecksum( md5ChecksumObserver, destination, temp, remotePath, ".md5", wagon );
+                            }
+                            catch ( ChecksumFailedException e )
+                            {
+                                // if we also fail to verify based on the MD5 checksum, and the checksum transfer/read
+                                // succeeded, then we need to determine whether to retry or handle it as a failure.
+                                if ( firstRun )
+                                {
+                                    retry = true;
+                                }
+                                else
+                                {
+                                    handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
+                                }
+                            }
+                            catch ( ResourceDoesNotExistException md5TryException )
+                            {
+                                // this was a failed transfer, and we don't want to retry.
+                                handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
+                                    md5TryException );
+                            }
+                        }
+
+                        // reinstate the download monitor...
+                        if ( downloadMonitor != null )
+                        {
+                            wagon.addTransferListener( downloadMonitor );
                         }
                     }
 
-                    // reinstate the download monitor...
-                    if ( downloadMonitor != null )
-                    {
-                        wagon.addTransferListener( downloadMonitor );
-                    }
+                    // unset the firstRun flag, so we don't get caught in an infinite loop...
+                    firstRun = false;
                 }
-
-                // unset the firstRun flag, so we don't get caught in an infinite loop...
-                firstRun = false;
+                finally
+                {
+                    wagon.removeTransferListener( md5ChecksumObserver );
+                    wagon.removeTransferListener( sha1ChecksumObserver );
+                }
             }
         }
         catch ( ConnectionException e )
@@ -626,9 +635,7 @@ public class DefaultWagonManager
         }
         finally
         {
-            // Remove every TransferListener
-            wagon.removeTransferListener( md5ChecksumObserver );
-            wagon.removeTransferListener( sha1ChecksumObserver );
+            // Remove remaining TransferListener instances (checksum handlers removed in above finally clause)
             if ( downloadMonitor != null )
             {
                 wagon.removeTransferListener( downloadMonitor );
