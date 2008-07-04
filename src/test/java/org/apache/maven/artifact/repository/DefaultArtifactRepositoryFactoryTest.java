@@ -69,4 +69,17 @@ public class DefaultArtifactRepositoryFactoryTest
 
         assertTrue( layout instanceof DefaultRepositoryLayout );
     }
+
+    public void testRetrievalOfKnownRepositoryLayouts()
+        throws Exception
+    {
+        ArtifactRepositoryLayout defaultLayout = repoFactory.getLayout( "default" ); 
+        assertNotNull( defaultLayout );
+        
+        ArtifactRepositoryLayout legacyLayout = repoFactory.getLayout( "legacy" ); 
+        assertNotNull( legacyLayout );
+        
+        ArtifactRepositoryLayout flatLayout = repoFactory.getLayout( "flat" ); 
+        assertNotNull( flatLayout );        
+    }
 }
