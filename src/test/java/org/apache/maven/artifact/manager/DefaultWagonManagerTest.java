@@ -20,9 +20,11 @@ package org.apache.maven.artifact.manager;
  */
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -30,13 +32,18 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.versioning.VersionRange;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.Debug;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusTestCase;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.easymock.MockControl;
 
 /**
  * @author <a href="michal.maczka@dimatics.com">Michal Maczka</a>
@@ -46,18 +53,205 @@ public class DefaultWagonManagerTest
     extends PlexusTestCase
 {
 
-    private WagonManager wagonManager;
+    private DefaultWagonManager wagonManager;
 
     private TransferListener transferListener = new Debug();
+
+    private ArtifactFactory artifactFactory;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        wagonManager = (WagonManager) lookup( WagonManager.ROLE );
+        wagonManager = (DefaultWagonManager) lookup( WagonManager.ROLE );
+        
+        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
 
+    public void testGetMissingPomUncached() throws TransferFailedException, UnsupportedProtocolException, IOException
+    {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
+        
+        ArtifactRepository repo = createNoOpRepo();
+        
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+        
+        updateCheckManager.isPomUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+        updateCheckManager.touch( artifact, repo );        
+        control.replay();        
+        
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, false );
+            
+            fail();
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            assertTrue( true );
+        }
+        
+        assertFalse( artifact.getFile().exists() );
+        
+        control.verify();
+    }
+
+    private Artifact createTestPomArtifact( String directory )
+        throws IOException
+    {
+        File testData = getTestFile( directory );
+        FileUtils.deleteDirectory( testData );
+        testData.mkdirs();
+
+        Artifact artifact = artifactFactory.createProjectArtifact( "test", "test", "1.0" );
+        artifact.setFile( new File( testData, "test-1.0.pom" ) );
+        assertFalse( artifact.getFile().exists() );
+        return artifact;
+    }
+    
+    public void testGetMissingPomCached() throws TransferFailedException, UnsupportedProtocolException, IOException
+    {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
+        
+        ArtifactRepository repo = createNoOpRepo();
+        
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+        
+        updateCheckManager.isPomUpdateRequired( artifact, repo );
+        control.setReturnValue( false );
+        control.replay();        
+        
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, false );
+            
+            fail();
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            assertTrue( true );
+        }
+        
+        assertFalse( artifact.getFile().exists() );
+        
+        control.verify();
+    }
+    
+    public void testGetMissingPomCachedForced() throws TransferFailedException, UnsupportedProtocolException, IOException
+    {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
+        
+        ArtifactRepository repo = createNoOpRepo();
+        
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+        
+        updateCheckManager.touch( artifact, repo );        
+        control.replay();        
+        
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+            
+            fail();
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            assertTrue( true );
+        }
+        
+        assertFalse( artifact.getFile().exists() );
+        
+        control.verify();
+    }
+    
+    public void testGetRemotePom()
+        throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException, AuthorizationException
+    {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
+        
+        ArtifactRepository repo = createNoOpRepo();
+        
+        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        wagon.setExpectedContent( "expected" );
+        
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+        
+        updateCheckManager.isPomUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+        control.replay();        
+        
+        wagonManager.getArtifact( artifact, repo, false );
+        
+        assertTrue( artifact.getFile().exists() );
+        
+        control.verify();
+    }
+
+    public void testGetPomExistsLocally()
+        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
+    {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
+        artifact.getFile().createNewFile();
+
+        ArtifactRepository repo = createNoOpRepo();
+
+        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        wagon.setExpectedContent( "expected" );
+        
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, false );
+
+        assertTrue( artifact.getFile().exists() );
+
+        control.verify();
+    }
+
+    public void testGetPomExistsLocallyForced()
+        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
+    {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
+        artifact.getFile().createNewFile();
+
+        ArtifactRepository repo = createNoOpRepo();
+
+        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        wagon.setExpectedContent( "expected" );
+        
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, true );
+
+        assertTrue( artifact.getFile().exists() );
+
+        control.verify();
+    }
+
+    private ArtifactRepository createNoOpRepo()
+    {
+        ArtifactRepository repo =
+            new DefaultArtifactRepository( "id", "noop://url", new ArtifactRepositoryLayoutStub() );
+        return repo;
+    }
+    
     /**
      * checks the handling of urls
      */
@@ -310,9 +504,9 @@ public class DefaultWagonManagerTest
                 new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ),
                                      "artifactScope", "type", "classifier", null );
             artifact.setFile( tmpFile );
-            ArtifactRepository repo =
-                new DefaultArtifactRepository( "id", "noop://url", new ArtifactRepositoryLayoutStub() );
+            ArtifactRepository repo = createNoOpRepo();
             WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+            wagon.setExpectedContent( "" );
 
             /* getArtifact */
             assertFalse( "Transfer listener is registered before test",

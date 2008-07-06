@@ -37,4 +37,6 @@ public interface UpdateCheckManager {
 
 	void touch( RepositoryMetadata metadata, ArtifactRepository repository, File file );
 
+    boolean isPomUpdateRequired( Artifact artifact, ArtifactRepository repository );
+
 }

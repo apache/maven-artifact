@@ -37,6 +37,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages <a href="http://maven.apache.org/wagon">Wagon</a> related operations in Maven.

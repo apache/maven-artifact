@@ -73,6 +73,11 @@ public class DefaultUpdateCheckManager
         // release-artifact short circuit above.
         ArtifactRepositoryPolicy policy = repository.getSnapshots();
 
+        return isUpdateRequired( artifact, repository, policy );
+    }
+
+    private boolean isUpdateRequired( Artifact artifact, ArtifactRepository repository, ArtifactRepositoryPolicy policy )
+    {
         File file = artifact.getFile();
 
         if ( !policy.isEnabled() )
@@ -344,6 +349,11 @@ public class DefaultUpdateCheckManager
     public File getTouchfile( RepositoryMetadata metadata, File file )
     {
         return new File( file.getParent(), TOUCHFILE_NAME );
+    }
+
+    public boolean isPomUpdateRequired( Artifact artifact, ArtifactRepository repository )
+    {
+        return isUpdateRequired( artifact, repository, repository.getReleases() );
     }
 
 }

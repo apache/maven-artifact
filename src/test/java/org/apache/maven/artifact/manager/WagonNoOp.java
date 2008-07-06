@@ -27,10 +27,17 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
+import org.codehaus.plexus.util.FileUtils;
 
 public class WagonNoOp
     extends AbstractWagon
 {
+    private String expectedContent;
+    
+    public void setExpectedContent( String expectedContent )
+    {
+        this.expectedContent = expectedContent ;
+    }
 
     public void closeConnection()
     {
@@ -51,7 +58,14 @@ public class WagonNoOp
         fireGetStarted( resource, destination );
         try
         {
-            destination.createNewFile();
+            if ( expectedContent != null )
+            {
+                FileUtils.fileWrite( destination.getAbsolutePath(), expectedContent );
+            }
+            else
+            {
+                throw new ResourceDoesNotExistException( "Mock wagon had no content set" );
+            }
         }
         catch ( IOException e )
         {

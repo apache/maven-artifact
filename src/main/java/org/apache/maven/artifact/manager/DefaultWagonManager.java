@@ -19,6 +19,18 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -52,18 +64,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /** @plexus.component */
 public class DefaultWagonManager
@@ -410,6 +410,42 @@ public class DefaultWagonManager
 
             artifact.setResolved( true );
         }
+
+        // XXX: This is not really intended for the long term - unspecified POMs should be converted to failures
+        //      meaning caching would be unnecessary. The code for this is here instead of the MavenMetadataSource
+        //      to keep the logic related to update checks enclosed, and so to keep the rules reasonably consistent
+        //      with release metadata
+        else if ( "pom".equals( artifact.getType() ) && !artifact.getFile().exists() )
+        {
+            // if POM is not present locally, try and get it if it's forced, out of date, or has not been attempted yet  
+            if ( force || updateCheckManager.isPomUpdateRequired( artifact, repository ) )
+            {
+                getLogger().debug( "Trying repository " + repository.getId() );
+
+                try
+                {
+                    getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor,
+                                   policy.getChecksumPolicy(), false );
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    // cache the POM failure
+                    updateCheckManager.touch( artifact, repository );
+                    
+                    throw e;
+                }
+
+                getLogger().debug( "  Artifact resolved" );
+
+                artifact.setResolved( true );
+            }
+            else
+            {
+                // cached failure - pass on the failure
+                throw new ResourceDoesNotExistException( "Failure was cached in the local repository" );
+            }
+        }
+        
         // If it's not a snapshot artifact, then we don't care what the force flag says. If it's on the local
         // system, it's resolved. Releases are presumed to be immutable, so release artifacts are not ever updated.
         // NOTE: This is NOT the case for metadata files on relese-only repositories. This metadata may contain information
@@ -1152,5 +1188,10 @@ public class DefaultWagonManager
     public void registerCredentialsDataSource( CredentialsDataSource cds )
     {
         credentialsDataSource = cds;
+    }
+
+    public void setUpdateCheckManager( UpdateCheckManager updateCheckManager )
+    {
+        this.updateCheckManager = updateCheckManager;        
     }
 }
