@@ -50,6 +50,13 @@ public class InvalidRepositoryException
         this.repositoryId = repositoryId;
     }
 
+    @Deprecated
+    public InvalidRepositoryException( String message, Throwable t )
+    {
+        super( message );
+        this.repositoryId = null;
+    }
+
     protected InvalidRepositoryException( String message,
                                           String repositoryId )
     {

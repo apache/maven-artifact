@@ -79,10 +79,23 @@ public class ArtifactResolutionException
         super( message, artifact, null, cause );
     }
 
+    @Deprecated
+    public ArtifactResolutionException( String message, Artifact artifact, Throwable cause )
+    {
+        super( message, artifact, null, cause );
+    }
+
     protected ArtifactResolutionException( String message,
                                            Artifact artifact,
                                            List<ArtifactRepository> remoteRepositories,
                                            ArtifactMetadataRetrievalException cause )
+    {
+        super( message, artifact, remoteRepositories, cause );
+    }
+
+    @Deprecated
+    protected ArtifactResolutionException( String message, Artifact artifact,
+                                           List<ArtifactRepository> remoteRepositories, Throwable cause )
     {
         super( message, artifact, remoteRepositories, cause );
     }
