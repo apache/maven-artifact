@@ -180,7 +180,7 @@ public class DefaultWagonManagerTest
         ArtifactRepository repo = createNoOpRepo();
         
         WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
-        wagon.setExpectedContent( "expected" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
@@ -206,7 +206,7 @@ public class DefaultWagonManagerTest
         ArtifactRepository repo = createNoOpRepo();
 
         WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
-        wagon.setExpectedContent( "expected" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
@@ -230,7 +230,7 @@ public class DefaultWagonManagerTest
         ArtifactRepository repo = createNoOpRepo();
 
         WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
-        wagon.setExpectedContent( "expected" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
@@ -243,6 +243,22 @@ public class DefaultWagonManagerTest
         assertTrue( artifact.getFile().exists() );
 
         control.verify();
+    }
+    
+    public void testGetArtifactSha1MissingMd5Present()
+        throws IOException, UnsupportedProtocolException, TransferFailedException, ResourceDoesNotExistException
+    {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-artifact" );
+
+        ArtifactRepository repo = createNoOpRepo();
+
+        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ) + ".md5", "bad_checksum" );
+        
+        wagonManager.getArtifact( artifact, repo, true );
+
+        assertTrue( artifact.getFile().exists() );
     }
 
     private ArtifactRepository createNoOpRepo()
@@ -506,7 +522,7 @@ public class DefaultWagonManagerTest
             artifact.setFile( tmpFile );
             ArtifactRepository repo = createNoOpRepo();
             WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
-            wagon.setExpectedContent( "" );
+            wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "" );
 
             /* getArtifact */
             assertFalse( "Transfer listener is registered before test",
@@ -517,10 +533,13 @@ public class DefaultWagonManagerTest
                          wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
 
             /* putArtifact */
+            File sampleFile = getTestFile( "target/test-file" );
+            FileUtils.fileWrite( sampleFile.getAbsolutePath(), "sample file" );
+            
             assertFalse( "Transfer listener is registered before test",
                          wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
             wagonManager.setDownloadMonitor( transferListener );
-            wagonManager.putArtifact( new File( "sample file" ), artifact, repo );
+            wagonManager.putArtifact( sampleFile, artifact, repo );
             assertFalse( "Transfer listener still registered after putArtifact",
                          wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
         }
