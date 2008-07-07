@@ -102,14 +102,12 @@ public class ArtifactResolutionResult
         return resolutionNodes;
     }
 
-    public ArtifactResolutionResult setArtifactResolutionNodes( final Set<ResolutionNode> resolutionNodes )
+    public void setArtifactResolutionNodes( final Set<ResolutionNode> resolutionNodes )
     {
         this.resolutionNodes = resolutionNodes;
 
         // clear the cache
         this.artifacts = null;
-
-        return this;
     }
 
     public List getMissingArtifacts()
