@@ -19,12 +19,9 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.maven.wagon.AbstractWagon;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.InputData;
 import org.apache.maven.wagon.OutputData;
@@ -34,11 +31,10 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.resource.Resource;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringInputStream;
 import org.codehaus.plexus.util.StringOutputStream;
 
-public class WagonNoOp
+public class StringWagon
     extends StreamWagon
 {
     private Map<String, String> expectedContent = new HashMap<String, String>();

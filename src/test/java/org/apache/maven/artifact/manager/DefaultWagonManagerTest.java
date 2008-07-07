@@ -179,7 +179,7 @@ public class DefaultWagonManagerTest
         
         ArtifactRepository repo = createNoOpRepo();
         
-        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
@@ -205,7 +205,7 @@ public class DefaultWagonManagerTest
 
         ArtifactRepository repo = createNoOpRepo();
 
-        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
@@ -229,7 +229,7 @@ public class DefaultWagonManagerTest
 
         ArtifactRepository repo = createNoOpRepo();
 
-        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
@@ -252,7 +252,7 @@ public class DefaultWagonManagerTest
 
         ArtifactRepository repo = createNoOpRepo();
 
-        WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ) + ".md5", "bad_checksum" );
         
@@ -521,7 +521,7 @@ public class DefaultWagonManagerTest
                                      "artifactScope", "type", "classifier", null );
             artifact.setFile( tmpFile );
             ArtifactRepository repo = createNoOpRepo();
-            WagonNoOp wagon = (WagonNoOp) wagonManager.getWagon( "noop" );
+            StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
             wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "" );
 
             /* getArtifact */
