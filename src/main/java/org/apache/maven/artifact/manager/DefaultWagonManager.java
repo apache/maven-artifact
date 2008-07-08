@@ -333,14 +333,15 @@ public class DefaultWagonManager
                              boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-        boolean successful = false;
-
         for (ArtifactRepository repository : remoteRepositories) {
             try
             {
                 getArtifact( artifact, repository, force );
 
-                successful = artifact.isResolved();
+                if (artifact.isResolved())
+                {
+                	break;
+                }
             }
             catch ( ResourceDoesNotExistException e )
             {
@@ -358,7 +359,7 @@ public class DefaultWagonManager
         }
 
         // if it already exists locally we were just trying to force it - ignore the update
-        if ( !successful && !artifact.getFile().exists() )
+        if ( !artifact.getFile().exists() )
         {
             throw new ResourceDoesNotExistException( "Unable to download the artifact from any repository" );
         }

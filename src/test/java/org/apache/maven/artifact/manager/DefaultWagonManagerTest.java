@@ -21,6 +21,8 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -31,13 +33,16 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.artifact.resolver.TestTransferListener;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authorization.AuthorizationException;
+import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.observers.AbstractTransferListener;
 import org.apache.maven.wagon.observers.Debug;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusTestCase;
@@ -67,6 +72,32 @@ public class DefaultWagonManagerTest
         wagonManager = (DefaultWagonManager) lookup( WagonManager.ROLE );
         
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+    }
+    
+    public void testUnnecessaryRepositoryLookup() throws Exception {
+        Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
+
+        List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
+        repos.add(new DefaultArtifactRepository( "repo1", "noop://url1", new ArtifactRepositoryLayoutStub() ));
+        repos.add(new DefaultArtifactRepository( "repo2", "noop://url2", new ArtifactRepositoryLayoutStub() ));
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
+        wagon.addExpectedContent( repos.get(0).getLayout().pathOf( artifact ), "expected" );
+        wagon.addExpectedContent( repos.get(1).getLayout().pathOf( artifact ), "expected" );
+        
+        class TransferListener extends AbstractTransferListener {
+        	public List<TransferEvent> events = new ArrayList<TransferEvent>();
+        	@Override
+        	public void transferInitiated(TransferEvent transferEvent) {
+        		events.add(transferEvent);
+        	}
+        };
+        TransferListener listener = new TransferListener();
+
+        wagonManager.setDownloadMonitor(listener);
+        wagonManager.getArtifact( artifact, repos, false );
+
+        assertEquals(1, listener.events.size());
     }
 
     public void testGetMissingPomUncached() throws TransferFailedException, UnsupportedProtocolException, IOException
