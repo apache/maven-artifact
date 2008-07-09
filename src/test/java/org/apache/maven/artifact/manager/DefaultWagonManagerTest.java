@@ -21,7 +21,9 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -33,7 +35,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
-import org.apache.maven.artifact.resolver.TestTransferListener;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -57,7 +58,6 @@ import org.easymock.MockControl;
 public class DefaultWagonManagerTest
     extends PlexusTestCase
 {
-
     private DefaultWagonManager wagonManager;
 
     private TransferListener transferListener = new Debug();
@@ -78,10 +78,10 @@ public class DefaultWagonManagerTest
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
 
         List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-        repos.add(new DefaultArtifactRepository( "repo1", "noop://url1", new ArtifactRepositoryLayoutStub() ));
-        repos.add(new DefaultArtifactRepository( "repo2", "noop://url2", new ArtifactRepositoryLayoutStub() ));
+        repos.add(new DefaultArtifactRepository( "repo1", "string://url1", new ArtifactRepositoryLayoutStub() ));
+        repos.add(new DefaultArtifactRepository( "repo2", "string://url2", new ArtifactRepositoryLayoutStub() ));
 
-        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repos.get(0).getLayout().pathOf( artifact ), "expected" );
         wagon.addExpectedContent( repos.get(1).getLayout().pathOf( artifact ), "expected" );
         
@@ -104,7 +104,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
         
-        ArtifactRepository repo = createNoOpRepo();
+        ArtifactRepository repo = createStringRepo();
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
@@ -131,24 +131,11 @@ public class DefaultWagonManagerTest
         control.verify();
     }
 
-    private Artifact createTestPomArtifact( String directory )
-        throws IOException
-    {
-        File testData = getTestFile( directory );
-        FileUtils.deleteDirectory( testData );
-        testData.mkdirs();
-
-        Artifact artifact = artifactFactory.createProjectArtifact( "test", "test", "1.0" );
-        artifact.setFile( new File( testData, "test-1.0.pom" ) );
-        assertFalse( artifact.getFile().exists() );
-        return artifact;
-    }
-    
     public void testGetMissingPomCached() throws TransferFailedException, UnsupportedProtocolException, IOException
     {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
         
-        ArtifactRepository repo = createNoOpRepo();
+        ArtifactRepository repo = createStringRepo();
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
@@ -178,7 +165,7 @@ public class DefaultWagonManagerTest
     {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
         
-        ArtifactRepository repo = createNoOpRepo();
+        ArtifactRepository repo = createStringRepo();
         
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
@@ -204,50 +191,28 @@ public class DefaultWagonManagerTest
     }
     
     public void testGetRemotePom()
-        throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException, AuthorizationException
+        throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException,
+        AuthorizationException
     {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
-        
-        ArtifactRepository repo = createNoOpRepo();
-        
-        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
+
+        ArtifactRepository repo = createStringRepo();
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
-        
+
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
         wagonManager.setUpdateCheckManager( updateCheckManager );
-        
+
         updateCheckManager.isPomUpdateRequired( artifact, repo );
         control.setReturnValue( true );
-        control.replay();        
-        
-        wagonManager.getArtifact( artifact, repo, false );
-        
-        assertTrue( artifact.getFile().exists() );
-        
-        control.verify();
-    }
-
-    public void testGetPomExistsLocally()
-        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
-    {
-        Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
-        artifact.getFile().createNewFile();
-
-        ArtifactRepository repo = createNoOpRepo();
-
-        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
-        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
-        
-        MockControl control = MockControl.createControl( UpdateCheckManager.class );
-        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
-        wagonManager.setUpdateCheckManager( updateCheckManager );
-
         control.replay();
 
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
 
         control.verify();
     }
@@ -258,11 +223,11 @@ public class DefaultWagonManagerTest
         Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-pom" );
         artifact.getFile().createNewFile();
 
-        ArtifactRepository repo = createNoOpRepo();
+        ArtifactRepository repo = createStringRepo();
 
-        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
-        
+
         MockControl control = MockControl.createControl( UpdateCheckManager.class );
         UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
         wagonManager.setUpdateCheckManager( updateCheckManager );
@@ -272,18 +237,256 @@ public class DefaultWagonManagerTest
         wagonManager.getArtifact( artifact, repo, true );
 
         assertTrue( artifact.getFile().exists() );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
 
         control.verify();
     }
+
+    public void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-missing-jar", "jar" );
+        
+        ArtifactRepository repo = createStringRepo();
+        
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, false );
+            
+            fail();
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            assertTrue( true );
+        }
+        
+        assertFalse( artifact.getFile().exists() );
+    }
+
+    public void testGetMissingJarForced() throws TransferFailedException, UnsupportedProtocolException, IOException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-missing-jar", "jar" );
+        
+        ArtifactRepository repo = createStringRepo();
+        
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+            
+            fail();
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            assertTrue( true );
+        }
+        
+        assertFalse( artifact.getFile().exists() );
+    }
     
+    public void testGetRemoteJar()
+        throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException,
+        AuthorizationException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "jar" );
+
+        ArtifactRepository repo = createStringRepo();
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, false );
+
+        assertTrue( artifact.getFile().exists() );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
+    }
+
+    public void testGetJarExistsLocallyForced()
+        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "jar" );
+        artifact.getFile().createNewFile();
+
+        ArtifactRepository repo = createStringRepo();
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, true );
+
+        assertTrue( artifact.getFile().exists() );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
+    }
+
+    public void testGetRemoteSnapshotJar()
+        throws TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException, IOException,
+        AuthorizationException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "1.0-SNAPSHOT", "jar" );
+
+        ArtifactRepository repo = createStringRepo();
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.isUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+        
+        updateCheckManager.touch( artifact, repo );
+
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, false );
+
+        assertTrue( artifact.getFile().exists() );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
+    }
+
+    public void testGetSnapshotJarExistsLocally()
+        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "1.0-SNAPSHOT", "jar" );
+        artifact.getFile().createNewFile();
+
+        ArtifactRepository repo = createStringRepo();
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.isUpdateRequired( artifact, repo );
+        control.setReturnValue( false );
+
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, false );
+
+        assertTrue( artifact.getFile().exists() );
+        assertEquals( "", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
+    }
+
+    public void testGetSnapshotJarExistsLocallyExpired()
+        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "1.0-SNAPSHOT", "jar" );
+        artifact.getFile().createNewFile();
+
+        ArtifactRepository repo = createStringRepo();
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.isUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+
+        updateCheckManager.touch( artifact, repo );
+
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, false );
+
+        assertTrue( artifact.getFile().exists() );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
+    }
+
+    public void testGetSnapshotJarExistsLocallyForced()
+        throws IOException, TransferFailedException, ResourceDoesNotExistException, UnsupportedProtocolException
+    {
+        Artifact artifact = createTestArtifact( "target/test-data/get-remote-jar", "1.0-SNAPSHOT", "jar" );
+        artifact.getFile().createNewFile();
+
+        ArtifactRepository repo = createStringRepo();
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
+
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.touch( artifact, repo );
+        
+        control.replay();
+
+        wagonManager.getArtifact( artifact, repo, true );
+
+        assertTrue( artifact.getFile().exists() );
+        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
+    }
+
+    private Artifact createTestPomArtifact( String directory )
+        throws IOException
+    {
+        File testData = getTestFile( directory );
+        FileUtils.deleteDirectory( testData );
+        testData.mkdirs();
+
+        Artifact artifact = artifactFactory.createProjectArtifact( "test", "test", "1.0" );
+        artifact.setFile( new File( testData, "test-1.0.pom" ) );
+        assertFalse( artifact.getFile().exists() );
+        return artifact;
+    }
+
+    private Artifact createTestArtifact( String directory, String type )
+        throws IOException
+    {
+        return createTestArtifact( directory, "1.0", type );
+    }
+
+    private Artifact createTestArtifact( String directory, String version, String type )
+        throws IOException
+    {
+        File testData = getTestFile( directory );
+        FileUtils.deleteDirectory( testData );
+        testData.mkdirs();
+
+        Artifact artifact = artifactFactory.createBuildArtifact( "test", "test", version, type );
+        artifact.setFile( new File( testData, "test-" + version + "." + artifact.getArtifactHandler().getExtension() ) );
+        assertFalse( artifact.getFile().exists() );
+        return artifact;
+    }
+
     public void testGetArtifactSha1MissingMd5Present()
         throws IOException, UnsupportedProtocolException, TransferFailedException, ResourceDoesNotExistException
     {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-remote-artifact" );
 
-        ArtifactRepository repo = createNoOpRepo();
+        ArtifactRepository repo = createStringRepo();
 
-        StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ) + ".md5", "bad_checksum" );
         
@@ -292,10 +495,10 @@ public class DefaultWagonManagerTest
         assertTrue( artifact.getFile().exists() );
     }
 
-    private ArtifactRepository createNoOpRepo()
+    private ArtifactRepository createStringRepo()
     {
         ArtifactRepository repo =
-            new DefaultArtifactRepository( "id", "noop://url", new ArtifactRepositoryLayoutStub() );
+            new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub() );
         return repo;
     }
     
@@ -462,7 +665,7 @@ public class DefaultWagonManagerTest
 
         assertWagon( "c" );
 
-        assertWagon( "noop" );
+        assertWagon( "string" );
 
         try
         {
@@ -542,42 +745,29 @@ public class DefaultWagonManagerTest
     public void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact()
         throws Exception
     {
-        File tmpFile = File.createTempFile( "mvn-test", ".temp" );
+        Artifact artifact = createTestArtifact( "transfer-listener", "jar" );
+        ArtifactRepository repo = createStringRepo();
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
-        try
-        {
-            tmpFile.deleteOnExit();
-            Artifact artifact =
-                new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ),
-                                     "artifactScope", "type", "classifier", null );
-            artifact.setFile( tmpFile );
-            ArtifactRepository repo = createNoOpRepo();
-            StringWagon wagon = (StringWagon) wagonManager.getWagon( "noop" );
-            wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "" );
+        /* getArtifact */
+        assertFalse( "Transfer listener is registered before test",
+                     wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
+        wagonManager.setDownloadMonitor( transferListener );
+        wagonManager.getArtifact( artifact, repo );
+        assertFalse( "Transfer listener still registered after getArtifact",
+                     wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
 
-            /* getArtifact */
-            assertFalse( "Transfer listener is registered before test",
-                         wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
-            wagonManager.setDownloadMonitor( transferListener );
-            wagonManager.getArtifact( artifact, repo );
-            assertFalse( "Transfer listener still registered after getArtifact",
-                         wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
+        /* putArtifact */
+        File sampleFile = getTestFile( "target/test-file" );
+        FileUtils.fileWrite( sampleFile.getAbsolutePath(), "sample file" );
 
-            /* putArtifact */
-            File sampleFile = getTestFile( "target/test-file" );
-            FileUtils.fileWrite( sampleFile.getAbsolutePath(), "sample file" );
-            
-            assertFalse( "Transfer listener is registered before test",
-                         wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
-            wagonManager.setDownloadMonitor( transferListener );
-            wagonManager.putArtifact( sampleFile, artifact, repo );
-            assertFalse( "Transfer listener still registered after putArtifact",
-                         wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
-        }
-        finally
-        {
-            tmpFile.delete();
-        }
+        assertFalse( "Transfer listener is registered before test",
+                     wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
+        wagonManager.setDownloadMonitor( transferListener );
+        wagonManager.putArtifact( sampleFile, artifact, repo );
+        assertFalse( "Transfer listener still registered after putArtifact",
+                     wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
     }
 
     /**
@@ -592,163 +782,91 @@ public class DefaultWagonManagerTest
         ArtifactRepository repo =
             new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
 
-        File tmpFile = File.createTempFile( "mvn-cs-test", ".temp" );
-        File sha1File = new File( tmpFile.getPath() + ".sha1" );
-        File md5File = new File( tmpFile.getPath() + ".md5" );
+        Artifact artifact =
+            new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ), "scope",
+                                 "jar", "classifier", null );
+        artifact.setFile( getTestFile( "target/sample-art" ) );            
+
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        
+        wagon.clearExpectedContent();
+        wagon.addExpectedContent( "path", "lower-case-checksum" );
+        wagon.addExpectedContent( "path.sha1", "2a25dc564a3b34f68237fc849066cbc7bb7a36a1" );
 
         try
         {
-            Artifact artifact =
-                new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ), "scope",
-                                     "jar", "classifier", null );
-            artifact.setFile( tmpFile );
-
-            {
-                Xpp3Dom path = new Xpp3Dom( "path" );
-                path.setValue( "lower-case-checksum" );
-                Xpp3Dom sha1 = new Xpp3Dom( "path.sha1" );
-                sha1.setValue( "2a25dc564a3b34f68237fc849066cbc7bb7a36a1" );
-                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
-                resourceStrings.addChild( path );
-                resourceStrings.addChild( sha1 );
-                Xpp3Dom conf = new Xpp3Dom( "configuration" );
-                conf.addChild( resourceStrings );
-
-                wagonManager.addConfiguration( repo.getId(), conf );
-
-                try
-                {
-                    wagonManager.getArtifact( artifact, repo );
-                }
-                catch ( ChecksumFailedException e )
-                {
-                    fail( "Checksum verification did not pass: " + e.getMessage() );
-                }
-            }
-
-            {
-                Xpp3Dom path = new Xpp3Dom( "path" );
-                path.setValue( "upper-case-checksum" );
-                Xpp3Dom sha1 = new Xpp3Dom( "path.sha1" );
-                sha1.setValue( "B7BB97D7D0B9244398D9B47296907F73313663E6" );
-                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
-                resourceStrings.addChild( path );
-                resourceStrings.addChild( sha1 );
-                Xpp3Dom conf = new Xpp3Dom( "configuration" );
-                conf.addChild( resourceStrings );
-
-                wagonManager.addConfiguration( repo.getId(), conf );
-
-                try
-                {
-                    wagonManager.getArtifact( artifact, repo );
-                }
-                catch ( ChecksumFailedException e )
-                {
-                    fail( "Checksum verification did not pass: " + e.getMessage() );
-                }
-            }
-
-            {
-                Xpp3Dom path = new Xpp3Dom( "path" );
-                path.setValue( "expected-failure" );
-                Xpp3Dom sha1 = new Xpp3Dom( "path.sha1" );
-                sha1.setValue( "b7bb97d7d0b9244398d9b47296907f73313663e6" );
-                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
-                resourceStrings.addChild( path );
-                resourceStrings.addChild( sha1 );
-                Xpp3Dom conf = new Xpp3Dom( "configuration" );
-                conf.addChild( resourceStrings );
-
-                wagonManager.addConfiguration( repo.getId(), conf );
-
-                try
-                {
-                    wagonManager.getArtifact( artifact, repo );
-                    fail( "Checksum verification did not fail" );
-                }
-                catch ( ChecksumFailedException e )
-                {
-                    // expected
-                }
-            }
-
-            {
-                Xpp3Dom path = new Xpp3Dom( "path" );
-                path.setValue( "lower-case-checksum" );
-                Xpp3Dom md5 = new Xpp3Dom( "path.md5" );
-                md5.setValue( "50b2cf50a103a965efac62b983035cac" );
-                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
-                resourceStrings.addChild( path );
-                resourceStrings.addChild( md5 );
-                Xpp3Dom conf = new Xpp3Dom( "configuration" );
-                conf.addChild( resourceStrings );
-
-                wagonManager.addConfiguration( repo.getId(), conf );
-
-                try
-                {
-                    wagonManager.getArtifact( artifact, repo );
-                }
-                catch ( ChecksumFailedException e )
-                {
-                    fail( "Checksum verification did not pass: " + e.getMessage() );
-                }
-            }
-
-            {
-                Xpp3Dom path = new Xpp3Dom( "path" );
-                path.setValue( "upper-case-checksum" );
-                Xpp3Dom md5 = new Xpp3Dom( "path.md5" );
-                md5.setValue( "842F568FCCFEB7E534DC72133D42FFDC" );
-                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
-                resourceStrings.addChild( path );
-                resourceStrings.addChild( md5 );
-                Xpp3Dom conf = new Xpp3Dom( "configuration" );
-                conf.addChild( resourceStrings );
-
-                wagonManager.addConfiguration( repo.getId(), conf );
-
-                try
-                {
-                    wagonManager.getArtifact( artifact, repo );
-                }
-                catch ( ChecksumFailedException e )
-                {
-                    fail( "Checksum verification did not pass: " + e.getMessage() );
-                }
-            }
-
-            {
-                Xpp3Dom path = new Xpp3Dom( "path" );
-                path.setValue( "expected-failure" );
-                Xpp3Dom md5 = new Xpp3Dom( "path.md5" );
-                md5.setValue( "b7bb97d7d0b9244398d9b47296907f73313663e6" );
-                Xpp3Dom resourceStrings = new Xpp3Dom( "resourceStrings" );
-                resourceStrings.addChild( path );
-                resourceStrings.addChild( md5 );
-                Xpp3Dom conf = new Xpp3Dom( "configuration" );
-                conf.addChild( resourceStrings );
-
-                wagonManager.addConfiguration( repo.getId(), conf );
-
-                try
-                {
-                    wagonManager.getArtifact( artifact, repo );
-                    fail( "Checksum verification did not fail" );
-                }
-                catch ( ChecksumFailedException e )
-                {
-                    // expected
-                }
-            }
-
+            wagonManager.getArtifact( artifact, repo, true );
         }
-        finally
+        catch ( ChecksumFailedException e )
         {
-            tmpFile.delete();
-            sha1File.delete();
-            md5File.delete();
+            fail( "Checksum verification did not pass: " + e.getMessage() );
+        }
+
+        wagon.clearExpectedContent();
+        wagon.addExpectedContent( "path", "upper-case-checksum" );
+        wagon.addExpectedContent( "path.sha1", "B7BB97D7D0B9244398D9B47296907F73313663E6" );
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+        }
+        catch ( ChecksumFailedException e )
+        {
+            fail( "Checksum verification did not pass: " + e.getMessage() );
+        }
+
+        wagon.clearExpectedContent();
+        wagon.addExpectedContent( "path", "expected-failure" );
+        wagon.addExpectedContent( "path.sha1", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+            fail( "Checksum verification did not fail" );
+        }
+        catch ( ChecksumFailedException e )
+        {
+            // expected
+        }
+
+        wagon.clearExpectedContent();
+        wagon.addExpectedContent( "path", "lower-case-checksum" );
+        wagon.addExpectedContent( "path.md5", "50b2cf50a103a965efac62b983035cac" );
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+        }
+        catch ( ChecksumFailedException e )
+        {
+            fail( "Checksum verification did not pass: " + e.getMessage() );
+        }
+
+        wagon.clearExpectedContent();
+        wagon.addExpectedContent( "path", "upper-case-checksum" );
+        wagon.addExpectedContent( "path.md5", "842F568FCCFEB7E534DC72133D42FFDC" );
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+        }
+        catch ( ChecksumFailedException e )
+        {
+            fail( "Checksum verification did not pass: " + e.getMessage() );
+        }
+
+        wagon.clearExpectedContent();
+        wagon.addExpectedContent( "path", "expected-failure" );
+        wagon.addExpectedContent( "path.md5", "b7bb97d7d0b9244398d9b47296907f73313663e6" );
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+            fail( "Checksum verification did not fail" );
+        }
+        catch ( ChecksumFailedException e )
+        {
+            // expected
         }
     }
 
