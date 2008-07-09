@@ -424,87 +424,100 @@ public class DefaultArtifactCollector
 
                         try
                         {
-                            Object childKey = child.getKey();
-                            if ( managedVersions.containsKey( childKey ) )
+                            Object childKey;
+                            do
                             {
-                                // If this child node is a managed dependency, ensure
-                                // we are using the dependency management version
-                                // of this child if applicable b/c we want to use the
-                                // managed version's POM, *not* any other version's POM.
-                                // We retrieve the POM below in the retrieval step.
-                                manageArtifact( child, managedVersions, listeners );
+                                childKey = child.getKey();
 
-                                // Also, we need to ensure that any exclusions it presents are
-                                // added to the artifact before we retrive the metadata
-                                // for the artifact; otherwise we may end up with unwanted
-                                // dependencies.
-                                Artifact ma = (Artifact) managedVersions.get( childKey );
-                                ArtifactFilter managedExclusionFilter = ma.getDependencyFilter();
-                                if ( null != managedExclusionFilter )
+                                if ( managedVersions.containsKey( childKey ) )
                                 {
-                                    if ( null != artifact.getDependencyFilter() )
+                                    // If this child node is a managed dependency, ensure
+                                    // we are using the dependency management version
+                                    // of this child if applicable b/c we want to use the
+                                    // managed version's POM, *not* any other version's POM.
+                                    // We retrieve the POM below in the retrieval step.
+                                    manageArtifact( child, managedVersions, listeners );
+
+                                    // Also, we need to ensure that any exclusions it presents are
+                                    // added to the artifact before we retrive the metadata
+                                    // for the artifact; otherwise we may end up with unwanted
+                                    // dependencies.
+                                    Artifact ma = (Artifact) managedVersions.get( childKey );
+                                    ArtifactFilter managedExclusionFilter = ma.getDependencyFilter();
+                                    if ( null != managedExclusionFilter )
                                     {
-                                        AndArtifactFilter aaf = new AndArtifactFilter();
-                                        aaf.add( artifact.getDependencyFilter() );
-                                        aaf.add( managedExclusionFilter );
-                                        artifact.setDependencyFilter( aaf );
+                                        if ( null != artifact.getDependencyFilter() )
+                                        {
+                                            AndArtifactFilter aaf = new AndArtifactFilter();
+                                            aaf.add( artifact.getDependencyFilter() );
+                                            aaf.add( managedExclusionFilter );
+                                            artifact.setDependencyFilter( aaf );
+                                        }
+                                        else
+                                        {
+                                            artifact.setDependencyFilter( managedExclusionFilter );
+                                        }
+                                    }
+                                }
+
+                                if ( artifact.getVersion() == null )
+                                {
+                                    // set the recommended version
+                                    // TODO: maybe its better to just pass the range through to retrieval and use a
+                                    // transformation?
+                                    ArtifactVersion version;
+                                    if ( !artifact.isSelectedVersionKnown() )
+                                    {
+                                        List<ArtifactVersion> versions = artifact.getAvailableVersions();
+                                        if ( versions == null )
+                                        {
+                                            versions =
+                                                source.retrieveAvailableVersions( artifact, localRepository,
+                                                                                  childRemoteRepositories );
+                                            artifact.setAvailableVersions( versions );
+                                        }
+
+                                        Collections.sort( versions );
+
+                                        VersionRange versionRange = artifact.getVersionRange();
+
+                                        version = versionRange.matchVersion( versions );
+
+                                        if ( version == null )
+                                        {
+                                            // Getting the dependency trail so it can be logged in the exception
+                                            artifact.setDependencyTrail( node.getDependencyTrail() );
+
+                                            if ( versions.isEmpty() )
+                                            {
+                                                throw new OverConstrainedVersionException(
+                                                                                           "No versions are present in the repository for the artifact with a range "
+                                                                                               + versionRange, artifact,
+                                                                                               childRemoteRepositories );
+                                            }
+
+                                            throw new OverConstrainedVersionException( "Couldn't find a version in "
+                                                + versions + " to match range " + versionRange, artifact,
+                                                childRemoteRepositories );
+                                        }
                                     }
                                     else
                                     {
-                                        artifact.setDependencyFilter( managedExclusionFilter );
+                                        version = artifact.getSelectedVersion();
                                     }
+
+                                    artifact.selectVersion( version.toString() );
+                                    fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
+                                }
+
+                                Artifact relocated = source.retrieveRelocatedArtifact( artifact, localRepository, childRemoteRepositories );
+                                if ( !artifact.equals( relocated ) )
+                                {
+                                    artifact = relocated;
+                                    child.setArtifact( artifact );
                                 }
                             }
-
-                            if ( artifact.getVersion() == null )
-                            {
-                                // set the recommended version
-                                // TODO: maybe its better to just pass the range through to retrieval and use a
-                                // transformation?
-                                ArtifactVersion version;
-                                if ( !artifact.isSelectedVersionKnown() )
-                                {
-                                    List<ArtifactVersion> versions = artifact.getAvailableVersions();
-                                    if ( versions == null )
-                                    {
-                                        versions =
-                                            source.retrieveAvailableVersions( artifact, localRepository,
-                                                                              childRemoteRepositories );
-                                        artifact.setAvailableVersions( versions );
-                                    }
-
-                                    Collections.sort( versions );
-
-                                    VersionRange versionRange = artifact.getVersionRange();
-
-                                    version = versionRange.matchVersion( versions );
-
-                                    if ( version == null )
-                                    {
-                                        // Getting the dependency trail so it can be logged in the exception
-                                        artifact.setDependencyTrail( node.getDependencyTrail() );
-
-                                        if ( versions.isEmpty() )
-                                        {
-                                            throw new OverConstrainedVersionException(
-                                                                                       "No versions are present in the repository for the artifact with a range "
-                                                                                           + versionRange, artifact,
-                                                                                           childRemoteRepositories );
-                                        }
-
-                                        throw new OverConstrainedVersionException( "Couldn't find a version in "
-                                            + versions + " to match range " + versionRange, artifact,
-                                            childRemoteRepositories );
-                                    }
-                                }
-                                else
-                                {
-                                    version = artifact.getSelectedVersion();
-                                }
-
-                                artifact.selectVersion( version.toString() );
-                                fireEvent( ResolutionListener.SELECT_VERSION_FROM_RANGE, listeners, child );
-                            }
+                            while( !childKey.equals( child.getKey() ) );
 
                             artifact.setDependencyTrail( node.getDependencyTrail() );
 

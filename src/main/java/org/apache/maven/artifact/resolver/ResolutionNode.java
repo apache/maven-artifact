@@ -34,7 +34,7 @@ import java.util.Set;
 
 public class ResolutionNode
 {
-    private final Artifact artifact;
+    private Artifact artifact;
 
     private List<ResolutionNode> children;
 
@@ -242,6 +242,11 @@ public class ResolutionNode
     public String toString()
     {
         return artifact.toString() + " (" + depth + "; " + ( active ? "enabled" : "disabled" ) + ")";
+    }
+
+    public void setArtifact( Artifact artifact )
+    {
+        this.artifact = artifact;
     }
 
 }
