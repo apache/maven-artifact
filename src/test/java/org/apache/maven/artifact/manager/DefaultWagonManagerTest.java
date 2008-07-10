@@ -21,9 +21,7 @@ package org.apache.maven.artifact.manager;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -745,7 +743,7 @@ public class DefaultWagonManagerTest
     public void testWagonTransferListenerRemovedAfterGetArtifactAndPutArtifact()
         throws Exception
     {
-        Artifact artifact = createTestArtifact( "transfer-listener", "jar" );
+        Artifact artifact = createTestArtifact( "target/test-data/transfer-listener", "jar" );
         ArtifactRepository repo = createStringRepo();
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
