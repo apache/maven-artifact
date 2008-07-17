@@ -35,7 +35,7 @@ public class DefaultArtifactRepository
     extends Repository
     implements ArtifactRepository
 {
-    private final ArtifactRepositoryLayout layout;
+    private ArtifactRepositoryLayout layout;
 
     private ArtifactRepositoryPolicy snapshots;
 

@@ -69,4 +69,26 @@ public class DefaultArtifactRepositoryFactoryTest
 
         assertTrue( layout instanceof DefaultRepositoryLayout );
     }
+
+    public void testRetrievalOfKnownRepositoryLayouts()
+        throws Exception
+    {
+        ArtifactRepositoryLayout defaultLayout = repoFactory.getLayout( "default" );
+        assertNotNull( defaultLayout );
+
+        ArtifactRepositoryLayout legacyLayout = repoFactory.getLayout( "legacy" );
+        assertNotNull( legacyLayout );
+
+        ArtifactRepositoryLayout flatLayout = repoFactory.getLayout( "flat" );
+        assertNotNull( flatLayout );
+    }
+
+    public void testCreationOfDeploymentRepository()
+        throws Exception
+    {
+        ArtifactRepository repository = repoFactory.createDeploymentArtifactRepository( "id", "file:///tmp/repo", "default", false );
+        assertNotNull( repository );        
+        assertNotNull( repository.getLayout() );
+        assertEquals( "id", repository.getId() );        
+    }
 }

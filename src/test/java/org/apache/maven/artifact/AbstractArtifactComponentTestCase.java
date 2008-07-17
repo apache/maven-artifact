@@ -41,6 +41,26 @@ import java.util.List;
 public abstract class AbstractArtifactComponentTestCase
     extends PlexusTestCase
 {
+    protected ArtifactFactory artifactFactory;
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+    }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        release( artifactFactory );
+        
+        super.tearDown();
+    }
+
     protected abstract String component();
 
     /**
@@ -248,8 +268,6 @@ public abstract class AbstractArtifactComponentTestCase
     protected Artifact createArtifact( String groupId, String artifactId, String version, String type )
         throws Exception
     {
-        ArtifactFactory artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
-
         return artifactFactory.createBuildArtifact( groupId, artifactId, version, type );
     }
 

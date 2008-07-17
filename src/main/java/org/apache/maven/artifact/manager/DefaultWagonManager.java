@@ -19,6 +19,18 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -52,18 +64,6 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /** @plexus.component */
 public class DefaultWagonManager
@@ -333,14 +333,15 @@ public class DefaultWagonManager
                              boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-        boolean successful = false;
-
         for (ArtifactRepository repository : remoteRepositories) {
             try
             {
                 getArtifact( artifact, repository, force );
 
-                successful = artifact.isResolved();
+                if (artifact.isResolved())
+                {
+                	break;
+                }
             }
             catch ( ResourceDoesNotExistException e )
             {
@@ -358,7 +359,7 @@ public class DefaultWagonManager
         }
 
         // if it already exists locally we were just trying to force it - ignore the update
-        if ( !successful && !artifact.getFile().exists() )
+        if ( !artifact.getFile().exists() )
         {
             throw new ResourceDoesNotExistException( "Unable to download the artifact from any repository" );
         }
@@ -410,6 +411,42 @@ public class DefaultWagonManager
 
             artifact.setResolved( true );
         }
+
+        // XXX: This is not really intended for the long term - unspecified POMs should be converted to failures
+        //      meaning caching would be unnecessary. The code for this is here instead of the MavenMetadataSource
+        //      to keep the logic related to update checks enclosed, and so to keep the rules reasonably consistent
+        //      with release metadata
+        else if ( "pom".equals( artifact.getType() ) && !artifact.getFile().exists() )
+        {
+            // if POM is not present locally, try and get it if it's forced, out of date, or has not been attempted yet  
+            if ( force || updateCheckManager.isPomUpdateRequired( artifact, repository ) )
+            {
+                getLogger().debug( "Trying repository " + repository.getId() );
+
+                try
+                {
+                    getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor,
+                                   policy.getChecksumPolicy(), false );
+                }
+                catch ( ResourceDoesNotExistException e )
+                {
+                    // cache the POM failure
+                    updateCheckManager.touch( artifact, repository );
+                    
+                    throw e;
+                }
+
+                getLogger().debug( "  Artifact resolved" );
+
+                artifact.setResolved( true );
+            }
+            else
+            {
+                // cached failure - pass on the failure
+                throw new ResourceDoesNotExistException( "Failure was cached in the local repository" );
+            }
+        }
+        
         // If it's not a snapshot artifact, then we don't care what the force flag says. If it's on the local
         // system, it's resolved. Releases are presumed to be immutable, so release artifacts are not ever updated.
         // NOTE: This is NOT the case for metadata files on relese-only repositories. This metadata may contain information
@@ -539,29 +576,58 @@ public class DefaultWagonManager
                         wagon.get( remotePath, temp );
                         downloaded = true;
                     }
+                }
+                finally
+                {
+                    wagon.removeTransferListener( md5ChecksumObserver );
+                    wagon.removeTransferListener( sha1ChecksumObserver );
+                }
 
-                    if ( downloaded )
+                if ( downloaded )
+                {
+                    // keep the checksum files from showing up on the download monitor...
+                    if ( downloadMonitor != null )
                     {
-                        // keep the checksum files from showing up on the download monitor...
-                        if ( downloadMonitor != null )
-                        {
-                            wagon.removeTransferListener( downloadMonitor );
-                        }
+                        wagon.removeTransferListener( downloadMonitor );
+                    }
 
-                        // try to verify the SHA-1 checksum for this file.
+                    // try to verify the SHA-1 checksum for this file.
+                    try
+                    {
+                        verifyChecksum( sha1ChecksumObserver, destination, temp, remotePath, ".sha1", wagon );
+                    }
+                    catch ( ChecksumFailedException e )
+                    {
+                        // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the checksum
+                        // doesn't match. This could be a problem with the server (ibiblio HTTP-200 error page), so we'll
+                        // try this up to two times. On the second try, we'll handle it as a bona-fide error, based on the
+                        // repository's checksum checking policy.
+                        if ( firstRun )
+                        {
+                            getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
+                            retry = true;
+                        }
+                        else
+                        {
+                            handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
+                        }
+                    }
+                    catch ( ResourceDoesNotExistException sha1TryException )
+                    {
+                        getLogger().debug( "SHA1 not found, trying MD5", sha1TryException );
+
+                        // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
+                        // file...we'll try again with the MD5 checksum.
                         try
                         {
-                            verifyChecksum( sha1ChecksumObserver, destination, temp, remotePath, ".sha1", wagon );
+                            verifyChecksum( md5ChecksumObserver, destination, temp, remotePath, ".md5", wagon );
                         }
                         catch ( ChecksumFailedException e )
                         {
-                            // if we catch a ChecksumFailedException, it means the transfer/read succeeded, but the checksum
-                            // doesn't match. This could be a problem with the server (ibiblio HTTP-200 error page), so we'll
-                            // try this up to two times. On the second try, we'll handle it as a bona-fide error, based on the
-                            // repository's checksum checking policy.
+                            // if we also fail to verify based on the MD5 checksum, and the checksum transfer/read
+                            // succeeded, then we need to determine whether to retry or handle it as a failure.
                             if ( firstRun )
                             {
-                                getLogger().warn( "*** CHECKSUM FAILED - " + e.getMessage() + " - RETRYING" );
                                 retry = true;
                             }
                             else
@@ -569,52 +635,23 @@ public class DefaultWagonManager
                                 handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
                             }
                         }
-                        catch ( ResourceDoesNotExistException sha1TryException )
+                        catch ( ResourceDoesNotExistException md5TryException )
                         {
-                            getLogger().debug( "SHA1 not found, trying MD5", sha1TryException );
-
-                            // if this IS NOT a ChecksumFailedException, it was a problem with transfer/read of the checksum
-                            // file...we'll try again with the MD5 checksum.
-                            try
-                            {
-                                verifyChecksum( md5ChecksumObserver, destination, temp, remotePath, ".md5", wagon );
-                            }
-                            catch ( ChecksumFailedException e )
-                            {
-                                // if we also fail to verify based on the MD5 checksum, and the checksum transfer/read
-                                // succeeded, then we need to determine whether to retry or handle it as a failure.
-                                if ( firstRun )
-                                {
-                                    retry = true;
-                                }
-                                else
-                                {
-                                    handleChecksumFailure( checksumPolicy, e.getMessage(), e.getCause() );
-                                }
-                            }
-                            catch ( ResourceDoesNotExistException md5TryException )
-                            {
-                                // this was a failed transfer, and we don't want to retry.
-                                handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
-                                    md5TryException );
-                            }
-                        }
-
-                        // reinstate the download monitor...
-                        if ( downloadMonitor != null )
-                        {
-                            wagon.addTransferListener( downloadMonitor );
+                            // this was a failed transfer, and we don't want to retry.
+                            handleChecksumFailure( checksumPolicy, "Error retrieving checksum file for " + remotePath,
+                                md5TryException );
                         }
                     }
 
-                    // unset the firstRun flag, so we don't get caught in an infinite loop...
-                    firstRun = false;
+                    // reinstate the download monitor...
+                    if ( downloadMonitor != null )
+                    {
+                        wagon.addTransferListener( downloadMonitor );
+                    }
                 }
-                finally
-                {
-                    wagon.removeTransferListener( md5ChecksumObserver );
-                    wagon.removeTransferListener( sha1ChecksumObserver );
-                }
+
+                // unset the firstRun flag, so we don't get caught in an infinite loop...
+                firstRun = false;
             }
         }
         catch ( ConnectionException e )
@@ -1152,5 +1189,10 @@ public class DefaultWagonManager
     public void registerCredentialsDataSource( CredentialsDataSource cds )
     {
         credentialsDataSource = cds;
+    }
+
+    public void setUpdateCheckManager( UpdateCheckManager updateCheckManager )
+    {
+        this.updateCheckManager = updateCheckManager;        
     }
 }

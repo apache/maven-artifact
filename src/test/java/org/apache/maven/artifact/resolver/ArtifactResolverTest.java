@@ -146,6 +146,14 @@ public class ArtifactResolverTest
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
             }
+
+            public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                       ArtifactRepository localRepository,
+                                                       List<ArtifactRepository> remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                return artifact;
+            }
         };
 
         ArtifactResolutionResult result =
@@ -212,6 +220,14 @@ public class ArtifactResolverTest
                 throws ArtifactMetadataRetrievalException
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            }
+
+            public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                       ArtifactRepository localRepository,
+                                                       List<ArtifactRepository> remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                return artifact;
             }
         };
 
@@ -294,6 +310,14 @@ public class ArtifactResolverTest
                 throws ArtifactMetadataRetrievalException
             {
                 throw new UnsupportedOperationException( "Cannot get available versions in this test case" );
+            }
+
+            public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                                       ArtifactRepository localRepository,
+                                                       List<ArtifactRepository> remoteRepositories )
+                throws ArtifactMetadataRetrievalException
+            {
+                return artifact;
             }
         };
 

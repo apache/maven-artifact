@@ -33,6 +33,12 @@ under the License.
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/tags/maven-artifact-3.0-alpha-1</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/tags/maven-artifact-3.0-alpha-1</url>
   </scm>
+  <distributionManagement>
+    <site>
+      <id>apache.website</id>
+      <url>scp://people.apache.org/www/maven.apache.org/ref/${project.artifactId}-${project.version}/</url>
+    </site>
+  </distributionManagement>
   <contributors>
     <contributor>
       <name>Oleg Gusakov</name>      
@@ -143,6 +149,7 @@ under the License.
         <artifactId>maven-release-plugin</artifactId>
         <configuration>
           <tagBase>https://svn.apache.org/repos/asf/maven/artifact/tags</tagBase>
+          <useReleaseProfile>true</useReleaseProfile>
         </configuration>
       </plugin>
       <plugin>
@@ -165,6 +172,42 @@ under the License.
         </executions>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>clirr-maven-plugin</artifactId>
+          <version>2.2.1</version>
+          <configuration>
+            <comparisonArtifacts>
+              <comparisonArtifact>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-artifact</artifactId>
+                <version>2.0.9</version>
+              </comparisonArtifact>
+              <comparisonArtifact>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-artifact-manager</artifactId>
+                <version>2.0.9</version>
+              </comparisonArtifact>
+            </comparisonArtifacts>
+            <excludes>
+              <!-- expanding interfaces we exclude. Worth reviewing on occasion -->
+              <exclude>org/apache/maven/artifact/manager/WagonManager</exclude>
+              <exclude>org/apache/maven/artifact/metadata/ArtifactMetadataSource*</exclude>
+              <exclude>org/apache/maven/artifact/repository/ArtifactRepositoryFactory*</exclude>
+              <exclude>org/apache/maven/artifact/resolver/ArtifactCollector</exclude>
+              <exclude>org/apache/maven/artifact/transform/ArtifactTransformationManager*</exclude>
+              <exclude>org/apache/maven/artifact/resolver/ArtifactResolver*</exclude>
+              <exclude>org/apache/maven/artifact/resolver/ResolutionListenerForDepMgmt</exclude>
+              <exclude>org/apache/maven/artifact/resolver/conflict/ConflictResolver*</exclude>
+              <!-- plexus interfaces were removed only -->
+              <exclude>org/apache/maven/artifact/transform/DefaultArtifactTransformationManager</exclude>
+            </excludes>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
   <properties>
     <wagon.version>1.0-beta-3</wagon.version>

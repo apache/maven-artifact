@@ -24,8 +24,8 @@ import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.metadata.ResolutionGroup;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,5 +54,13 @@ public class SimpleArtifactMetadataSource
         throws ArtifactMetadataRetrievalException
     {
         return Collections.<ArtifactVersion>singletonList( new DefaultArtifactVersion( "10.1.3" ) );
+    }
+
+    public Artifact retrieveRelocatedArtifact( Artifact artifact,
+                                               ArtifactRepository localRepository,
+                                               List<ArtifactRepository> remoteRepositories )
+        throws ArtifactMetadataRetrievalException
+    {
+        return artifact;
     }
 }
