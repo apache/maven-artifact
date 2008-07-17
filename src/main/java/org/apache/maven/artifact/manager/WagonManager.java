@@ -19,6 +19,12 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -31,14 +37,9 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
+import org.bouncycastle.openpgp.PGPException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Manages <a href="http://maven.apache.org/wagon">Wagon</a> related operations in Maven.
@@ -173,4 +174,7 @@ public interface WagonManager
     void setDefaultRepositoryPermissions( RepositoryPermissions permissions );
 
     ArtifactRepository getMirrorRepository( ArtifactRepository repository );
+
+    void registerPublicKeyRing( InputStream fileInputStream )
+        throws IOException, PGPException;
 }

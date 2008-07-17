@@ -46,6 +46,7 @@ import org.apache.maven.wagon.observers.Debug;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.easymock.MockControl;
 
@@ -68,16 +69,24 @@ public class DefaultWagonManagerTest
         super.setUp();
 
         wagonManager = (DefaultWagonManager) lookup( WagonManager.ROLE );
+        wagonManager.registerPublicKeyRing( getClass().getResourceAsStream( "/pubring.gpg" ) );
         
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
+    }
+    
+    public void tearDown() 
+        throws Exception
+    {
+        release( wagonManager );
+        release( artifactFactory );
     }
     
     public void testUnnecessaryRepositoryLookup() throws Exception {
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
 
         List<ArtifactRepository> repos = new ArrayList<ArtifactRepository>();
-        repos.add(new DefaultArtifactRepository( "repo1", "string://url1", new ArtifactRepositoryLayoutStub() ));
-        repos.add(new DefaultArtifactRepository( "repo2", "string://url2", new ArtifactRepositoryLayoutStub() ));
+        repos.add( createStringRepo( "string://url1" ) );
+        repos.add( createStringRepo( "string://url2" ) );
 
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repos.get(0).getLayout().pathOf( artifact ), "expected" );
@@ -495,9 +504,17 @@ public class DefaultWagonManagerTest
 
     private ArtifactRepository createStringRepo()
     {
-        ArtifactRepository repo =
-            new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub() );
-        return repo;
+        return createStringRepo( "string://url" );
+    }
+
+    private ArtifactRepository createStringRepo( String url )
+    {
+        ArtifactRepositoryPolicy policy =
+            new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                          ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE,
+                                          ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE );        
+        
+        return new DefaultArtifactRepository( "id", url, new ArtifactRepositoryLayoutStub(), policy, policy );
     }
     
     /**
@@ -768,6 +785,167 @@ public class DefaultWagonManagerTest
                      wagon.getTransferEventSupport().hasTransferListener( transferListener ) );
     }
 
+    public void testIncorrectSignatureVerificationJar() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL );
+        
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent( "/other-test-signature.asc" );
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+            fail( "Should have failed signature check" );
+        }
+        catch ( SignatureFailedException e )
+        {
+            assertTrue( true );
+        }
+    }
+
+    private ArtifactRepositoryPolicy getSignaturePolicy( String policy )
+    {
+        return new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
+                                             ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE, policy );
+    }
+
+    public void testIncorrectSignatureVerificationJarIgnore() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE );
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent( "/other-test-signature.asc" );
+
+        wagonManager.getArtifact( artifact, repo, true );
+    }
+
+    public void testIncorrectSignatureVerificationJarWarn() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_WARN );
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent( "/other-test-signature.asc" );
+
+        wagonManager.getArtifact( artifact, repo, true );
+    }
+
+    private ArtifactRepository createStringRepo( ArtifactRepositoryPolicy policy )
+    {
+        ArtifactRepository repo =
+            new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
+        return repo;
+    }
+
+    public void testSignatureVerificationJar() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL );
+        
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+        
+        createWagonWithSignedContent( "/test-signature.asc" );
+
+        wagonManager.getArtifact( artifact, repo, true );
+    }
+    
+    public void testMissingSignatureVerificationJar() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL );
+        
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent();
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+            fail( "Should have failed signature check" );
+        }
+        catch ( SignatureFailedException e )
+        {
+            assertTrue( true );
+        }
+    }
+    
+    public void testMissingSignatureVerificationJarIgnored() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE );
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent();
+
+        wagonManager.getArtifact( artifact, repo, true );
+    }
+
+    public void testMissingSignatureVerificationJarWarn() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_WARN );
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent();
+
+        wagonManager.getArtifact( artifact, repo, true );
+    }
+
+    public void testUnknownSignatureVerificationJar() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL );
+        
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent( "/unknown-but-valid-signature.asc" );
+
+        try
+        {
+            wagonManager.getArtifact( artifact, repo, true );
+            fail( "Should have failed signature check" );
+        }
+        catch ( SignatureFailedException e )
+        {
+            assertTrue( true );
+        }
+    }
+    
+    public void testUnknownSignatureVerificationJarIgnored() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE );
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent( "/unknown-but-valid-signature.asc" );
+
+        wagonManager.getArtifact( artifact, repo, true );
+    }
+
+    public void testUnknownSignatureVerificationJarWarn() throws Exception
+    {
+        ArtifactRepositoryPolicy policy = getSignaturePolicy( ArtifactRepositoryPolicy.SIGNATURE_POLICY_WARN );
+        ArtifactRepository repo = createStringRepo( policy );
+        
+        Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
+                
+        createWagonWithSignedContent( "/unknown-but-valid-signature.asc" );
+
+        wagonManager.getArtifact( artifact, repo, true );
+    }
+
     /**
      * Checks the verification of checksums.
      */
@@ -777,8 +955,7 @@ public class DefaultWagonManagerTest
         ArtifactRepositoryPolicy policy =
             new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
                                           ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL );
-        ArtifactRepository repo =
-            new DefaultArtifactRepository( "id", "string://url", new ArtifactRepositoryLayoutStub(), policy, policy );
+        ArtifactRepository repo = createStringRepo( policy );
 
         Artifact artifact =
             new DefaultArtifact( "sample.group", "sample-art", VersionRange.createFromVersion( "1.0" ), "scope",
@@ -791,27 +968,13 @@ public class DefaultWagonManagerTest
         wagon.addExpectedContent( "path", "lower-case-checksum" );
         wagon.addExpectedContent( "path.sha1", "2a25dc564a3b34f68237fc849066cbc7bb7a36a1" );
 
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, true );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, true );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "upper-case-checksum" );
         wagon.addExpectedContent( "path.sha1", "B7BB97D7D0B9244398D9B47296907F73313663E6" );
 
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, true );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, true );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
@@ -831,27 +994,13 @@ public class DefaultWagonManagerTest
         wagon.addExpectedContent( "path", "lower-case-checksum" );
         wagon.addExpectedContent( "path.md5", "50b2cf50a103a965efac62b983035cac" );
 
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, true );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, true );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "upper-case-checksum" );
         wagon.addExpectedContent( "path.md5", "842F568FCCFEB7E534DC72133D42FFDC" );
 
-        try
-        {
-            wagonManager.getArtifact( artifact, repo, true );
-        }
-        catch ( ChecksumFailedException e )
-        {
-            fail( "Checksum verification did not pass: " + e.getMessage() );
-        }
+        wagonManager.getArtifact( artifact, repo, true );
 
         wagon.clearExpectedContent();
         wagon.addExpectedContent( "path", "expected-failure" );
@@ -866,6 +1015,23 @@ public class DefaultWagonManagerTest
         {
             // expected
         }
+    }
+
+    private void createWagonWithSignedContent( String signatureResource )
+        throws UnsupportedProtocolException, IOException
+    {
+        StringWagon wagon = createWagonWithSignedContent();
+        wagon.addExpectedContent( "path.asc", IOUtil.toString( getClass().getResourceAsStream( signatureResource ) ) );
+    }
+
+    private StringWagon createWagonWithSignedContent()
+        throws UnsupportedProtocolException
+    {
+        StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
+        wagon.clearExpectedContent();
+        wagon.addExpectedContent( "path", "signed-text\n" );
+        wagon.addExpectedContent( "path.sha1", "36e0a272f6861ccea6be4433fa8c25cd5ba52794" );
+        return wagon;
     }
 
     private void assertWagon( String protocol )

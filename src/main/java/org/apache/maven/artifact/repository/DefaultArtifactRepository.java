@@ -99,7 +99,7 @@ public class DefaultArtifactRepository
         if ( snapshots == null )
         {
             snapshots = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE, ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE );
         }
 
         this.snapshots = snapshots;
@@ -107,7 +107,7 @@ public class DefaultArtifactRepository
         if ( releases == null )
         {
             releases = new ArtifactRepositoryPolicy( true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE );
+                ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE, ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL );
         }
 
         this.releases = releases;

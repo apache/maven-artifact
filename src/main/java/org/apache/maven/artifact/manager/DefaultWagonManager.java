@@ -20,7 +20,9 @@ package org.apache.maven.artifact.manager;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
@@ -31,6 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.openpgp.BouncyCastleKeyRing;
+import org.apache.commons.openpgp.KeyRing;
+import org.apache.commons.openpgp.OpenPgpException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -42,14 +47,17 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.UnsupportedProtocolException;
 import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.WagonException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.observers.ChecksumObserver;
+import org.apache.maven.wagon.openpgp.WagonOpenPgpSignatureVerifierObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
+import org.bouncycastle.openpgp.PGPException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
@@ -63,6 +71,7 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 /** @plexus.component */
@@ -117,6 +126,8 @@ public class DefaultWagonManager
 
     /** @plexus.requirement */
     private UpdateCheckManager updateCheckManager;
+
+    private KeyRing keyRing = new BouncyCastleKeyRing();
 
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
@@ -353,8 +364,12 @@ public class DefaultWagonManager
             }
             catch ( TransferFailedException e )
             {
-                getLogger().debug( "Unable to get resource '" + artifact.getId() + "' from repository " +
-                    repository.getId() + " (" + repository.getUrl() + ")", e );
+                String msg =
+                    "Unable to get resource '" + artifact.getId() + "' from repository " + repository.getId() + " ("
+                        + repository.getUrl() + ")\nDue to: " + e.getMessage()
+                        + "\nRemaining repositories will be checked before failing.";
+                getLogger().warn( msg );
+                getLogger().debug( "Unable to get resource", e );
             }
         }
 
@@ -400,7 +415,7 @@ public class DefaultWagonManager
             try
             {
                 getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor,
-                               policy.getChecksumPolicy(), false );
+                               policy, false );
             }
             finally
             {
@@ -426,7 +441,7 @@ public class DefaultWagonManager
                 try
                 {
                     getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor,
-                                   policy.getChecksumPolicy(), false );
+                                   policy, false );
                 }
                 catch ( ResourceDoesNotExistException e )
                 {
@@ -458,7 +473,8 @@ public class DefaultWagonManager
         {
             getLogger().debug( "Trying repository " + repository.getId() );
 
-            getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor, policy.getChecksumPolicy(), false );
+            getRemoteFile( getMirrorRepository( repository ), artifact.getFile(), remotePath, downloadMonitor, policy,
+                           false );
 
             getLogger().debug( "  Artifact resolved" );
 
@@ -474,7 +490,8 @@ public class DefaultWagonManager
     {
         String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
 
-        getRemoteFile( getMirrorRepository( repository ), destination, remotePath, null, checksumPolicy, true );
+        getRemoteFile( getMirrorRepository( repository ), destination, remotePath, null, checksumPolicy,
+                       ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE, true );
     }
 
     public void getArtifactMetadataFromDeploymentRepository( ArtifactMetadata metadata, ArtifactRepository repository,
@@ -483,18 +500,35 @@ public class DefaultWagonManager
     {
         String remotePath = repository.pathOfRemoteRepositoryMetadata( metadata );
 
-        getRemoteFile( repository, destination, remotePath, null, checksumPolicy, true );
+        getRemoteFile( repository, destination, remotePath, null, checksumPolicy,
+                       ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE, true );
     }
 
     private void getRemoteFile( ArtifactRepository repository,
                                 File destination,
                                 String remotePath,
                                 TransferListener downloadMonitor,
-                                String checksumPolicy,
+                                ArtifactRepositoryPolicy policy,
                                 boolean force )
         throws TransferFailedException, ResourceDoesNotExistException
     {
-        // TODO: better excetpions - transfer failed is not enough?
+        String checksumPolicy = policy.getChecksumPolicy();
+        
+        String signaturePolicy = policy.getSignaturePolicy();
+        
+        getRemoteFile( repository, destination, remotePath, downloadMonitor, checksumPolicy, signaturePolicy, force );
+    }
+    
+    private void getRemoteFile( ArtifactRepository repository,
+                                File destination,
+                                String remotePath,
+                                TransferListener downloadMonitor,
+                                String checksumPolicy,
+                                String signaturePolicy,
+                                boolean force )
+        throws TransferFailedException, ResourceDoesNotExistException
+    {
+        // TODO: better exceptions - transfer failed is not enough?
 
         failIfNotOnline();
 
@@ -524,11 +558,45 @@ public class DefaultWagonManager
 
         boolean downloaded = false;
 
+        WagonOpenPgpSignatureVerifierObserver pgpObserver = null;
         try
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
                 getAuthenticationInfo( repository.getId() ), getProxy( protocol ) );
 
+            // don't fetch the signature if it's ignored
+            if ( !ArtifactRepositoryPolicy.SIGNATURE_POLICY_IGNORE.equalsIgnoreCase( signaturePolicy ) )
+            {                
+                try
+                {
+                    pgpObserver = getTempSignatureFile( destination, remotePath, wagon );
+                }
+                catch ( SignatureFailedException e )
+                {
+                    if ( ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL.equalsIgnoreCase( signaturePolicy ) )
+                    {
+                        throw e;
+                    }
+                    else
+                    {
+                        getLogger().warn( e.getMessage() );
+                    }
+                }
+                catch ( IOException e )
+                {
+                    String msg = "An error occurred reading the signature file: " + e.getMessage();
+                    if ( ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL.equalsIgnoreCase( signaturePolicy ) )
+                    {
+                        throw new SignatureFailedException( msg, e );
+                    }
+                    else
+                    {
+                        getLogger().warn( msg );
+                        getLogger().debug( msg, e );
+                    }
+                }
+            }
+            
             boolean firstRun = true;
             boolean retry = true;
 
@@ -546,7 +614,10 @@ public class DefaultWagonManager
 
                     md5ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
                     sha1ChecksumObserver = addChecksumObserver( wagon, CHECKSUM_ALGORITHMS[i++] );
-
+                    if ( pgpObserver != null )
+                    {
+                        wagon.addTransferListener( pgpObserver );
+                    }
                     // reset the retry flag.
                     retry = false;
 
@@ -579,6 +650,10 @@ public class DefaultWagonManager
                 }
                 finally
                 {
+                    if ( pgpObserver != null )
+                    {
+                        wagon.removeTransferListener( pgpObserver );
+                    }
                     wagon.removeTransferListener( md5ChecksumObserver );
                     wagon.removeTransferListener( sha1ChecksumObserver );
                 }
@@ -685,6 +760,22 @@ public class DefaultWagonManager
 
         if ( downloaded )
         {
+            if ( pgpObserver != null )
+            {
+                if ( !pgpObserver.getStatus().isValid() )
+                {
+                    String msg = "Invalid signature for artifact '" + remotePath + "'";
+                    if ( ArtifactRepositoryPolicy.SIGNATURE_POLICY_FAIL.equalsIgnoreCase( signaturePolicy ) )
+                    {
+                        throw new SignatureFailedException( msg );
+                    }
+                    else
+                    {
+                        getLogger().warn( msg );
+                    }
+                }
+            }
+            
             if ( !temp.exists() )
             {
                 throw new ResourceDoesNotExistException( "Downloaded file does not exist: " + temp );
@@ -711,6 +802,61 @@ public class DefaultWagonManager
                 }
             }
         }
+    }
+
+    private WagonOpenPgpSignatureVerifierObserver getTempSignatureFile( File destination, String remotePath, Wagon wagon )
+        throws IOException, SignatureFailedException
+    {
+        WagonOpenPgpSignatureVerifierObserver pgpObserver = null;
+        
+        if ( downloadMonitor != null )
+        {
+            wagon.removeTransferListener( downloadMonitor );
+        }
+
+        File sigFile = null;
+        try
+        {
+            File tempSignatureFile = getRemoteVerificationFile( destination, remotePath, ".asc", wagon );
+            sigFile = copyTempFile( destination, ".asc", tempSignatureFile );
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            getLogger().debug( e.getMessage(), e );
+            throw new SignatureFailedException( "No signature was found for the artifact in the remote repository: '"
+                + remotePath + "'" );
+        }
+        catch ( WagonException e )
+        {
+            getLogger().debug( e.getMessage(), e );
+            throw new SignatureFailedException( "An error occurred receiving the remote signature for: '" + remotePath
+                + "': " + e.getMessage() );
+        }
+        finally
+        {
+            if ( downloadMonitor != null )
+            {
+                wagon.addTransferListener( downloadMonitor );
+            }
+        }
+        
+        InputStream signature = null;
+        try
+        {
+            signature = new FileInputStream( sigFile );
+            
+            pgpObserver = new WagonOpenPgpSignatureVerifierObserver( signature, keyRing );
+        }
+        catch ( OpenPgpException e )
+        {
+            throw new SignatureFailedException( "An error occurred reading the signature file: '" + remotePath + "': "
+                + e.getMessage(), e );
+        }
+        finally
+        {
+            IOUtil.close( signature );
+        }
+        return pgpObserver;
     }
 
     public ArtifactRepository getMirrorRepository( ArtifactRepository repository )
@@ -765,17 +911,27 @@ public class DefaultWagonManager
                                  String remotePath,
                                  String checksumFileExtension,
                                  Wagon wagon )
-        throws ResourceDoesNotExistException, TransferFailedException, AuthorizationException
-    {
+        throws ResourceDoesNotExistException, ChecksumFailedException
+    {        
+        // grab it first, because it's about to change...
+        String actualChecksum = checksumObserver.getActualChecksum();
+
+        File tempChecksumFile;
         try
         {
-            // grab it first, because it's about to change...
-            String actualChecksum = checksumObserver.getActualChecksum();
+            tempChecksumFile = getRemoteVerificationFile( tempDestination, remotePath, checksumFileExtension, wagon );
+        }
+        catch ( ResourceDoesNotExistException e )
+        {
+            throw e;
+        }
+        catch ( WagonException e )
+        {
+            throw new ChecksumFailedException( "An error occurred receiving the remote checksum: " + e.getMessage(), e );
+        }
 
-            File tempChecksumFile = new File( tempDestination + checksumFileExtension + ".tmp" );
-            tempChecksumFile.deleteOnExit();
-            wagon.get( remotePath + checksumFileExtension, tempChecksumFile );
-
+        try
+        {
             String expectedChecksum = FileUtils.fileRead( tempChecksumFile, "UTF-8" );
 
             // remove whitespaces at the end
@@ -799,13 +955,7 @@ public class DefaultWagonManager
             }
             if ( expectedChecksum.equalsIgnoreCase( actualChecksum ) )
             {
-                File checksumFile = new File( destination + checksumFileExtension );
-                if ( checksumFile.exists() )
-                {
-                    checksumFile.delete();
-                }
-                FileUtils.copyFile( tempChecksumFile, checksumFile );
-                tempChecksumFile.delete();
+                copyTempFile( destination, checksumFileExtension, tempChecksumFile );
             }
             else
             {
@@ -817,6 +967,30 @@ public class DefaultWagonManager
         {
             throw new ChecksumFailedException( "Invalid checksum file", e );
         }
+    }
+
+    private File getRemoteVerificationFile( File tempDestination, String remotePath, String extension, Wagon wagon )
+        throws ResourceDoesNotExistException, WagonException
+    {
+        getLogger().debug( "Retrieving: " + remotePath + extension );
+        File tempChecksumFile = new File( tempDestination + extension + ".tmp" );
+        tempChecksumFile.deleteOnExit();
+        wagon.get( remotePath + extension, tempChecksumFile );
+        return tempChecksumFile;
+    }
+
+    private File copyTempFile( File destination, String extension, File tempFile )
+        throws IOException
+    {
+        File checksumFile = new File( destination + extension );
+        if ( checksumFile.exists() )
+        {
+            checksumFile.delete();
+        }
+        FileUtils.copyFile( tempFile, checksumFile );
+        tempFile.delete();
+        
+        return checksumFile;
     }
 
 
@@ -1179,6 +1353,15 @@ public class DefaultWagonManager
         final XmlPlexusConfiguration xmlConf = new XmlPlexusConfiguration( configuration );
 
         serverConfigurationMap.put( repositoryId, xmlConf );
+    }
+    
+    public void registerPublicKeyRing( InputStream inputStream )
+        throws IOException, PGPException
+    {
+        // TODO: remove PGPException
+        this.keyRing.addPublicKeyRing( inputStream );
+        
+        // TODO: debug logging of keys
     }
 
     public void setDefaultRepositoryPermissions( RepositoryPermissions defaultRepositoryPermissions )

@@ -45,11 +45,19 @@ public class ArtifactRepositoryPolicy
 
     public static final String CHECKSUM_POLICY_IGNORE = "ignore";
 
+    public static final String SIGNATURE_POLICY_FAIL = "fail";
+
+    public static final String SIGNATURE_POLICY_WARN = "warn";
+
+    public static final String SIGNATURE_POLICY_IGNORE = "ignore";
+
     private boolean enabled;
 
     private String updatePolicy;
 
     private String checksumPolicy;
+    
+    private String signaturePolicy = SIGNATURE_POLICY_IGNORE;
 
     public ArtifactRepositoryPolicy()
     {
@@ -74,7 +82,18 @@ public class ArtifactRepositoryPolicy
         }
         this.checksumPolicy = checksumPolicy;
     }
-
+    
+    public ArtifactRepositoryPolicy( boolean enabled, String updatePolicy, String checksumPolicy, String signaturePolicy )
+    {
+        this( enabled, updatePolicy, checksumPolicy );
+        
+        if ( checksumPolicy == null )
+        {
+            checksumPolicy = SIGNATURE_POLICY_IGNORE;
+        }
+        this.signaturePolicy = signaturePolicy;
+    }
+    
     public void setEnabled( boolean enabled )
     {
         this.enabled = enabled;
@@ -90,6 +109,11 @@ public class ArtifactRepositoryPolicy
         this.checksumPolicy = checksumPolicy;
     }
 
+    public void setSignaturePolicy( String signaturePolicy )
+    {
+        this.signaturePolicy = signaturePolicy;
+    }
+
     public boolean isEnabled()
     {
         return enabled;
@@ -103,6 +127,11 @@ public class ArtifactRepositoryPolicy
     public String getChecksumPolicy()
     {
         return checksumPolicy;
+    }
+
+    public String getSignaturePolicy()
+    {
+        return signaturePolicy;
     }
 
     public boolean checkOutOfDate( Date lastModified )
