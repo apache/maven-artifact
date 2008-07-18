@@ -33,6 +33,20 @@ under the License.
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/tags/maven-artifact-3.0-alpha-1</developerConnection>
     <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/tags/maven-artifact-3.0-alpha-1</url>
   </scm>
+
+  <ciManagement>
+    <system>hudson</system>
+    <url>http://ci.sonatype.org</url>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <configuration>
+          <address>notifications@maven.apache.org</address>
+        </configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+
   <distributionManagement>
     <site>
       <id>apache.website</id>
