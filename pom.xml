@@ -26,12 +26,12 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.artifact</groupId>
   <artifactId>maven-artifact</artifactId>
-  <version>3.0-alpha-1-SNAPSHOT</version>
+  <version>3.0-alpha-1</version>
   <name>Maven Artifact</name>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/artifact/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/trunk</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/trunk</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/artifact/tags/maven-artifact-3.0-alpha-1</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/artifact/tags/maven-artifact-3.0-alpha-1</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/artifact/tags/maven-artifact-3.0-alpha-1</url>
   </scm>
 
   <ciManagement>
