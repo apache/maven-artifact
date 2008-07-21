@@ -70,6 +70,7 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -78,7 +79,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class DefaultWagonManager
     extends AbstractLogEnabled
     implements WagonManager,
-    Contextualizable
+    Contextualizable, Disposable
 {
     private static final String WILDCARD = "*";
 
@@ -1377,5 +1378,10 @@ public class DefaultWagonManager
     public void setUpdateCheckManager( UpdateCheckManager updateCheckManager )
     {
         this.updateCheckManager = updateCheckManager;        
+    }
+
+    public void dispose()
+    {
+        keyRing = null;
     }
 }
