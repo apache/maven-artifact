@@ -85,7 +85,7 @@ public class DefaultWagonManager
     /** have to match the CHECKSUM_IDS */
     private static final String[] CHECKSUM_ALGORITHMS = {"MD5", "SHA-1"};
 
-    private static final String MAVEN_ARTIFACT_PROPERTIES = "META-INF/maven/org.apache.maven/maven-artifact/pom.properties";
+    private static final String MAVEN_ARTIFACT_PROPERTIES = "META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties";
 
     private PlexusContainer container;
 
