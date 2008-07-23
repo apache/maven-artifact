@@ -26,7 +26,7 @@ under the License.
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.maven.artifact</groupId>
   <artifactId>maven-artifact</artifactId>
-  <version>3.0-alpha-2-SNAPSHOT</version>
+  <version>3.0-alpha-1-SNAPSHOT</version>
   <name>Maven Artifact</name>
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/maven/artifact/trunk</connection>
