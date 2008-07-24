@@ -56,7 +56,7 @@ import org.easymock.MockControl;
 public class DefaultWagonManagerTest
     extends PlexusTestCase
 {
-    private WagonManager wagonManager;
+    private DefaultWagonManager wagonManager;
 
     private TransferListener transferListener = new Debug();
 
@@ -67,7 +67,7 @@ public class DefaultWagonManagerTest
     {
         super.setUp();
 
-        wagonManager = (WagonManager) lookup( WagonManager.ROLE );
+        wagonManager = (DefaultWagonManager) lookup( WagonManager.ROLE );
         
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
@@ -104,6 +104,15 @@ public class DefaultWagonManagerTest
         
         ArtifactRepository repo = createStringRepo();
         
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+        
+        updateCheckManager.isPomUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+        updateCheckManager.touch( artifact, repo );        
+        control.replay();        
+        
         try
         {
             wagonManager.getArtifact( artifact, repo, false );
@@ -116,6 +125,8 @@ public class DefaultWagonManagerTest
         }
         
         assertFalse( artifact.getFile().exists() );
+        
+        control.verify();
     }
 
     public void testGetMissingPomCached() throws TransferFailedException, UnsupportedProtocolException, IOException
@@ -124,6 +135,14 @@ public class DefaultWagonManagerTest
         
         ArtifactRepository repo = createStringRepo();
         
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+        
+        updateCheckManager.isPomUpdateRequired( artifact, repo );
+        control.setReturnValue( false );
+        control.replay();        
+        
         try
         {
             wagonManager.getArtifact( artifact, repo, false );
@@ -136,6 +155,8 @@ public class DefaultWagonManagerTest
         }
         
         assertFalse( artifact.getFile().exists() );
+        
+        control.verify();
     }
     
     public void testGetMissingPomCachedForced() throws TransferFailedException, UnsupportedProtocolException, IOException
@@ -143,6 +164,13 @@ public class DefaultWagonManagerTest
         Artifact artifact = createTestPomArtifact( "target/test-data/get-missing-pom" );
         
         ArtifactRepository repo = createStringRepo();
+        
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+        
+        updateCheckManager.touch( artifact, repo );        
+        control.replay();        
         
         try
         {
@@ -156,6 +184,8 @@ public class DefaultWagonManagerTest
         }
         
         assertFalse( artifact.getFile().exists() );
+        
+        control.verify();
     }
     
     public void testGetRemotePom()
@@ -169,10 +199,20 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.isPomUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     public void testGetPomExistsLocallyForced()
@@ -186,10 +226,18 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, true );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     public void testGetMissingJar() throws TransferFailedException, UnsupportedProtocolException, IOException
@@ -243,10 +291,18 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     public void testGetJarExistsLocallyForced()
@@ -260,10 +316,18 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, true );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     public void testGetRemoteSnapshotJar()
@@ -277,10 +341,23 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.isUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+        
+        updateCheckManager.touch( artifact, repo );
+
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     public void testGetSnapshotJarExistsLocally()
@@ -294,10 +371,21 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.isUpdateRequired( artifact, repo );
+        control.setReturnValue( false );
+
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
-        assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+        assertEquals( "", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     public void testGetSnapshotJarExistsLocallyExpired()
@@ -311,10 +399,23 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.isUpdateRequired( artifact, repo );
+        control.setReturnValue( true );
+
+        updateCheckManager.touch( artifact, repo );
+
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, false );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     public void testGetSnapshotJarExistsLocallyForced()
@@ -328,10 +429,20 @@ public class DefaultWagonManagerTest
         StringWagon wagon = (StringWagon) wagonManager.getWagon( "string" );
         wagon.addExpectedContent( repo.getLayout().pathOf( artifact ), "expected" );
 
+        MockControl control = MockControl.createControl( UpdateCheckManager.class );
+        UpdateCheckManager updateCheckManager = (UpdateCheckManager) control.getMock();
+        wagonManager.setUpdateCheckManager( updateCheckManager );
+
+        updateCheckManager.touch( artifact, repo );
+        
+        control.replay();
+
         wagonManager.getArtifact( artifact, repo, true );
 
         assertTrue( artifact.getFile().exists() );
         assertEquals( "expected", FileUtils.fileRead( artifact.getFile() ) );
+
+        control.verify();
     }
 
     private Artifact createTestPomArtifact( String directory )
