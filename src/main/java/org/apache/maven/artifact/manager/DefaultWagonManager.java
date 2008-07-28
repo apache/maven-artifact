@@ -87,6 +87,8 @@ public class DefaultWagonManager
 
     private static final String MAVEN_ARTIFACT_PROPERTIES = "META-INF/maven/org.apache.maven.artifact/maven-artifact/pom.properties";
 
+    private static int anonymousMirrorIdSeed = 0;
+    
     private PlexusContainer container;
 
     // TODO: proxies, authentication and mirrors are via settings, and should come in via an alternate method - perhaps
@@ -126,7 +128,7 @@ public class DefaultWagonManager
     private UpdateCheckManager updateCheckManager;
 
     private String httpUserAgent;
-    
+
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
         throws UnsupportedProtocolException, WagonConfigurationException
@@ -1085,6 +1087,12 @@ public class DefaultWagonManager
                            String mirrorOf,
                            String url )
     {
+        if ( id == null )
+        {
+            id = "mirror-" + anonymousMirrorIdSeed++;
+            getLogger().warn( "You are using a mirror that doesn't declare an <id/> element. Using \'" + id + "\' instead:\nId: " + id + "\nmirrorOf: " + mirrorOf + "\nurl: " + url + "\n" );
+        }
+        
         ArtifactRepository mirror = new DefaultArtifactRepository( id, url, null );
 
         mirrors.put( mirrorOf, mirror );
