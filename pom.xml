@@ -50,7 +50,8 @@ under the License.
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>scp://people.apache.org/www/maven.apache.org/ref/${project.artifactId}-${project.version}/</url>
+      <!-- TODO similar to the svn layout but does make sense to use ${project.artifactId}-${project.version}? -->
+      <url>scp://people.apache.org/www/maven.apache.org/artifact/${project.artifactId}-${project.version}/</url>
     </site>
   </distributionManagement>
   <contributors>
