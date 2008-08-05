@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.openpgp.BouncyCastleKeyRing;
-import org.apache.commons.openpgp.KeyRing;
-import org.apache.commons.openpgp.OpenPgpException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.pgp.OpenPgpException;
+import org.apache.maven.artifact.pgp.PublicKeyRing;
+import org.apache.maven.artifact.pgp.WagonOpenPgpSignatureVerifierObserver;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
@@ -56,7 +56,6 @@ import org.apache.maven.wagon.observers.ChecksumObserver;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
-import org.bouncycastle.openpgp.PGPException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.BasicComponentConfigurator;
@@ -127,7 +126,7 @@ public class DefaultWagonManager
     /** @plexus.requirement */
     private UpdateCheckManager updateCheckManager;
 
-    private KeyRing keyRing = new BouncyCastleKeyRing();
+    private PublicKeyRing keyRing = new PublicKeyRing();
 
     // TODO: this leaks the component in the public api - it is never released back to the container
     public Wagon getWagon( Repository repository )
@@ -1356,9 +1355,8 @@ public class DefaultWagonManager
     }
     
     public void registerPublicKeyRing( InputStream inputStream )
-        throws IOException, PGPException
+        throws IOException, OpenPgpException
     {
-        // TODO: remove PGPException
         this.keyRing.addPublicKeyRing( inputStream );
         
         // TODO: debug logging of keys

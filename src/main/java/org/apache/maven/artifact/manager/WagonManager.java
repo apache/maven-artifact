@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
+import org.apache.maven.artifact.pgp.OpenPgpException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -37,7 +38,6 @@ import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.apache.maven.wagon.repository.Repository;
 import org.apache.maven.wagon.repository.RepositoryPermissions;
-import org.bouncycastle.openpgp.PGPException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -176,5 +176,5 @@ public interface WagonManager
     ArtifactRepository getMirrorRepository( ArtifactRepository repository );
 
     void registerPublicKeyRing( InputStream fileInputStream )
-        throws IOException, PGPException;
+        throws IOException, OpenPgpException;
 }

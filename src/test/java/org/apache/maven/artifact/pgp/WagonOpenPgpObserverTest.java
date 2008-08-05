@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.manager;
+package org.apache.maven.artifact.pgp;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,12 +19,8 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-import org.apache.commons.openpgp.BouncyCastleKeyRing;
-import org.apache.commons.openpgp.BouncyCastleOpenPgpSignatureVerifier;
-import org.apache.commons.openpgp.KeyRing;
-import org.apache.commons.openpgp.OpenPgpException;
-import org.apache.commons.openpgp.OpenPgpSignatureVerifier;
-import org.apache.commons.openpgp.SignatureStatus;
+import org.apache.maven.artifact.pgp.WagonOpenPgpSignatureVerifierObserver;
+import org.apache.maven.artifact.pgp.WagonOpenPgpSignerObserver;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -41,7 +37,7 @@ import java.net.MalformedURLException;
 
 /**
  * Test the wagon observer for open pgp signatures.
- *
+ * 
  * @author <a href="mailto:brett@apache.org">Brett Porter</a>
  */
 public class WagonOpenPgpObserverTest
@@ -49,22 +45,23 @@ public class WagonOpenPgpObserverTest
 {
     private String keyId = "A7D16BD4";
 
-    private static final String PASSWORD = "cop";
-
-    private KeyRing keyRing;
+    private PublicKeyRing keyRing;
 
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
-        keyRing = new BouncyCastleKeyRing( getClass().getResourceAsStream( "/secring.gpg" ),
-                                           getClass().getResourceAsStream( "/pubring.gpg" ), PASSWORD.toCharArray() );
+        keyRing = new PublicKeyRing();
+        keyRing.addPublicKeyRing( getClass().getResourceAsStream( "/pubring.gpg" ) );
     }
 
     public void testSign()
         throws Exception
     {
+        SecretKeyRing keyRing = new SecretKeyRing();
+        keyRing.addSecretKeyRing( getClass().getResourceAsStream( "/secring.gpg" ), "cop".toCharArray() );
+
         WagonOpenPgpSignerObserver observer = new WagonOpenPgpSignerObserver( keyId, keyRing, false );
 
         Wagon wagon = (Wagon) lookup( Wagon.ROLE, "file" );
@@ -88,10 +85,10 @@ public class WagonOpenPgpObserverTest
         wagon.disconnect();
 
         // check signature
-        OpenPgpSignatureVerifier verifier = new BouncyCastleOpenPgpSignatureVerifier();
+        SignatureVerifier verifier = new SignatureVerifier();
         SignatureStatus status =
             verifier.verifyDetachedSignature( getClass().getResourceAsStream( "/test-input.txt" ),
-                                              new ByteArrayInputStream( signature ), keyRing );
+                                              new ByteArrayInputStream( signature ), this.keyRing );
 
         assertNotNull( "check we got a status", status );
         assertTrue( "check it was successful", status.isValid() );
@@ -101,7 +98,7 @@ public class WagonOpenPgpObserverTest
         throws Exception
     {
         verifySignature( "/test-input.txt.sig" );
-        
+
         verifySignature( "/test-input.txt.asc" );
     }
 

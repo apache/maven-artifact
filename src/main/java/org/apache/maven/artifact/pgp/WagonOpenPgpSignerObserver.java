@@ -1,4 +1,4 @@
-package org.apache.maven.artifact.manager;
+package org.apache.maven.artifact.pgp;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,10 +19,6 @@ package org.apache.maven.artifact.manager;
  * under the License.
  */
 
-import org.apache.commons.openpgp.BouncyCastleOpenPgpStreamingSigner;
-import org.apache.commons.openpgp.KeyRing;
-import org.apache.commons.openpgp.OpenPgpException;
-import org.apache.commons.openpgp.OpenPgpStreamingSigner;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.observers.AbstractTransferListener;
 
@@ -36,16 +32,16 @@ import java.io.IOException;
 public class WagonOpenPgpSignerObserver
     extends AbstractTransferListener
 {
-    private final OpenPgpStreamingSigner signer;
+    private final StreamingSigner signer;
 
     private byte[] actualSignature;
 
     private Exception failure;
 
-    public WagonOpenPgpSignerObserver( String keyId, KeyRing keyRing, boolean asciiArmored )
+    public WagonOpenPgpSignerObserver( String keyId, SecretKeyRing keyRing, boolean asciiArmored )
         throws OpenPgpException
     {
-        signer = new BouncyCastleOpenPgpStreamingSigner( keyId, keyRing, asciiArmored );
+        signer = new StreamingSigner( keyId, keyRing, asciiArmored );
     }
 
     public void transferInitiated( TransferEvent transferEvent )
