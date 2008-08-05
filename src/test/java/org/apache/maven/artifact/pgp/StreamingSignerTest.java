@@ -32,8 +32,8 @@ import junit.framework.TestCase;
 public class StreamingSignerTest
     extends TestCase
 {
-    private static final String FILE = "/test-input.txt";
-
+    private static final String FILE = "/gpg/test-input.txt";
+    
     private String keyId = "A7D16BD4";
 
     private SecretKeyRing keyRing;
@@ -42,16 +42,18 @@ public class StreamingSignerTest
 
     private PublicKeyRing publicKeyRing;
 
+    private SignatureVerifier verifier = new SignatureVerifier();
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
 
         keyRing = new SecretKeyRing();
-        keyRing.addSecretKeyRing( getClass().getResourceAsStream( "/secring.gpg" ), PASSWORD.toCharArray() );
+        keyRing.addSecretKeyRing( getClass().getResourceAsStream( "/gpg/secring.gpg" ), PASSWORD.toCharArray() );
 
         publicKeyRing = new PublicKeyRing();
-        publicKeyRing.addPublicKeyRing( getClass().getResourceAsStream( "/pubring.gpg" ) );
+        publicKeyRing.addPublicKeyRing( getClass().getResourceAsStream( "/gpg/pubring.gpg" ) );
     }
 
     public void testSignDataDetachedBinary()
@@ -93,7 +95,7 @@ public class StreamingSignerTest
     public void testVerifySignatureDetachedBinaryGpg()
         throws IOException, OpenPgpException
     {
-        InputStream signature = getClass().getResourceAsStream( "/test-input.txt.sig" );
+        InputStream signature = getClass().getResourceAsStream( "/gpg/test-input.txt.sig" );
         StreamingSignatureVerifier verifier = new StreamingSignatureVerifier( signature, publicKeyRing );
 
         InputStream in = getClass().getResourceAsStream( FILE );
@@ -161,7 +163,7 @@ public class StreamingSignerTest
     public void testVerifySignatureDetachedAscii()
         throws IOException, OpenPgpException
     {
-        InputStream signature = getClass().getResourceAsStream( "/test-input.txt.asc" );
+        InputStream signature = getClass().getResourceAsStream( "/gpg/test-input.txt.asc" );
         StreamingSignatureVerifier verifier = new StreamingSignatureVerifier( signature, publicKeyRing );
 
         InputStream in = getClass().getResourceAsStream( FILE );
@@ -188,5 +190,150 @@ public class StreamingSignerTest
 
         assertNotNull( "check we got a status", status );
         assertTrue( "check it was successful", status.isValid() );
+    }
+
+    public void testVerifyMultipleSignatureDetachedAsciiBothGood()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-both-good.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertTrue( "check it was successful", status.isValid() );
+    }
+
+    public void testVerifyMultipleSignatureDetachedAsciiOneGoodOneBad()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-one-good-one-bad.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertTrue( "check it was successful", status.isValid() );
+    }
+
+    public void testVerifyMultipleSignatureDetachedAsciiOneGoodOneMissing()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-one-good-one-missing.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertTrue( "check it was successful", status.isValid() );
+    }
+
+    public void testVerifyMultipleSignatureDetachedAsciiOneBadOneGood()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-one-bad-one-good.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertFalse( "check it was not successful", status.isValid() );
+    }
+
+    /* Requires Bouncycastle 140 to work
+    public void testVerifyMultipleSignatureDetachedAsciiOneMissingOneGood()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-one-missing-one-good.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertTrue( "check it was successful", status.isValid() );
+    }*/
+
+    public void testVerifyMultipleSignatureDetachedAsciiBothMissing()
+        throws IOException, OpenPgpException
+    {
+        try
+        {
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-both-missing.asc" ),
+                                              publicKeyRing );
+            fail( "Expected failure due to missing keys" );
+        }
+        catch ( UnknownKeyException e )
+        {
+            assertTrue( true );
+        }
+    }
+
+    public void testVerifyDualSignatureDetachedAsciiBothGood()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-dual-both-good.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertTrue( "check it was successful", status.isValid() );
+    }
+
+    public void testVerifyDualSignatureDetachedAsciiOneGoodOneMissing()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature(
+                                              getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream(
+                                                                              "/gpg/test-input-dual-one-good-one-missing.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertTrue( "check it was successful", status.isValid() );
+    }
+
+    public void testVerifyDualSignatureDetachedAsciiBad()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-dual-bad.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertFalse( "check it was not successful", status.isValid() );
+    }
+
+    public void testVerifyDualSignatureDetachedAsciiOneMissingOneGood()
+        throws IOException, OpenPgpException
+    {
+        SignatureStatus status =
+            verifier.verifyDetachedSignature(
+                                              getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream(
+                                                                              "/gpg/test-input-dual-one-missing-one-good.asc" ),
+                                              publicKeyRing );
+
+        assertNotNull( "check we got a status", status );
+        assertTrue( "check it was successful", status.isValid() );
+    }
+
+    public void testVerifyDualSignatureDetachedAsciiBothMissing()
+        throws IOException, OpenPgpException
+    {
+        try
+        {
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( FILE ),
+                                              getClass().getResourceAsStream( "/gpg/test-input-dual-both-missing.asc" ),
+                                              publicKeyRing );
+            fail( "Expected failure due to missing keys" );
+        }
+        catch ( UnknownKeyException e )
+        {
+            assertTrue( true );
+        }
     }
 }

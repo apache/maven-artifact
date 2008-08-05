@@ -53,14 +53,14 @@ public class WagonOpenPgpObserverTest
         super.setUp();
 
         keyRing = new PublicKeyRing();
-        keyRing.addPublicKeyRing( getClass().getResourceAsStream( "/pubring.gpg" ) );
+        keyRing.addPublicKeyRing( getClass().getResourceAsStream( "/gpg/pubring.gpg" ) );
     }
 
     public void testSign()
         throws Exception
     {
         SecretKeyRing keyRing = new SecretKeyRing();
-        keyRing.addSecretKeyRing( getClass().getResourceAsStream( "/secring.gpg" ), "cop".toCharArray() );
+        keyRing.addSecretKeyRing( getClass().getResourceAsStream( "/gpg/secring.gpg" ), "cop".toCharArray() );
 
         WagonOpenPgpSignerObserver observer = new WagonOpenPgpSignerObserver( keyId, keyRing, false );
 
@@ -76,7 +76,7 @@ public class WagonOpenPgpObserverTest
 
         wagon.connect( repository );
 
-        wagon.put( getTestFile( "src/test/resources/test-input.txt" ), "test-input.txt" );
+        wagon.put( getTestFile( "src/test/resources/gpg/test-input.txt" ), "/gpg/test-input.txt" );
 
         byte[] signature = observer.getActualSignature();
 
@@ -87,7 +87,7 @@ public class WagonOpenPgpObserverTest
         // check signature
         SignatureVerifier verifier = new SignatureVerifier();
         SignatureStatus status =
-            verifier.verifyDetachedSignature( getClass().getResourceAsStream( "/test-input.txt" ),
+            verifier.verifyDetachedSignature( getClass().getResourceAsStream( "/gpg/test-input.txt" ),
                                               new ByteArrayInputStream( signature ), this.keyRing );
 
         assertNotNull( "check we got a status", status );
@@ -97,9 +97,9 @@ public class WagonOpenPgpObserverTest
     public void testVerify()
         throws Exception
     {
-        verifySignature( "/test-input.txt.sig" );
+        verifySignature( "/gpg/test-input.txt.sig" );
 
-        verifySignature( "/test-input.txt.asc" );
+        verifySignature( "/gpg/test-input.txt.asc" );
     }
 
     private void verifySignature( String name )
@@ -121,7 +121,7 @@ public class WagonOpenPgpObserverTest
 
         wagon.connect( repository );
 
-        wagon.get( "test-input.txt", new File( tempDir, "test-input.txt" ) );
+        wagon.get( "gpg/test-input.txt", new File( tempDir, "gpg/test-input.txt" ) );
 
         SignatureStatus status = observer.getStatus();
 

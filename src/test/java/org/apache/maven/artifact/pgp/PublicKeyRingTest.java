@@ -39,7 +39,7 @@ public class PublicKeyRingTest
         super.setUp();
 
         keyRing = new PublicKeyRing();
-        keyRing.addPublicKeyRing( getClass().getResourceAsStream( "/pubring.gpg" ) );
+        keyRing.addPublicKeyRing( getClass().getResourceAsStream( "/gpg/pubring.gpg" ) );
     }
 
     public void testPublicKeys()

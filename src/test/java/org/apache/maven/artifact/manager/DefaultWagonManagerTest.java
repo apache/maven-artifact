@@ -57,6 +57,10 @@ import org.easymock.MockControl;
 public class DefaultWagonManagerTest
     extends PlexusTestCase
 {
+    private static final String UNKNOWN_BUT_VALID_SIGNATURE_ASC = "/gpg/unknown-but-valid-signature.asc";
+
+    private static final String TEST_SIG_FILE = "/gpg/other-test-signature.asc";
+
     private DefaultWagonManager wagonManager;
 
     private TransferListener transferListener = new Debug();
@@ -69,7 +73,7 @@ public class DefaultWagonManagerTest
         super.setUp();
 
         wagonManager = (DefaultWagonManager) lookup( WagonManager.ROLE );
-        wagonManager.registerPublicKeyRing( getClass().getResourceAsStream( "/pubring.gpg" ) );
+        wagonManager.registerPublicKeyRing( getClass().getResourceAsStream( "/gpg/pubring.gpg" ) );
         
         artifactFactory = (ArtifactFactory) lookup( ArtifactFactory.ROLE );
     }
@@ -793,7 +797,7 @@ public class DefaultWagonManagerTest
         
         Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
                 
-        createWagonWithSignedContent( "/other-test-signature.asc" );
+        createWagonWithSignedContent( TEST_SIG_FILE );
 
         try
         {
@@ -819,7 +823,7 @@ public class DefaultWagonManagerTest
         
         Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
                 
-        createWagonWithSignedContent( "/other-test-signature.asc" );
+        createWagonWithSignedContent( TEST_SIG_FILE );
 
         wagonManager.getArtifact( artifact, repo, true );
     }
@@ -831,7 +835,7 @@ public class DefaultWagonManagerTest
         
         Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
                 
-        createWagonWithSignedContent( "/other-test-signature.asc" );
+        createWagonWithSignedContent( TEST_SIG_FILE );
 
         wagonManager.getArtifact( artifact, repo, true );
     }
@@ -851,7 +855,7 @@ public class DefaultWagonManagerTest
         
         Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
         
-        createWagonWithSignedContent( "/test-signature.asc" );
+        createWagonWithSignedContent( "/gpg/test-signature.asc" );
 
         wagonManager.getArtifact( artifact, repo, true );
     }
@@ -909,7 +913,7 @@ public class DefaultWagonManagerTest
         
         Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
                 
-        createWagonWithSignedContent( "/unknown-but-valid-signature.asc" );
+        createWagonWithSignedContent( UNKNOWN_BUT_VALID_SIGNATURE_ASC );
 
         try
         {
@@ -929,7 +933,7 @@ public class DefaultWagonManagerTest
         
         Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
                 
-        createWagonWithSignedContent( "/unknown-but-valid-signature.asc" );
+        createWagonWithSignedContent( UNKNOWN_BUT_VALID_SIGNATURE_ASC );
 
         wagonManager.getArtifact( artifact, repo, true );
     }
@@ -941,7 +945,7 @@ public class DefaultWagonManagerTest
         
         Artifact artifact = createTestArtifact( "target/test-data/signature-verification", "jar" );
                 
-        createWagonWithSignedContent( "/unknown-but-valid-signature.asc" );
+        createWagonWithSignedContent( UNKNOWN_BUT_VALID_SIGNATURE_ASC );
 
         wagonManager.getArtifact( artifact, repo, true );
     }

@@ -41,7 +41,7 @@ public class SecretKeyRingTest
         super.setUp();
 
         keyRing = new SecretKeyRing();
-        keyRing.addSecretKeyRing( getClass().getResourceAsStream( "/secring.gpg" ), PASSWORD.toCharArray() );
+        keyRing.addSecretKeyRing( getClass().getResourceAsStream( "/gpg/secring.gpg" ), PASSWORD.toCharArray() );
     }
 
     public void testSecretKeys()
