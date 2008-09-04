@@ -225,6 +225,6 @@ under the License.
     </pluginManagement>
   </build>
   <properties>
-    <wagon.version>1.0-beta-4-SNAPSHOT</wagon.version>
+    <wagon.version>1.0-beta-4</wagon.version>
   </properties>
 </project>

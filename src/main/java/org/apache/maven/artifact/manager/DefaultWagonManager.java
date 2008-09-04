@@ -244,9 +244,11 @@ public class DefaultWagonManager
                     getLogger().debug( "not adding permissions to wagon connection" );
                 }
 
-                wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider(){
-                    public ProxyInfo getProxyInfo(String protocol) {
-                        return (ProxyInfo) proxies.get( protocol );
+                wagon.connect( artifactRepository, getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider()
+                {
+                    public ProxyInfo getProxyInfo( String protocol )
+                    {
+                        return getProxy( protocol );
                     }
                 });
 
@@ -543,9 +545,11 @@ public class DefaultWagonManager
         try
         {
             wagon.connect( new Repository( repository.getId(), repository.getUrl() ),
-                           getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider(){
-                public ProxyInfo getProxyInfo(String protocol) {
-                    return (ProxyInfo) proxies.get( protocol );
+                           getAuthenticationInfo( repository.getId() ), new ProxyInfoProvider()
+            {
+                public ProxyInfo getProxyInfo( String protocol )
+                {
+                    return getProxy( protocol );
                 }
             });
 
