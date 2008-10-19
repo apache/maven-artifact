@@ -39,8 +39,8 @@ public class ComparableVersionTest
 
     private static final String[] VERSIONS_QUALIFIER =
         { "1-SNAPSHOT", "1-alpha2snapshot", "1-alpha2", "1-alpha-123", "1-beta-2", "1-beta123", "1-m2", "1-m11",
-            "1-rc", "1-cr2", "1-rc123", "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-1-snapshot", "1-1",
-            "1-2", "1-123" };
+            "1-rc", "1-cr2", "1-rc123", "1", "1-sp", "1-sp2", "1-sp123", "1-abc", "1-def", "1-pom-1", "1-1-snapshot",
+            "1-1", "1-2", "1-123" };
 
     private static final String[] VERSIONS_NUMBER =
         { "2.0", "2-1", "2.0.a", "2.0.0.a", "2.0.2", "2.0.123", "2.1.0", "2.1-a", "2.1b", "2.1-c", "2.1-1", "2.1.0.1",
